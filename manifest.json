@@ -1,0 +1,18 @@
+{
+  "name": "زای تسک",
+  "short_name": "زای تسک",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f3f4f6",
+  "theme_color": "#4b5563",
+  "description": "یک برنامه مدیریت وظایف گیمیفای شده برای افزایش انگیزه و بهره‌وری.",
+  "lang": "fa",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon"
+    }
+  ]
+}
