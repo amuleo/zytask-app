@@ -6,6 +6,11 @@
     <title>زای تسک</title>
     <meta name="robots" content="noindex, nofollow">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="زای تسک">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@33.003/misc/Farsi-Digits/Vazirmatn-FD-font-face.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -1685,6 +1690,12 @@
             if (storedTasks) {
                 try {
                     tasks = JSON.parse(storedTasks);
+                    // Ensure all loaded tasks have the isPinned property
+                    tasks.forEach(task => {
+                        if (typeof task.isPinned === 'undefined') {
+                            task.isPinned = false;
+                        }
+                    });
                 } catch (e) {
                     console.error("Error parsing stored tasks from Local Storage:", e);
                     tasks = []; // Reset tasks if parsing fails
@@ -1884,7 +1895,7 @@
         function renderTasks(focusTaskId = null) {
             // Get current active and completed tasks from the data model
             let activeTasks = tasks.filter(task => !task.completed);
-            const completedTasks = tasks.filter(task => t.completed);
+            const completedTasks = tasks.filter(task => task.completed); // Corrected 't.completed'
 
             // Sort active tasks: pinned first, then maintain relative order (manual order)
             activeTasks.sort((a, b) => {
@@ -1935,7 +1946,7 @@
             // Handle completed tasks rendering
             const completedTotalPages = Math.ceil(completedTasks.length / TASKS_PER_PAGE);
             if (completedCurrentPage > completedTotalPages && completedTotalPages > 0) {
-                completedCurrentPage = totalPages; // Set to last page if current is out of bounds
+                completedCurrentPage = completedTotalPages; // FIX: Changed from 'totalPages' to 'completedTotalPages'
             } else if (completedTotalPages === 0) {
                 completedCurrentPage = 1;
             }
