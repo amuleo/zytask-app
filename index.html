@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,7 +16,10 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@33.003/misc/Farsi-Digits/Vazirmatn-FD-font-face.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <style>
         /* CSS variables for dynamic theming */
         :root {
@@ -46,24 +50,30 @@
         .modal-scrollable-content::-webkit-scrollbar {
             width: 8px;
         }
+
         .modal-scrollable-content::-webkit-scrollbar-track {
             background: #f1f1f1;
             border-radius: 10px;
         }
+
         .modal-scrollable-content::-webkit-scrollbar-thumb {
             background: #888;
             border-radius: 10px;
         }
+
         .modal-scrollable-content::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
+
         /* Dark mode scrollbar */
         .dark .modal-scrollable-content::-webkit-scrollbar-track {
             background: #333;
         }
+
         .dark .modal-scrollable-content::-webkit-scrollbar-thumb {
             background: #666;
         }
+
         .dark .modal-scrollable-content::-webkit-scrollbar-thumb:hover {
             background: #999;
         }
@@ -77,8 +87,10 @@
             -ms-user-select: none;     /* Internet Explorer/Edge */
             user-select: none;         /* Standard */
         }
+
         /* Allow selection for inputs and textareas */
-        input, textarea {
+        input,
+        textarea {
             -webkit-user-select: text;
             -moz-user-select: text;
             -ms-user-select: text;
@@ -86,8 +98,12 @@
         }
 
         /* Force Vazirmatn to use Farsi numbers for all numbers */
-        body, input[type="number"], input[type="text"], select {
-            font-feature-settings: "ss02", "locl"; /* Stylistic set 2 and local forms for Vazirmatn */
+        body,
+        input[type="number"],
+        input[type="text"],
+        select {
+            font-feature-settings: "ss02",
+                "locl"; /* Stylistic set 2 and local forms for Vazirmatn */
             font-variant-numeric: traditional; /* Use traditional numeric forms */
             unicode-bidi: plaintext; /* Helps with mixed directionality in inputs */
         }
@@ -375,7 +391,6 @@
                 text-align: center;
             }
             .header-mobile-stats {
-                display: flex;
                 flex-wrap: nowrap; /* Prevent wrapping on mobile */
                 justify-content: center;
                 gap: 0.5rem; /* Smaller gap for mobile stats */
@@ -904,7 +919,7 @@
                     <p>برای ساخت این برنامه، ۷ روز از مهم‌ترین روزهای عمرم صرف شد. روزهایی که امتحان داشتم، اما ۲۴ ساعت تمرکزم روی این پروژه بود و روزی ۱۶ ساعت، معادل ۱۴ روز کاری روی این پروژه کار کردم. این پروژه بیش از ۲۰۰ یا ۳۰۰ بار دیباگ شده تا متناسب با هر صفحه نمایشی واکنش‌گرا باشد. برای همین، این پروژه پایان و خداحافظی من از دنیای برنامه‌نویسی است و دیگر این سایت آپدیت نمی‌شود.</p>
                 </div>
                 <p class="mb-3 text-justify">تمامی حقوق متعلق به <strong class="text-gray-600 dark:text-gray-300"><a href="https://amuleo.ir" target="_blank" rel="noopener noreferrer">عمو لئو</a></strong> است.</p>
-                <p class="mb-3 text-justify">تاریخ: ۴ خرداد ۱۴۰۴</p>
+                <p class="mb-3 text-justify">تاریخ: ۷ خرداد ۱۴۰۴</p>
             </div>
             <button id="closeAboutModalBtn" class="absolute top-3 left-3 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400">
                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -919,7 +934,7 @@
                 <p class="text-sm text-gray-700 dark:text-gray-300">برای پشتیبان‌گیری، دکمه "ذخیره داده‌ها" را فشار دهید تا فایل پشتیبان دانلود شود. برای بازیابی، فایل پشتیبان را انتخاب کرده و "بارگذاری از فایل" را فشار دهید.</p>
 
                 <button id="exportDataBtn" class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400">
-                    ذخیره داده‌ها (دانلود فایل)
+                    ذخیره داده‌ها
                 </button>
 
                 <div class="flex items-center gap-2 mt-2">
@@ -1058,7 +1073,7 @@
         const levelPointsThresholds = [
             { name: 'نوب', points: 0, icon: 'fa-solid fa-ghost', motivational: 'شروع هر سفر با گام اول است. شما در ابتدای مسیر هستید و آماده برای کشف توانایی‌هایتان!' }, /* Changed icon to fa-ghost */
             { name: 'مبتدی', points: 50, icon: 'fa-solid fa-seedling', motivational: 'شما با تلاش و پشتکار، بذر موفقیت را کاشته‌اید. به رشد خود ادامه دهید!' },
-            { name: 'جنگجو', points: 120, icon: 'fa-solid fa-hand-fist', motivational: 'شما با هر چالش، قوی‌تر و مصمم‌تر می‌شوید. روحیه جنگجویانه شما ستودنی است!' },
+            { name: 'جنگجو', points: 120, icon: 'fa-solid fa-hand-fist', motivational: 'شما با هر چallenge، قوی‌تر و مصمم‌تر می‌شوید. روحیه جنگجویانه شما ستودنی است!' },
             { name: 'شوالیه', points: 220, icon: 'fa-solid fa-shield-halved', motivational: 'با هر وظیفه، زره‌ای از تجربه بر تن می‌کنید. شجاعت شما راهگشاست!' },
             { name: 'هیرو', points: 350, icon: 'fa-solid fa-mask', motivational: 'شما الهام‌بخش دیگران هستید. قدم‌هایتان ردپایی از موفقیت بر جای می‌گذارد!' },
             { name: 'استاد', points: 500, icon: 'fa-solid fa-graduation-cap', motivational: 'دانش و مهارت شما در حال شکوفایی است. از هر تجربه درسی بیاموزید!' },
@@ -1066,11 +1081,11 @@
             { name: 'سلطان', points: 950, icon: 'fa-solid fa-crown', motivational: 'شما بر قلمرو وظایف خود مسلط شده‌اید. با اقتدار به سوی اهداف بزرگتر گام بردارید!' },
             { name: 'کار درست', points: 1250, icon: 'fa-solid fa-dragon', motivational: 'شما به قدرتی بی‌نظیر دست یافته‌اید. هیچ مانعی جلودار شما نخواهد بود!' },
             { name: 'خفن', points: 1600, icon: 'fa-solid fa-fire-alt', motivational: 'شما به یک ستاره درخشان تبدیل شده‌اید. انرژی و خلاقیت شما بی‌حد و مرز است و هر کاری را به بهترین شکل ممکن انجام می‌دهید!' },
-            { name: 'جاودان', points: 2000, icon: 'fa-solid fa-infinity', motivational: 'پشتکار شما بی‌حد و مرز است. این مسیر، راهی برای جاودانگی دستاوردهای شماست!' },
-            { name: 'کیهان‌سالار', points: 2500, icon: 'fa-solid fa-bolt', motivational: 'شما با سرعتی باورنکردنی در حال پیشرفت هستید. انرژی شما جهان را به حرکت درمی‌آورد!' },
-            { name: 'کیهان‌نورد', points: 3100, icon: 'fa-solid fa-rocket', motivational: 'شما مرزها را درنوردیده‌اید و به سوی ناشناخته‌ها پرواز می‌کنید. آسمان حد شما نیست!' },
-            { name: 'بتمن', points: 3800, icon: 'fa-solid fa-user-secret', motivational: 'شما در سایه‌ها نیز قدرتمندید. با هوش و اراده، هر مشکلی را حل می‌کنید!' },
-            { name: 'سیگما', points: 5000, icon: 'fa-solid fa-chess-king', motivational: 'شما به اوج رسیده‌اید. با خرد و استراتژی، هر بازی را به نفع خود به پایان می‌رسانید!' }
+            { level: 11, name: 'جاودان', icon: 'fa-solid fa-infinity', motivational: 'پشتکار شما بی‌حد و مرز است. این مسیر، راهی برای جاودانگی دستاوردهای شماست!' },
+            { level: 12, name: 'کیهان‌سالار', icon: 'fa-solid fa-bolt', motivational: 'شما با سرعتی باورنکردنی در حال پیشرفت هستید. انرژی شما جهان را به حرکت درمی‌آورد!' },
+            { level: 13, name: 'کیهان‌نورد', icon: 'fa-solid fa-rocket', motivational: 'شما مرزها را درنوردیده‌اید و به سوی ناشناخته‌ها پرواز می‌کنید. آسمان حد شما نیست!' },
+            { level: 14, name: 'بتمن', icon: 'fa-solid fa-user-secret', motivational: 'شما در سایه‌ها نیز قدرتمندید. با هوش و اراده، هر مشکلی را حل می‌کنید!' },
+            { level: 15, name: 'سیگما', icon: 'fa-solid fa-chess-king', motivational: 'شما به اوج رسیده‌اید. با خرد و استراتژی، هر بازی را به نفع خود به پایان می‌رسانید!' }
         ];
 
         // Achievement data with Font Awesome icons
@@ -1616,7 +1631,7 @@
             }
 
             // Check for other achievements (totalTasks, streak, points, firstPin)
-            const currentTotalTasksCompleted = tasks.filter(t => t.completed).length;
+            const currentTotalTasksCompleted = tasks.filter(task => task.completed).length;
 
             achievementsData.forEach(achievement => {
                 // Skip level achievements as they are handled above
@@ -1692,10 +1707,13 @@
             if (storedTasks) {
                 try {
                     tasks = JSON.parse(storedTasks);
-                    // Ensure all loaded tasks have the isPinned property
+                    // Ensure all loaded tasks have the isPinned and pinnedAt properties
                     tasks.forEach(task => {
                         if (typeof task.isPinned === 'undefined') {
                             task.isPinned = false;
+                        }
+                        if (typeof task.pinnedAt === 'undefined') {
+                            task.pinnedAt = null;
                         }
                     });
                 } catch (e) {
@@ -1786,6 +1804,51 @@
             highestDailyStreak = Math.max(highestDailyStreak, dailyStreak); // Ensure highest is updated on load too
             saveToLocalStorage(); // Save updated streak if reset
         }
+
+        /**
+         * Function to re-evaluate and update the daily streak after importing data.
+         * This is necessary because the initial load logic might have run before import.
+         */
+        function updateDailyStreakOnImport() {
+            const today = new Date().toDateString();
+
+            // Only proceed if lastCompletionDate is not null and is a valid date string
+            if (lastCompletionDate && lastCompletionDate !== 'null') {
+                const lastDate = new Date(lastCompletionDate);
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+
+                // If last completion was yesterday, continue streak
+                if (lastDate.toDateString() === yesterday.toDateString()) {
+                    // Streak continues, no need to change dailyStreak if it was already correctly loaded
+                    // We only need to ensure it's not incorrectly reset if it was already continuous.
+                    // This scenario is mainly for when the app is opened on a new day after import.
+                    // If the imported lastCompletionDate is today, streak should not be affected.
+                    // If imported lastCompletionDate is yesterday, streak should be current + 1.
+                    // If imported lastCompletionDate is older than yesterday, streak should be 0.
+
+                    // To simplify, let's re-calculate from scratch based on imported lastCompletionDate
+                    if (lastDate.toDateString() === today) {
+                        // If last completion was today, streak is already correct (from imported value)
+                        // No change needed to dailyStreak
+                    } else if (lastDate.toDateString() === yesterday.toDateString()) {
+                        dailyStreak = (dailyStreak === 0 ? 1 : dailyStreak + 1); // Increment if it was 0 or more
+                    } else {
+                        dailyStreak = 0; // Reset if older than yesterday
+                        showMessageBox('زنجیره روزانه شما پس از بازیابی بازنشانی شد.', 'info');
+                    }
+                } else if (lastDate.toDateString() !== today) {
+                    // If last completion date is not today and not yesterday, reset streak
+                    dailyStreak = 0;
+                    showMessageBox('زنجیره روزانه شما پس از بازیابی بازنشانی شد.', 'info');
+                }
+            } else { // If lastCompletionDate is null or 'null'
+                dailyStreak = 0;
+            }
+            highestDailyStreak = Math.max(highestDailyStreak, dailyStreak); // Update highest streak
+            saveToLocalStorage(); // Save updated streak after import
+        }
+
 
         /**
          * Creates a new HTML element for a task.
@@ -1897,13 +1960,24 @@
         function renderTasks(focusTaskId = null) {
             // Get current active and completed tasks from the data model
             let activeTasks = tasks.filter(task => !task.completed);
-            const completedTasks = tasks.filter(task => task.completed); // Corrected 't.completed'
+            const completedTasks = tasks.filter(task => task.completed); // Corrected 't.completed' to 'task.completed'
 
-            // Sort active tasks: pinned first, then maintain relative order (manual order)
+            // Sort active tasks: pinned first (newest pinned at top), then maintain relative order (manual order)
             activeTasks.sort((a, b) => {
+                // Primary sort: Pinned tasks first
                 if (a.isPinned && !b.isPinned) return -1;
                 if (!a.isPinned && b.isPinned) return 1;
-                return 0; // Maintain existing order for unpinned tasks
+
+                // Secondary sort for pinned tasks: newest pinned first (descending pinnedAt)
+                if (a.isPinned && b.isPinned) {
+                    const dateA = new Date(a.pinnedAt || 0); // Use 0 for tasks without pinnedAt (older backups)
+                    const dateB = new Date(b.pinnedAt || 0);
+                    return dateB.getTime() - dateA.getTime(); // Newest pinned first
+                }
+
+                // Tertiary sort for unpinned tasks: maintain original order
+                // This assumes the `tasks` array itself is generally ordered by creation or manual reorder.
+                return 0;
             });
 
             // Dynamic Page Calculation based on focusTaskId
@@ -2206,8 +2280,8 @@
             achievementsData.forEach(achievement => {
                 let isAchieved = false;
                 // Calculate current counts for achievements
-                const currentTotalTasksCompleted = tasks.filter(t => t.completed).length;
-                const currentImportantTasksCompleted = tasks.filter(t => t.completed && t.importance === 'important').length; // Kept for importantTasks achievements if they were not removed from the data
+                const currentTotalTasksCompleted = tasks.filter(task => task.completed).length;
+                const currentImportantTasksCompleted = tasks.filter(task => task.completed && task.importance === 'important').length; // Kept for importantTasks achievements if they were not removed from the data
                 const currentCustomTasksCompleted = totalCustomTasksCompleted; // Direct use of counter
 
                 if (achievement.type === 'level') {
@@ -2329,7 +2403,8 @@
                 completed: false, // Notes are never "completed" in the gamification sense
                 importance: importance,
                 customPoints: importance === 'custom' ? customPoints : undefined, // Store custom points if importance is custom
-                isPinned: false // New property for pinning
+                isPinned: false, // New property for pinning
+                pinnedAt: null // Timestamp for when it was pinned
             };
             tasks.push(newTask);
             taskInput.value = ''; // Clear input
@@ -2347,7 +2422,7 @@
             completedTasksSection.classList.toggle('hidden');
             toggleIcon.classList.toggle('rotate-180'); // Rotate arrow icon
             // Re-render pagination controls to update visibility based on section status
-            renderPaginationControls(completedTasksPagination, tasks.filter(t => t.completed).length, completedCurrentPage, 'completed');
+            renderPaginationControls(completedTasksPagination, tasks.filter(task => task.completed).length, completedCurrentPage, 'completed');
         });
 
         // Manage task actions (toggle completion, delete, edit, save, cancel)
@@ -2426,6 +2501,7 @@
                 if (!task.completed) { // User wants to complete the task
                     task.completed = true;
                     task.isPinned = false; // Unpin task when completed
+                    task.pinnedAt = null; // Clear pinnedAt timestamp
                     if (task.importance === 'important') {
                         pointsGained = pointsPerImportantTask;
                     } else if (task.importance === 'normal') {
@@ -2487,7 +2563,8 @@
                         completed: false, // This new instance is active
                         importance: task.importance,
                         customPoints: task.customPoints,
-                        isPinned: false // New tasks are not pinned by default
+                        isPinned: false, // New tasks are not pinned by default
+                        pinnedAt: null // New tasks are not pinned, so no timestamp
                     };
 
                     tasks.push(newActiveTask); // Add new active task to the end of the tasks array
@@ -2509,9 +2586,16 @@
             if (taskIndex > -1) {
                 const task = tasks[taskIndex];
                 task.isPinned = !task.isPinned; // Toggle pin status
-                if (task.isPinned && !hasPinnedTaskEver) {
-                    hasPinnedTaskEver = true; // Set flag if this is the first time pinning
+
+                if (task.isPinned) {
+                    task.pinnedAt = new Date().toISOString(); // Set timestamp when pinned
+                    if (!hasPinnedTaskEver) {
+                        hasPinnedTaskEver = true; // Set flag if this is the first time pinning
+                    }
+                } else {
+                    task.pinnedAt = null; // Clear timestamp when unpinned
                 }
+
                 saveToLocalStorage();
                 renderTasks(taskId); // Re-render and focus on the pinned/unpinned task
                 // Use truncateText for the task name in the message
@@ -2666,8 +2750,8 @@
 
         // Function to move a task up or down
         function moveTask(taskId, direction) {
-            const activeTasks = tasks.filter(t => !t.completed);
-            const taskIndexInActive = activeTasks.findIndex(t => t.id === taskId);
+            const activeTasks = tasks.filter(task => !task.completed);
+            const taskIndexInActive = activeTasks.findIndex(task => task.id === taskId);
 
             if (taskIndexInActive === -1) {
                 showMessageBox('خطا: وظیفه برای جابجایی یافت نشد.', 'error');
@@ -2688,16 +2772,17 @@
             // If the task was pinned, unpin it when manually reordering
             if (movedTask.isPinned) {
                 movedTask.isPinned = false;
+                movedTask.pinnedAt = null; // Clear pinnedAt timestamp
                 showMessageBox('وظیفه به دلیل تغییر چیدمان دستی از پین خارج شد.', 'info');
             }
 
             // Reconstruct the main tasks array
-            const completedTasks = tasks.filter(t => t.completed);
+            const completedTasks = tasks.filter(task => task.completed);
             tasks = [...activeTasks, ...completedTasks];
 
             // Find the new index of the moved task in the *full* active tasks list
-            const updatedActiveTasks = tasks.filter(t => !t.completed);
-            const newIndexInActiveList = updatedActiveTasks.findIndex(t => t.id === taskId);
+            const updatedActiveTasks = tasks.filter(task => !task.completed);
+            const newIndexInActiveList = updatedActiveTasks.findIndex(task => task.id === taskId);
 
             // Calculate the new page based on the new index
             const newPage = Math.ceil((newIndexInActiveList + 1) / TASKS_PER_PAGE);
@@ -2855,6 +2940,7 @@
                 const taskItemElement = document.querySelector(`.task-item[data-id="${taskId}"]`);
                 const taskToDelete = tasks[taskIndex];
                 taskToDelete.isPinned = false; // Unpin task when deleting
+                taskToDelete.pinnedAt = null; // Clear pinnedAt timestamp
 
                 // Create a copy of the task with its original index for undo
                 const deletedTaskCopy = { ...taskToDelete, originalIndex: taskIndex };
@@ -2884,7 +2970,7 @@
                         isUndo: true,
                         duration: 5000,
                         taskData: deletedTaskCopy // Pass specific task data for undo
-                    });
+                        });
                 }
             } else {
                 showMessageBox('خطا: وظیفه برای حذف یافت نشد.', 'error');
@@ -2901,7 +2987,8 @@
                     completed: false, // Always active
                     importance: originalTask.importance,
                     customPoints: originalTask.customPoints, // Retain original custom points
-                    isPinned: false // New task is not pinned by default
+                    isPinned: false, // New task is not pinned by default
+                    pinnedAt: null // New task is not pinned, so no timestamp
                 };
                 tasks.push(newTask); // Add to end of list
                 saveToLocalStorage();
@@ -3007,7 +3094,7 @@
             profileModalContent.classList.add('opacity-100', 'scale-100');
 
             const totalTasks = tasks.length;
-            const completedTasksCount = tasks.filter(t => t.completed).length;
+            const completedTasksCount = tasks.filter(task => task.completed).length;
 
             // Calculate days since creation
             let daysSinceCreation = 'نامشخص';
@@ -3021,7 +3108,7 @@
             // Filter for achieved achievements and count them
             const achievedAchievementsCount = achievementsData.filter(achievement => {
                 let isAchieved = false;
-                const currentTotalTasksCompleted = tasks.filter(t => t.completed).length;
+                const currentTotalTasksCompleted = tasks.filter(task => task.completed).length;
 
                 if (achievement.type === 'level') {
                     const levelInfo = levelPointsThresholds.find(l => l.name === achievement.name);
@@ -3221,7 +3308,7 @@
                     تمام داده‌های شما به صورت امن و فقط در حافظه محلی مرورگر شما ذخیره می‌شوند و هیچ اطلاعاتی به هیچ سروری ارسال نمی‌شود. این به معنای حریم خصوصی کامل است، اما مسئولیت پشتیبان‌گیری از داده‌ها با خود شماست.
                 </p>
                 <p class="mb-2 text-justify"><strong class="text-gray-600 dark:text-gray-300">پشتیبان‌گیری (خروجی گرفتن):</strong>
-                    برای ایجاد یک نسخه پشتیبان از داده‌های خود، از منوی اصلی، گزینه "پشتیبان‌گیری" را انتخاب کرده و سپس روی دکمه "ذخیره داده‌ها (دانلود فایل)" کلیک کنید. یک فایل JSON حاوی تمام وظایف، پوینت‌ها، سطح و دستاوردهای شما دانلود خواهد شد. این فایل را در مکانی امن نگهداری کنید.
+                    برای ایجاد یک نسخه پشتیبان از داده‌های خود، از منوی اصلی، گزینه "پشتیبان‌گیری" را انتخاب کرده و سپس روی دکمه "ذخیره داده‌ها" کلیک کنید. یک فایل JSON حاوی تمام وظایف، پوینت‌ها، سطح و دستاوردهای شما دانلود خواهد شد. این فایل را در مکانی امن نگهداری کنید.
                 </p>
                 <p class="mb-2 text-justify"><strong class="text-gray-600 dark:text-gray-300">بازیابی (ورودی گرفتن):</strong>
                     برای بازیابی داده‌ها از یک فایل پشتیبان، در همان بخش "پشتیبان‌گیری"، روی "انتخاب فایل" کلیک کرده و فایل JSON پشتیبان خود را انتخاب کنید. سپس "بارگذاری از فایل" را فشار دهید. این کار داده‌های فعلی برنامه شما را با داده‌های موجود در فایل جایگزین می‌کند.
@@ -3581,65 +3668,123 @@
                     const dataString = e.target.result;
                     const importedData = JSON.parse(dataString);
 
-                    // Basic validation of imported data structure
-                    if (
-                        typeof importedData.tasks === 'object' && Array.isArray(importedData.tasks) &&
-                        typeof importedData.zPoint === 'number' &&
-                        typeof importedData.level === 'number' &&
-                        typeof importedData.dailyStreak === 'number' &&
-                        (typeof importedData.highestDailyStreak === 'number' || typeof importedData.highestDailyStreak === 'undefined') &&
-                        (typeof importedData.lastCompletionDate === 'string' || importedData.lastCompletionDate === null) &&
-                        typeof importedData.totalCustomTasksCompleted === 'number' &&
-                        (typeof importedData.userName === 'string' || importedData.userName === null || importedData.userName === undefined) &&
-                        (typeof importedData.userCreationDate === 'string' || importedData.userCreationDate === null || importedData.userCreationDate === undefined) && // Validate new userCreationDate
-                        (typeof importedData.unlockedAchievements === 'object' && Array.isArray(importedData.unlockedAchievements) || typeof importedData.unlockedAchievements === 'undefined') &&
-                        (typeof importedData.achievementUnlockDates === 'object' || typeof importedData.achievementUnlockDates === 'undefined') &&
-                        (typeof importedData.hasPinnedTaskEver === 'boolean' || typeof importedData.hasPinnedTaskEver === 'undefined') &&
-                        (typeof importedData.theme === 'string' || typeof importedData.theme === 'undefined') // Validate theme
-                    ) {
-                        tasks = importedData.tasks;
-                        zPoint = importedData.zPoint;
-                        level = importedData.level;
-                        dailyStreak = importedData.dailyStreak;
-                        highestDailyStreak = importedData.highestDailyStreak || 0;
-                        lastCompletionDate = importedData.lastCompletionDate;
-                        totalCustomTasksCompleted = importedData.totalCustomTasksCompleted;
-                        userName = importedData.userName || null;
-                        userCreationDate = importedData.userCreationDate || null; // Load userCreationDate
-                        unlockedAchievements = importedData.unlockedAchievements || [];
-                        achievementUnlockDates = importedData.achievementUnlockDates || {};
-                        hasPinnedTaskEver = importedData.hasPinnedTaskEver || false;
-                        const importedTheme = importedData.theme || null;
+                    // --- Robust Data Assignment and Validation ---
+                    // Initialize with current defaults to ensure all properties exist
+                    tasks = [];
+                    zPoint = 0;
+                    level = 1;
+                    dailyStreak = 0;
+                    highestDailyStreak = 0;
+                    lastCompletionDate = null;
+                    totalCustomTasksCompleted = 0;
+                    userName = null;
+                    userCreationDate = null;
+                    unlockedAchievements = [];
+                    achievementUnlockDates = {};
+                    hasPinnedTaskEver = false;
+                    let importedTheme = null;
 
-                        // Ensure imported tasks have the new 'isPinned' property
-                        tasks.forEach(task => {
-                            if (typeof task.isPinned === 'undefined') {
-                                task.isPinned = false;
-                            }
-                        });
-
-                        // Apply imported theme
-                        if (importedTheme) {
-                            localStorage.setItem('theme', importedTheme);
-                            applyTheme(importedTheme);
-                        } else {
-                            localStorage.removeItem('theme'); // Clear theme if not present in backup
-                            initializeTheme(); // Re-initialize based on system or default
+                    // Assign properties with robust type checking and fallbacks
+                    if (importedData && typeof importedData === 'object') {
+                        if (Array.isArray(importedData.tasks)) {
+                            tasks = importedData.tasks.map(task => ({
+                                id: typeof task.id === 'string' ? task.id : Date.now().toString() + Math.random().toString().substring(2, 8), // Ensure unique ID
+                                name: typeof task.name === 'string' ? task.name : 'وظیفه نامشخص',
+                                completed: typeof task.completed === 'boolean' ? task.completed : false,
+                                importance: typeof task.importance === 'string' && ['important', 'normal', 'custom', 'note'].includes(task.importance) ? task.importance : 'normal',
+                                customPoints: typeof task.customPoints === 'number' ? task.customPoints : undefined,
+                                isPinned: typeof task.isPinned === 'boolean' ? task.isPinned : false,
+                                pinnedAt: typeof task.pinnedAt === 'string' || task.pinnedAt === null ? task.pinnedAt : null
+                            }));
                         }
 
-                        saveToLocalStorage(); // Save imported data to local storage
-                        renderTasks(); // Re-render UI with new data
-
-                        // Hide backup modal with animation
-                        backupModalContent.classList.remove('opacity-100', 'scale-95');
-                        backupModalContent.classList.add('opacity-0', 'scale-95');
-                        setTimeout(() => {
-                            backupModal.classList.add('hidden');
-                        }, 50);
-                        showMessageBox('داده‌ها با موفقیت بارگذاری شدند!', 'success');
+                        if (typeof importedData.zPoint === 'number') {
+                            zPoint = importedData.zPoint;
+                        } else {
+                            zPoint = 0; // Default if not a number
+                        }
+                        if (typeof importedData.level === 'number') {
+                            level = importedData.level;
+                        } else {
+                            level = 1; // Default if not a number
+                        }
+                        if (typeof importedData.dailyStreak === 'number') {
+                            dailyStreak = importedData.dailyStreak;
+                        } else {
+                            dailyStreak = 0; // Default if not a number
+                        }
+                        if (typeof importedData.highestDailyStreak === 'number') {
+                            highestDailyStreak = importedData.highestDailyStreak;
+                        } else {
+                            highestDailyStreak = 0; // Default if not a number
+                        }
+                        if (typeof importedData.lastCompletionDate === 'string' || importedData.lastCompletionDate === null) {
+                            lastCompletionDate = importedData.lastCompletionDate;
+                        } else {
+                            lastCompletionDate = null; // Default if invalid
+                        }
+                        if (typeof importedData.totalCustomTasksCompleted === 'number') {
+                            totalCustomTasksCompleted = importedData.totalCustomTasksCompleted;
+                        } else {
+                            totalCustomTasksCompleted = 0; // Default if not a number
+                        }
+                        if (typeof importedData.userName === 'string' || importedData.userName === null) {
+                            userName = importedData.userName;
+                        } else {
+                            userName = null; // Default if invalid
+                        }
+                        if (typeof importedData.userCreationDate === 'string' || importedData.userCreationDate === null) {
+                            userCreationDate = importedData.userCreationDate;
+                        } else {
+                            userCreationDate = null; // Default if invalid
+                        }
+                        if (Array.isArray(importedData.unlockedAchievements)) {
+                            unlockedAchievements = importedData.unlockedAchievements;
+                        } else {
+                            unlockedAchievements = []; // Default if invalid
+                        }
+                        if (typeof importedData.achievementUnlockDates === 'object' && importedData.achievementUnlockDates !== null) {
+                            achievementUnlockDates = importedData.achievementUnlockDates;
+                        } else {
+                            achievementUnlockDates = {}; // Default if invalid
+                        }
+                        if (typeof importedData.hasPinnedTaskEver === 'boolean') {
+                            hasPinnedTaskEver = importedData.hasPinnedTaskEver;
+                        } else {
+                            hasPinnedTaskEver = false; // Default if invalid
+                        }
+                        if (typeof importedData.theme === 'string') {
+                            importedTheme = importedData.theme;
+                        } else {
+                            importedTheme = null; // Default if invalid
+                        }
                     } else {
+                        // If importedData is not an object, it's definitely invalid format
                         showMessageBox('فرمت داده‌های وارد شده نامعتبر است. لطفاً یک فایل پشتیبان معتبر را وارد کنید.', 'error');
+                        return; // Stop execution
                     }
+
+                    // Apply imported theme
+                    if (importedTheme) {
+                        localStorage.setItem('theme', importedTheme);
+                        applyTheme(importedTheme);
+                    } else {
+                        localStorage.removeItem('theme'); // Clear theme if not present in backup
+                        initializeTheme(); // Re-initialize based on system or default
+                    }
+
+                    saveToLocalStorage(); // Save imported data to local storage
+                    updateDailyStreakOnImport(); // Re-evaluate daily streak based on imported data
+                    renderTasks(); // Re-render UI with new data
+
+                    // Hide backup modal with animation
+                    backupModalContent.classList.remove('opacity-100', 'scale-95');
+                    backupModalContent.classList.add('opacity-0', 'scale-95');
+                    setTimeout(() => {
+                        backupModal.classList.add('hidden');
+                    }, 50);
+                    showMessageBox('داده‌ها با موفقیت بارگذاری شدند!', 'success');
+
                 } catch (error) {
                     console.error("Error parsing imported data:", error);
                     showMessageBox('خطا در پردازش فایل وارد شده. اطمینان حاصل کنید که یک فایل JSON معتبر است.', 'error');
