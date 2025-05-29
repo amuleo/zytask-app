@@ -3798,7 +3798,7 @@
         });
 
         // --- Level/Achievement Detail Modal Logic ---
-        function showDetailModal(type, identifier) {
+function showDetailModal(type, identifier, data) {
   detailModal.classList.remove('hidden');
   void detailModalContent.offsetWidth;
 
@@ -3825,18 +3825,20 @@
     }
     break;
 
-   case 'streak':
-   case 'totalTasks':
-   case 'points':
-   case 'firstPin':
-    //  کد برای نمایش اطلاعات سایر دستاوردها
-    const achievement = achievementsData.find(ach => ach.type === type && (ach.value === identifier || ach.name === identifier)); //  یا هر شرط دیگری که برای شناسایی دستاورد مناسب است
-    if (achievement) {
-     titleText = achievement.name;
-     contentHtml = `<p class="mb-2 text-gray-700 dark:text-gray-300 text-justify">${achievement.description}</p>`;
+   case 'achievement':
+    //  کد جدید برای نمایش اطلاعات دستاورد (عمومی)
+    if (data) {
+     const achievement = data.find(item => item.type === identifier || item.name === identifier); //  تلاش برای یافتن بر اساس نوع یا نام
+     if (achievement) {
+      titleText = achievement.name;
+      contentHtml = `<p class="mb-2 text-gray-700 dark:text-gray-300 text-justify">${achievement.description}</p>`;
+     } else {
+      titleText = `خطا`;
+      contentHtml = `<p class="text-red-500 text-justify">دستاورد نامعتبر است.</p>`;
+     }
     } else {
      titleText = `خطا`;
-     contentHtml = `<p class="text-red-500 text-justify">دستاورد نامعتبر است.</p>`;
+     contentHtml = `<p class="text-red-500 text-justify">داده‌های دستاورد در دسترس نیستند.</p>`;
     }
     break;
 
