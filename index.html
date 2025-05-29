@@ -2367,7 +2367,7 @@
             showDetailModal(achievement.type, achievement.level, levelPointsThresholds);
         } else {
             // در غیر این صورت، اطلاعات دستاورد را ارسال کنید
-            showDetailModal(achievement.type, achievement.name || achievement.value, achievementsData);
+            showDetailModal('achievement', achievement.name);
         }
     });
 }
