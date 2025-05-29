@@ -46,6 +46,32 @@
             --theme-input-focus-ring: #9ca3af; /* Gray-400 */
         }
 
+
+        /* Custom scrollbar for dropdown (if content overflows) */
+        .dropdown-scrollable::-webkit-scrollbar {
+            width: 8px;
+        }
+        .dropdown-scrollable::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .dropdown-scrollable::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .dropdown-scrollable::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .dark .dropdown-scrollable::-webkit-scrollbar-track {
+            background: #333;
+        }
+        .dark .dropdown-scrollable::-webkit-scrollbar-thumb {
+            background: #666;
+        }
+        .dark .dropdown-scrollable::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+        
         /* Custom scrollbar for modals */
         .modal-scrollable-content::-webkit-scrollbar {
             width: 8px;
@@ -384,12 +410,7 @@
                 padding-top: 20px !important; /* Added 20px padding to container */
                 padding-bottom: 20px !important; /* Added 20px padding to container */
             }
-            /* Header adjustments for mobile */
-            .header-mobile-flex {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-            }
+    
             .header-mobile-stats {
                 flex-wrap: nowrap; /* Prevent wrapping on mobile */
                 justify-content: center;
@@ -771,21 +792,48 @@
             </svg>
         </button>
 
-        <div class="flex flex-col items-center md:flex-row md:justify-between mb-6 border-b pb-4 border-gray-200 dark:border-gray-700 md:px-16 header-mobile-flex">
-            <h1 class="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-4 md:mb-0 text-center w-full md:w-auto sm:text-5xl md:text-6xl md:text-right whitespace-nowrap md:ml-5">زای تسک</h1>
-            <div class="flex flex-nowrap justify-center gap-2 sm:flex-row sm:space-x-4 sm:space-x-reverse w-full md:max-w-md header-mobile-stats overflow-x-auto whitespace-nowrap">
-                <div class="flex items-center bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 px-3 py-1 rounded-full flex-shrink-0">
+       <header class="relative p-4 flex items-center justify-between bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700">
+            <button id="menuBtn" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="باز کردن منو">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 100-2 1 1 0 000 2zm0 7a1 1 0 100-2 1 1 0 000 2zm0 7a1 1 0 100-2 1 1 0 000 2z"></path>
+                </svg>
+            </button>
+
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">زای تسک</h1>
+
+            <button id="themeToggleBtn" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="تغییر تم">
+                <svg id="themeIcon" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.325 6.675l-.707-.707M6.318 6.318l-.707-.707m12.728 0l-.707.707M6.318 17.682l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+            </button>
+        </header>
+
+        <div class="relative w-full">
+            <div id="pointsDropdownToggle" class="flex items-center justify-between w-full py-3 px-4 bg-yellow-500 dark:bg-yellow-700 text-white cursor-pointer transition-all duration-200 ease-in-out hover:bg-yellow-600 dark:hover:bg-yellow-800">
+                <div class="flex items-center">
                     <i class="fa-solid fa-coins text-xl ml-2"></i>
-                    <span class="text-base sm:text-lg font-semibold">پوینت: <span id="zPoint" class="text-yellow-800 dark:text-yellow-200">0</span></span>
+                    <span class="text-lg font-semibold">پوینت: <span id="zPoint">1234</span></span>
                 </div>
-                <div class="flex items-center bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full clickable-item flex-shrink-0" id="currentLevelDisplay">
-                    <i id="levelIcon" class="text-xl ml-2"></i>
-                    <span class="text-base sm:text-lg font-semibold">سطح: <span id="level" class="text-blue-800 dark:text-blue-200">1</span></span>
-                </div>
-                <div class="flex items-center bg-purple-100 dark:bg-purple-800 text-purple-800 dark:text-purple-200 px-3 py-1 rounded-full flex-shrink-0">
-                    <i class="fa-solid fa-fire text-xl ml-2"></i>
-                    <span class="text-base sm:text-lg font-semibold">زنجیره: <span id="dailyStreak" class="text-purple-800 dark:text-purple-200">0</span></span>
-                </div>
+                <i id="dropdownIndicator" class="fa-solid fa-chevron-down transition-transform duration-200"></i>
+            </div>
+
+            <div id="pointsDropdownContent" class="absolute top-full left-0 right-0 w-full bg-white dark:bg-gray-800 shadow-lg py-2 hidden z-10 transition-all duration-200 ease-in-out origin-top opacity-0 scale-y-95 transform dropdown-scrollable">
+                <div class="flex flex-col gap-2 p-2">
+                    <div class="flex items-center justify-between theme-blue-bg theme-blue-text px-4 py-2 rounded-lg">
+                        <div class="flex items-center">
+                            <i id="levelIcon" class="fa-solid fa-star text-xl ml-2"></i>
+                            <span class="text-base font-semibold">سطح:</span>
+                        </div>
+                        <span id="level" class="text-base font-semibold">5</span>
+                    </div>
+                    <div class="flex items-center justify-between theme-purple-bg theme-purple-text px-4 py-2 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fa-solid fa-fire text-xl ml-2"></i>
+                            <span class="text-base font-semibold">زنجیره:</span>
+                        </div>
+                        <span id="dailyStreak" class="text-base font-semibold">7 روز</span>
+                    </div>
+                    </div>
             </div>
         </div>
 
@@ -3958,6 +4006,109 @@
                     });
             });
         }
+
+        //new header
+
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const themeIcon = document.getElementById('themeIcon');
+        const pointsDropdownToggle = document.getElementById('pointsDropdownToggle');
+        const pointsDropdownContent = document.getElementById('pointsDropdownContent');
+        const levelSpan = document.getElementById('level');
+        const zPointSpan = document.getElementById('zPoint');
+        const dailyStreakSpan = document.getElementById('dailyStreak');
+        const dropdownIndicator = document.getElementById('dropdownIndicator');
+        const levelIcon = document.getElementById('levelIcon');
+
+        // Sample values (these would come from your global variables in the actual app)
+        let currentLevel = 5;
+        let currentStreak = 7;
+        let currentZPoint = 1234;
+
+        // Function to update the displayed values
+        function updateDisplay() {
+            levelSpan.textContent = currentLevel;
+            zPointSpan.textContent = currentZPoint;
+            dailyStreakSpan.textContent = `${currentStreak} روز`;
+            // You can update the level icon here based on currentLevel if you have a mapping
+            // For now, it's a static star icon
+        }
+
+        // Theme Toggle Logic (copied from your original code for completeness)
+        function applyTheme(theme) {
+            const htmlElement = document.documentElement;
+            if (theme === 'dark') {
+                htmlElement.classList.add('dark');
+                themeIcon.innerHTML = `<path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9 0 0012 21a9.003 9 0 008.354-5.646z"></path>`;
+            } else {
+                htmlElement.classList.remove('dark');
+                themeIcon.innerHTML = `<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.325 6.675l-.707-.707M6.318 6.318l-.707-.707m12.728 0l-.707.707M6.318 17.682l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>`;
+            }
+        }
+
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                applyTheme(savedTheme);
+            } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                applyTheme('dark');
+            } else {
+                applyTheme('light');
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                applyTheme(e.matches ? 'dark' : 'light');
+            });
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+        });
+        // End Theme Toggle Logic
+
+        // Dropdown Toggle Logic
+        pointsDropdownToggle.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent click from bubbling up to window and closing immediately
+
+            const isHidden = pointsDropdownContent.classList.contains('hidden');
+
+            if (isHidden) {
+                pointsDropdownContent.classList.remove('hidden');
+                void pointsDropdownContent.offsetHeight; // Force reflow for animation
+                pointsDropdownContent.classList.remove('opacity-0', 'scale-y-95');
+                pointsDropdownContent.classList.add('opacity-100', 'scale-y-100');
+                dropdownIndicator.classList.add('rotate-180'); // Rotate arrow up
+            } else {
+                pointsDropdownContent.classList.remove('opacity-100', 'scale-y-100');
+                pointsDropdownContent.classList.add('opacity-0', 'scale-y-95');
+                dropdownIndicator.classList.remove('rotate-180'); // Rotate arrow down
+                pointsDropdownContent.addEventListener('transitionend', () => {
+                    pointsDropdownContent.classList.add('hidden');
+                }, { once: true });
+            }
+        });
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', (e) => {
+            if (!pointsDropdownToggle.contains(e.target) && !pointsDropdownContent.contains(e.target)) {
+                if (!pointsDropdownContent.classList.contains('hidden')) {
+                    pointsDropdownContent.classList.remove('opacity-100', 'scale-y-100');
+                    pointsDropdownContent.classList.add('opacity-0', 'scale-y-95');
+                    dropdownIndicator.classList.remove('rotate-180');
+                    pointsDropdownContent.addEventListener('transitionend', () => {
+                        pointsDropdownContent.classList.add('hidden');
+                    }, { once: true });
+                }
+            }
+        });
+
+        // Initialize on load
+        window.onload = () => {
+            initializeTheme(); // Set initial theme
+            updateDisplay(); // Update stats display
+        };
+        
     </script>
 </body>
 </html>
