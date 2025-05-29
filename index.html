@@ -3798,7 +3798,7 @@
         });
 
         // --- Level/Achievement Detail Modal Logic ---
-function showDetailModal(type, identifier, data) {
+function showDetailModal(type, identifier) {
   detailModal.classList.remove('hidden');
   void detailModalContent.offsetWidth;
 
@@ -3808,49 +3808,37 @@ function showDetailModal(type, identifier, data) {
   let contentHtml = '';
   let titleText = '';
 
-  switch (type) {
-   case 'level':
-    //  کد قبلی برای نمایش اطلاعات سطح
-    const levelNum = parseInt(identifier, 10);
-    if (isNaN(levelNum) || levelNum < 1 || levelNum > levelPointsThresholds.length) {
-     titleText = `خطا`;
-     contentHtml = `<p class="text-red-500 text-justify">سطح نامعتبر است.</p>`;
-    } else {
-     const levelInfo = levelPointsThresholds[levelNum - 1];
-     titleText = `سطح ${levelNum}: ${levelInfo.name}`;
-     contentHtml = `
-           <p class="mb-2 text-gray-700 dark:text-gray-300 text-justify">${levelInfo.motivational}</p>
-           <p class="text-sm text-gray-500 dark:text-gray-400">برای رسیدن به این سطح، باید ${levelInfo.points} پوینت کسب کنید.</p>
-          `;
-    }
-    break;
-
-   case 'achievement':
-    //  کد جدید برای نمایش اطلاعات دستاورد (عمومی)
-    if (data) {
-     const achievement = data.find(item => item.type === identifier || item.name === identifier); //  تلاش برای یافتن بر اساس نوع یا نام
-     if (achievement) {
-      titleText = achievement.name;
-      contentHtml = `<p class="mb-2 text-gray-700 dark:text-gray-300 text-justify">${achievement.description}</p>`;
-     } else {
-      titleText = `خطا`;
-      contentHtml = `<p class="text-red-500 text-justify">دستاورد نامعتبر است.</p>`;
-     }
-    } else {
-     titleText = `خطا`;
-     contentHtml = `<p class="text-red-500 text-justify">داده‌های دستاورد در دسترس نیستند.</p>`;
-    }
-    break;
-
-   default:
+  if (type === 'level') {
+   //  کد برای نمایش اطلاعات سطح
+   const levelNum = parseInt(identifier, 10);
+   if (isNaN(levelNum) || levelNum < 1 || levelNum > levelPointsThresholds.length) {
     titleText = `خطا`;
-    contentHtml = `<p class="text-red-500 text-justify">نوع نامعتبر است.</p>`;
+    contentHtml = `<p class="text-red-500 text-justify">سطح نامعتبر است.</p>`;
+   } else {
+    const levelInfo = levelPointsThresholds[levelNum - 1];
+    titleText = `سطح ${levelNum}: ${levelInfo.name}`;
+    contentHtml = `
+          <p class="mb-2 text-gray-700 dark:text-gray-300 text-justify">${levelInfo.motivational}</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">برای رسیدن به این سطح، باید ${levelInfo.points} پوینت کسب کنید.</p>
+         `;
+   }
+  } else {
+   //  کد برای نمایش اطلاعات دستاورد
+   const achievement = achievementsData.find(
+    (ach) => ach.type === type && (ach.value === identifier || ach.name === identifier)
+   );
+   if (achievement) {
+    titleText = achievement.name;
+    contentHtml = `<p class="mb-2 text-gray-700 dark:text-gray-300 text-justify">${achievement.description}</p>`;
+   } else {
+    titleText = `خطا`;
+    contentHtml = `<p class="text-red-500 text-justify">دستاورد نامعتبر است.</p>`;
+   }
   }
 
   detailModalTitle.textContent = titleText;
   detailModalBody.innerHTML = contentHtml;
  }
-
         closeDetailModalBtn.addEventListener('click', () => {
             detailModalContent.classList.remove('opacity-100', 'scale-100');
             detailModalContent.classList.add('opacity-0', 'scale-95');
