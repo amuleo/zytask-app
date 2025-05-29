@@ -4010,28 +4010,11 @@
         //new header
         
        
+        
         const pointsDropdownToggle = document.getElementById('pointsDropdownToggle');
         const pointsDropdownContent = document.getElementById('pointsDropdownContent');
-        const levelSpan = document.getElementById('level');
-        const zPointSpan = document.getElementById('zPoint');
-        const dailyStreakSpan = document.getElementById('dailyStreak');
-        const dropdownIndicator = document.getElementById('dropdownIndicator');
-        const levelIcon = document.getElementById('levelIcon');
-
-        // Sample values (these would come from your global variables in the actual app)
-        let currentLevel = 5;
-        let currentStreak = 7;
-        let currentZPoint = 1234;
-
-        // Function to update the displayed values
-        function updateDisplay() {
-            levelSpan.textContent = currentLevel;
-            zPointSpan.textContent = currentZPoint;
-            dailyStreakSpan.textContent = `${currentStreak} روز`;
-            // You can update the level icon here based on currentLevel if you have a mapping
-            // For now, it's a static star icon
-        }
-
+        const dropdownIndcator = document.getElementById('dropdownIndicator');
+        
 
         // Dropdown Toggle Logic
         pointsDropdownToggle.addEventListener('click', (e) => {
