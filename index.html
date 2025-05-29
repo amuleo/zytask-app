@@ -4008,11 +4008,7 @@
         }
 
         //new header
-
-        const themeToggleBtn = document.getElementById('themeToggleBtn');
-        const themeIcon = document.getElementById('themeIcon');
-        const pointsDropdownToggle = document.getElementById('pointsDropdownToggle');
-        const pointsDropdownContent = document.getElementById('pointsDropdownContent');
+        
         const levelSpan = document.getElementById('level');
         const zPointSpan = document.getElementById('zPoint');
         const dailyStreakSpan = document.getElementById('dailyStreak');
@@ -4024,14 +4020,6 @@
         let currentStreak = 7;
         let currentZPoint = 1234;
 
-        // Function to update the displayed values
-        function updateDisplay() {
-            levelSpan.textContent = currentLevel;
-            zPointSpan.textContent = currentZPoint;
-            dailyStreakSpan.textContent = `${currentStreak} روز`;
-            // You can update the level icon here based on currentLevel if you have a mapping
-            // For now, it's a static star icon
-        }
 
         // Theme Toggle Logic (copied from your original code for completeness)
         function applyTheme(theme) {
@@ -4103,11 +4091,7 @@
             }
         });
 
-        // Initialize on load
-        window.onload = () => {
-            initializeTheme(); // Set initial theme
-            updateDisplay(); // Update stats display
-        };
+    
         
     </script>
 </body>
