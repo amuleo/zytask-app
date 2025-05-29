@@ -789,6 +789,51 @@
             </div>
         </div>
 
+        <header class="relative p-4 flex items-center justify-between bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700">
+            <button id="menuBtn" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="باز کردن منو">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 100-2 1 1 0 000 2zm0 7a1 1 0 100-2 1 1 0 000 2zm0 7a1 1 0 100-2 1 1 0 000 2z"></path>
+                </svg>
+            </button>
+
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">زای تسک</h1>
+
+            <button id="themeToggleBtn" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="تغییر تم">
+                <svg id="themeIcon" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.325 6.675l-.707-.707M6.318 6.318l-.707-.707m12.728 0l-.707.707M6.318 17.682l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+            </button>
+        </header>
+
+        <div class="relative w-full">
+            <div id="pointsDropdownToggle" class="flex items-center justify-between w-full py-3 px-4 bg-yellow-500 dark:bg-yellow-700 text-white cursor-pointer transition-all duration-200 ease-in-out hover:bg-yellow-600 dark:hover:bg-yellow-800">
+                <div class="flex items-center">
+                    <i class="fa-solid fa-coins text-xl ml-2"></i>
+                    <span class="text-lg font-semibold">پوینت: <span id="zPoint">1234</span></span>
+                </div>
+                <i id="dropdownIndicator" class="fa-solid fa-chevron-down transition-transform duration-200"></i>
+            </div>
+
+            <div id="pointsDropdownContent" class="absolute top-full left-0 right-0 w-full bg-white dark:bg-gray-800 shadow-lg py-2 hidden z-10 transition-all duration-200 ease-in-out origin-top opacity-0 scale-y-95 transform dropdown-scrollable">
+                <div class="flex flex-col gap-2 p-2">
+                    <div class="flex items-center justify-between theme-blue-bg theme-blue-text px-4 py-2 rounded-lg">
+                        <div class="flex items-center">
+                            <i id="levelIcon" class="fa-solid fa-star text-xl ml-2"></i>
+                            <span class="text-base font-semibold">سطح:</span>
+                        </div>
+                        <span id="level" class="text-base font-semibold">5</span>
+                    </div>
+                    <div class="flex items-center justify-between theme-purple-bg theme-purple-text px-4 py-2 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fa-solid fa-fire text-xl ml-2"></i>
+                            <span class="text-base font-semibold">زنجیره:</span>
+                        </div>
+                        <span id="dailyStreak" class="text-base font-semibold">7 روز</span>
+                    </div>
+                    </div>
+            </div>
+        </div>
+
         <div class="mb-6 px-2 md:px-0">
             <h2 class="text-lg sm:text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">پیشرفت شما به سطح بعدی:</h2>
             <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
@@ -3958,6 +4003,51 @@
                     });
             });
         }
+
+        // new script
+
+        
+        const pointsDropdownToggle = document.getElementById('pointsDropdownToggle');
+        const pointsDropdownContent = document.getElementById('pointsDropdownContent');
+        const dropdownIndcator = document.getElementById('dropdownIndicator');
+        
+
+        // Dropdown Toggle Logic
+        pointsDropdownToggle.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent click from bubbling up to window and closing immediately
+
+            const isHidden = pointsDropdownContent.classList.contains('hidden');
+
+            if (isHidden) {
+                pointsDropdownContent.classList.remove('hidden');
+                void pointsDropdownContent.offsetHeight; // Force reflow for animation
+                pointsDropdownContent.classList.remove('opacity-0', 'scale-y-95');
+                pointsDropdownContent.classList.add('opacity-100', 'scale-y-100');
+                dropdownIndicator.classList.add('rotate-180'); // Rotate arrow up
+            } else {
+                pointsDropdownContent.classList.remove('opacity-100', 'scale-y-100');
+                pointsDropdownContent.classList.add('opacity-0', 'scale-y-95');
+                dropdownIndicator.classList.remove('rotate-180'); // Rotate arrow down
+                pointsDropdownContent.addEventListener('transitionend', () => {
+                    pointsDropdownContent.classList.add('hidden');
+                }, { once: true });
+            }
+        });
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', (e) => {
+            if (!pointsDropdownToggle.contains(e.target) && !pointsDropdownContent.contains(e.target)) {
+                if (!pointsDropdownContent.classList.contains('hidden')) {
+                    pointsDropdownContent.classList.remove('opacity-100', 'scale-y-100');
+                    pointsDropdownContent.classList.add('opacity-0', 'scale-y-95');
+                    dropdownIndicator.classList.remove('rotate-180');
+                    pointsDropdownContent.addEventListener('transitionend', () => {
+                        pointsDropdownContent.classList.add('hidden');
+                    }, { once: true });
+                }
+            }
+        });
+        
     </script>
 </body>
 </html>
