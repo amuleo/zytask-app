@@ -2360,9 +2360,17 @@
                         `;
 
                     // Add click listener to show details only for achieved items
-                    if (isAchieved) {
-                        achievementItem.addEventListener('click', () => showDetailModal(achievement.type, achievement.type === 'level' ? achievement.level : achievement.name));
-                    }
+                     if (isAchieved) {
+    achievementItem.addEventListener('click', () => {
+        if (achievement.type === 'level') {
+            // اگر نوع دستاورد 'level' باشد، اطلاعات سطح را ارسال کنید
+            showDetailModal(achievement.type, achievement.level, levelPointsThresholds);
+        } else {
+            // در غیر این صورت، اطلاعات دستاورد را ارسال کنید
+            showDetailModal(achievement.type, achievement.name || achievement.value, achievementsData);
+        }
+    });
+}
 
                     achievementsModalBody.appendChild(achievementItem);
                 });
