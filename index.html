@@ -3808,37 +3808,49 @@ function showDetailModal(type, identifier, data) {
   let contentHtml = '';
   let titleText = '';
 
-  if (type === 'level') {
-   //  کد برای نمایش اطلاعات سطح
-   const levelNum = parseInt(identifier, 10);
-   if (isNaN(levelNum) || levelNum < 1 || levelNum > levelPointsThresholds.length) {
-    titleText = `خطا`;
-    contentHtml = `<p class="text-red-500 text-justify">سطح نامعتبر است.</p>`;
-   } else {
-    const levelInfo = levelPointsThresholds[levelNum - 1];
-    titleText = `سطح ${levelNum}: ${levelInfo.name}`;
-    contentHtml = `
-          <p class="mb-2 text-gray-700 dark:text-gray-300 text-justify">${levelInfo.motivational}</p>
-          <p class="text-sm text-gray-500 dark:text-gray-400">برای رسیدن به این سطح، باید ${levelInfo.points} پوینت کسب کنید.</p>
-         `;
-   }
-  } else {
-   //  کد برای نمایش اطلاعات دستاورد
-   if (data) {
-    const achievement = data.find(
-     (item) => item.type === type && (item.value === identifier || item.name === identifier)
-    ) || data.find(item => item.name === identifier); //  تلاش برای یافتن بر اساس نام اگر نوع مطابقت نداشت
-    if (achievement) {
-     titleText = achievement.name;
-     contentHtml = `<p class="mb-2 text-gray-700 dark:text-gray-300 text-justify">${achievement.description || achievement.motivational}</p>`; //  استفاده از motivational اگر description وجود نداشت
+  switch (type) {
+   case 'level':
+    //  کد برای نمایش اطلاعات سطح
+    const levelNum = parseInt(identifier, 10);
+    if (isNaN(levelNum) || levelNum < 1 || levelNum > levelPointsThresholds.length) {
+     titleText = `خطا`;
+     contentHtml = `<p class="text-red-500 text-justify">سطح نامعتبر است.</p>`;
+    } else {
+     const levelInfo = levelPointsThresholds[levelNum - 1];
+     titleText = `سطح ${levelNum}: ${levelInfo.name}`;
+     contentHtml = `
+           <p class="mb-2 text-gray-700 dark:text-gray-300 text-justify">${levelInfo.motivational}</p>
+           <p class="text-sm text-gray-500 dark:text-gray-400">برای رسیدن به این سطح، باید ${levelInfo.points} پوینت کسب کنید.</p>
+          `;
+    }
+    break;
+
+   case 'achievement':
+    //  کد برای نمایش اطلاعات دستاورد
+    if (data) {
+     let achievement;
+     if (type === 'level') {
+      achievement = data.find(item => item.name === identifier);
+     } else {
+      achievement = data.find(item => item.type === type && (item.value === identifier || item.name === identifier)) || data.find(item => item.name === identifier);
+     }
+    
+     if (achievement) {
+      titleText = achievement.name;
+      contentHtml = `<p class="mb-2 text-gray-700 dark:text-gray-300 text-justify">${achievement.description || achievement.motivational}</p>`;
+     } else {
+      titleText = `خطا`;
+      contentHtml = `<p class="text-red-500 text-justify">دستاورد نامعتبر است.</p>`;
+     }
     } else {
      titleText = `خطا`;
-     contentHtml = `<p class="text-red-500 text-justify">دستاورد نامعتبر است.</p>`;
+     contentHtml = `<p class="text-red-500 text-justify">داده‌های دستاورد در دسترس نیستند.</p>`;
     }
-   } else {
+    break;
+
+   default:
     titleText = `خطا`;
-    contentHtml = `<p class="text-red-500 text-justify">داده‌های دستاورد در دسترس نیستند.</p>`;
-   }
+    contentHtml = `<p class="text-red-500 text-justify">نوع نامعتبر است.</p>`;
   }
 
   detailModalTitle.textContent = titleText;
