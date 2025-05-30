@@ -1,11 +1,11 @@
 // service-worker.js
-// این Service Worker به طور خاص برای مدیریت کش و بروزرسانی‌های برنامه zytask.html طراحی شده است.
+// این Service Worker به طور خاص برای مدیریت کش و بروزرسانی‌های برنامه index.html طراحی شده است.
 // تمامی عملیات کشینگ و پاکسازی داده‌ها در محدوده این برنامه انجام می‌شود.
 
-const CACHE_NAME = 'zytask-v1.0.2'; // نسخه کش بروزرسانی شده برای اجبار به نصب مجدد
+const CACHE_NAME = 'my-app-v1.0.3'; // نسخه کش بروزرسانی شده
 const urlsToCache = [
-    '/', // کش کردن مسیر ریشه، با فرض اینکه zytask.html از آنجا سرو می‌شود
-    '/zytask.html', // کش کردن صریح فایل HTML
+    '/', // کش کردن مسیر ریشه، با فرض اینکه index.html از آنجا سرو می‌شود
+    '/index.html', // کش کردن صریح فایل HTML
     'https://cdn.tailwindcss.com',
     'https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@33.003/misc/Farsi-Digits/Vazirmatn-FD-font-face.css',
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css',
@@ -16,6 +16,7 @@ const urlsToCache = [
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-regular-400.ttf',
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-brands-400.woff2',
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-brands-400.ttf'
+    // می‌توانید URLهای دیگری از CSS، JavaScript، تصاویر و غیره را در اینجا اضافه کنید
 ];
 
 // شنونده رویداد 'install': هنگام نصب Service Worker فراخوانی می‌شود.
@@ -36,7 +37,7 @@ self.addEventListener('install', (event) => {
 
 // شنونده رویداد 'fetch': هر درخواست شبکه را رهگیری می‌کند.
 // این رویداد ابتدا سعی می‌کند پاسخ را از کش برگرداند؛ اگر در کش نبود، درخواست را از شبکه دریافت می‌کند.
-// این رفتار، قابلیت آفلاین را برای zytask.html و منابع وابسته به آن فراهم می‌کند.
+// این رفتار، قابلیت آفلاین را برای index.html و منابع وابسته به آن فراهم می‌کند.
 self.addEventListener('fetch', (event) => {
     // فقط درخواست‌های GET را رهگیری می‌کنیم
     if (event.request.method !== 'GET') {
@@ -111,10 +112,10 @@ self.addEventListener('activate', (event) => {
     );
 });
 
-// شنونده پیام‌ها از رشته اصلی (مثلاً از zytask.html).
-// این بخش مسئول مدیریت دستور بروزرسانی عمیق از برنامه zytask.html است.
+// شنونده پیام‌ها از رشته اصلی (مثلاً از index.html).
+// این بخش مسئول مدیریت دستور بروزرسانی عمیق از برنامه index.html است.
 self.addEventListener('message', (event) => {
-    // بررسی می‌کنیم که پیام از zytask.html و از نوع START_DEEP_UPDATE باشد.
+    // بررسی می‌کنیم که پیام از index.html و از نوع START_DEEP_UPDATE باشد.
     if (event.data && event.data.type === 'START_DEEP_UPDATE') {
         console.log('[Service Worker] پیام START_DEEP_UPDATE دریافت شد. در حال پاکسازی تمامی کش‌ها و لغو ثبت...');
         event.waitUntil(
@@ -128,7 +129,7 @@ self.addEventListener('message', (event) => {
                 );
             }).then(() => {
                 // کلیدهای localStorage که باید در صفحه اصلی حفظ شوند.
-                // این لیست باید با لیست موجود در zytask.html یکسان باشد.
+                // این لیست باید با لیست موجود در index.html یکسان باشد.
                 const keysToPreserve = [
                     'tasks',
                     'zPoint',
@@ -143,12 +144,13 @@ self.addEventListener('message', (event) => {
                     'achievementUnlockDates',
                     'hasPinnedTaskEver',
                     'theme' // حفظ تم برنامه
+                    // می‌توانید کلیدهای دیگری که می‌خواهید حفظ کنید را به این لیست اضافه کنید
                 ];
 
                 console.log('[Service Worker] تمامی کش‌ها پاک شدند. در حال لغو ثبت Service Worker و ارسال پیام به کلاینت.');
                 // Service Worker خودش را لغو ثبت می‌کند تا مرورگر نسخه جدید را نصب کند.
                 return self.registration.unregister().then(() => {
-                    // پیام را به کلاینت (صفحه zytask.html) ارسال می‌کنیم تا پاکسازی localStorage و بارگذاری مجدد را انجام دهد.
+                    // پیام را به کلاینت (صفحه index.html) ارسال می‌کنیم تا پاکسازی localStorage و بارگذاری مجدد را انجام دهد.
                     self.clients.matchAll().then(clients => {
                         clients.forEach(client => {
                             client.postMessage({
