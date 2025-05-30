@@ -1,8 +1,8 @@
 // service-worker.js
 // -----------------------------------------------------------------------------
-// این Service Worker برای مدیریت کش، نمایش فایل index.html ذخیره‌شده در حالت آفلاین
-// و بروزرسانی عمیق برنامه index.html طراحی شده است.
-// نسخه اصلی (حدود ۲۰۰ خط) دست نخورده حفظ شده و سپس ویژگی‌های جدید اضافه شده‌اند.
+// این Service Worker برای مدیریت کش، استفاده از فایل cached index.html در حالت آفلاین
+// و بروزرسانی عمیق (Deep Update) برنامه index.html طراحی شده است.
+// نسخه اصلی (تقریباً ۲۰۰ خط) دست نخورده حفظ شده و سپس ویژگی‌های جدید اضافه شده‌اند.
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
@@ -65,7 +65,6 @@ self.addEventListener('install', (event) => {
   );
 });
 
-
 // مدیریت درخواست‌های شبکه
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
@@ -78,8 +77,8 @@ self.addEventListener('fetch', (event) => {
       caches.open(CACHE_NAME).then((cache) => {
         return cache.match('/index.html').then((cachedIndex) => {
           if (cachedIndex) {
-            // اگر index.html در کش موجود بود به کاربر برگردان (حتی اگر منقضی شده باشد)
-            // در پس‌زمینه تلاش می‌کنیم فایل را به‌روز کنیم
+            // اگر index.html در کش موجود بود، آن را بازگردانیم
+            // در پس‌زمینه نسخه جدید از شبکه دریافت و به‌روز می‌شود
             event.waitUntil(
               fetch(event.request)
                 .then((networkResponse) => {
@@ -88,7 +87,7 @@ self.addEventListener('fetch', (event) => {
                   }
                 })
                 .catch(() => {
-                  // اگر شبکه در دسترس نباشد، مشکلی نیست؛ از نسخه کش شده استفاده می‌کنیم
+                  // در صورت شکست شبکه، مشکلی نیست؛ از نسخه cached استفاده می‌شود
                 })
             );
             return cachedIndex;
@@ -102,25 +101,8 @@ self.addEventListener('fetch', (event) => {
               return networkResponse;
             })
             .catch(() => {
-              // FALLBACK: در صورتی که هیچ داده‌ای یافت نشد، یک صفحه آفلاین ساده نمایش داده می‌شود.
-              return new Response(
-                `<!DOCTYPE html>
-                <html>
-                  <head>
-                    <meta charset="utf-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1">
-                    <title>آفلاین</title>
-                    <style>
-                      body { font-family: sans-serif; text-align: center; padding: 2rem; }
-                    </style>
-                  </head>
-                  <body>
-                    <h1>وب‌سایت آفلاین است</h1>
-                    <p>متأسفانه، امکان بارگذاری اطلاعات وجود ندارد.</p>
-                  </body>
-                </html>`,
-                { headers: { 'Content-Type': 'text/html' } }
-              );
+              // در صورتی که حتی شبکه هم در دسترس نباشد، سعی می‌کنیم دوباره index.html را از کش برگردانیم
+              return cache.match('/index.html');
             });
         });
       })
@@ -129,7 +111,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   // =============================
-  // مدیریت درخواست‌های API (URLهایی که شامل '/api/' هستند)
+  // مدیریت درخواست‌های API (URL هایی که '/api/' در آنها وجود دارد)
   // =============================
   if (event.request.url.includes('/api/')) {
     event.respondWith(
@@ -221,7 +203,7 @@ self.addEventListener('activate', (event) => {
 });
 
 
-// مدیریت پیام‌ها (به عنوان مثال، برای بروزرسانی عمیق)
+// مدیریت پیام‌ها (برای مثال، برای بروزرسانی عمیق)
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'START_DEEP_UPDATE') {
     console.log('[Service Worker] پیام START_DEEP_UPDATE دریافت شد. در حال پاکسازی کش‌ها...');
