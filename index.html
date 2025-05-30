@@ -4349,11 +4349,14 @@
 
         // new code
 
-       document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener('DOMContentLoaded', () => {
     // --- اینجا کدهای موجود برنامه اصلی شما (مثلاً مدیریت وظایف، امتیاز و ...) قرار می‌گیرد ---
+    // این شامل تمامی توابع و متغیرهای اصلی برنامه شماست
     // مثال:
     // const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    // let zPoint = parseInt(localStorage.getItem('zPoint')) || 0;
     // function saveTasks() { /* ... */ }
+    // function updatePoints(amount) { /* ... */ }
     // ... (بقیه کدهای موجود شما برای منطق اصلی برنامه) ...
 
 
@@ -4378,21 +4381,28 @@
             });
     }
 
-    // --- Start: Share and Manual Install Modal Functionality ---
+    // --- Start: Share and Manual Install Modal Functionality with Theming and Detailed Instructions ---
 
     const shareAppLink = document.getElementById('shareAppLink');
-    const installAppLink = document.getElementById('installAppLink'); // This button is always visible now
+    const installAppLink = document.getElementById('installAppLink');
 
-    // --- Dynamically Add Modal HTML to the body ---
+    // --- Dynamically Add Modal HTML to the body with theme colors ---
+    // Using TailwindCSS classes and your specified colors
     const modalHtml = `
         <div id="installModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-[9999] hidden">
             <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md text-right text-gray-800 relative" style="direction: rtl;">
                 <button id="closeModalBtn" class="absolute top-3 left-3 text-gray-400 hover:text-gray-600 focus:outline-none">
                     <i class="fas fa-times text-xl"></i>
                 </button>
-                <h2 class="text-xl font-bold mb-4 text-center">نصب برنامه زای تسک</h2>
-                <div id="installInstructions" class="space-y-4">
+                <h2 class="text-xl font-bold mb-4 text-center text-[#1d4ed8]">نصب برنامه زای تسک</h2>
+                <p class="text-sm text-gray-600 mb-4 text-center">برای تجربه بهتر، برنامه را روی دستگاه خود نصب کنید:</p>
+                <div id="installInstructions" class="space-y-4 text-gray-700">
                     </div>
+                <div class="mt-6 text-center">
+                    <button id="understoodBtn" class="bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-bold py-2 px-6 rounded-lg focus:outline-none focus:shadow-outline transition duration-200">
+                        متوجه شدم
+                    </button>
+                </div>
             </div>
         </div>
     `;
@@ -4400,85 +4410,143 @@
 
     const installModal = document.getElementById('installModal');
     const closeModalBtn = document.getElementById('closeModalBtn');
+    const understoodBtn = document.getElementById('understoodBtn');
     const installInstructions = document.getElementById('installInstructions');
 
-    // Function to detect browser
-    function getBrowser() {
+    // Function to detect browser and platform
+    function getBrowserAndPlatform() {
         const userAgent = navigator.userAgent;
-        if (userAgent.includes('CriOS')) return 'Chrome iOS'; // Chrome on iOS
-        if (userAgent.includes('Chrome') && !userAgent.includes('Edge')) return 'Chrome'; // Chrome on Android/Desktop
-        if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) return 'Safari'; // Safari on iOS/Desktop
-        if (userAgent.includes('Firefox')) return 'Firefox';
-        if (userAgent.includes('Edg') || userAgent.includes('Edge')) return 'Edge';
-        if (userAgent.includes('SamsungBrowser')) return 'Samsung Browser';
-        if (userAgent.includes('Brave')) return 'Brave';
-        if (userAgent.includes('Opera') || userAgent.includes('OPR')) return 'Opera';
-        if (userAgent.includes('Trident') || userAgent.includes('MSIE')) return 'Internet Explorer'; // Legacy IE
-        return 'Other';
+        let browser = 'Other';
+        let platform = 'Desktop';
+
+        if (/(android|iphone|ipad|ipod)/i.test(userAgent)) {
+            platform = 'Mobile';
+        } else if (/(windows|mac|linux)/i.test(userAgent)) {
+            platform = 'Desktop';
+        }
+
+        if (userAgent.includes('CriOS')) browser = 'Chrome'; // Chrome on iOS
+        else if (userAgent.includes('Chrome') && !userAgent.includes('Edge')) browser = 'Chrome'; // Chrome on Android/Desktop
+        else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) browser = 'Safari'; // Safari on iOS/Desktop
+        else if (userAgent.includes('Firefox')) browser = 'Firefox';
+        else if (userAgent.includes('Edg') || userAgent.includes('Edge')) browser = 'Edge';
+        else if (userAgent.includes('SamsungBrowser')) browser = 'Samsung Browser';
+        else if (userAgent.includes('Brave')) browser = 'Brave';
+        else if (userAgent.includes('Opera') || userAgent.includes('OPR')) browser = 'Opera';
+        else if (userAgent.includes('Trident') || userAgent.includes('MSIE')) browser = 'Internet Explorer'; // Legacy IE
+
+        return { browser, platform };
     }
 
-    // Function to provide browser-specific instructions
+    // Function to provide browser- and platform-specific instructions
     function showInstallInstructions() {
-        const browser = getBrowser();
+        const { browser, platform } = getBrowserAndPlatform();
         let instructions = '';
 
-        const commonSafari = `
-            <p><strong>برای نصب زای تسک در سافاری (iOS):</strong></p>
-            <ol class="list-decimal list-inside text-sm">
-                <li>روی دکمه <i class="fas fa-share-alt text-base"></i> (Share) در نوار پایین مرورگر ضربه بزنید.</li>
-                <li>به پایین اسکرول کنید و گزینه "Add to Home Screen" را انتخاب کنید.</li>
+        const commonSafariMobile = `
+            <p><strong class="text-[#2563eb]">در مرورگر سافاری:</strong></p>
+            <ol class="list-decimal list-inside text-sm leading-relaxed">
+                <li>روی دکمه <i class="fas fa-share-alt text-base text-[#2563eb]"></i> (Share) در نوار پایین مرورگر ضربه بزنید.</li>
+                <li>به پایین اسکرول کنید و گزینه "<strong>Add to Home Screen</strong>" را انتخاب کنید.</li>
                 <li>در پنجره باز شده، روی "Add" در بالا سمت راست ضربه بزنید.</li>
             </ol>
         `;
 
         switch (browser) {
             case 'Chrome':
-            case 'Chrome iOS':
-            case 'Samsung Browser': // Often behaves like Chrome for PWA install
-            case 'Brave': // Chromium-based
-                instructions = `
-                    <p><strong>برای نصب زای تسک در ${browser} (اندروید/دسکتاپ):</strong></p>
-                    <ol class="list-decimal list-inside text-sm">
-                        <li>به دنبال دکمه "نصب برنامه" یا آیکون <i class="fas fa-download text-base"></i> / <i class="fas fa-ellipsis-v text-base"></i> در نوار آدرس مرورگر بگردید.</li>
-                        <li>روی آن ضربه بزنید و دستورالعمل‌ها را دنبال کنید.</li>
-                        <li>(یا) به منوی مرورگر (سه نقطه) بروید و گزینه "Add to Home screen" یا "Install app" را پیدا کنید.</li>
-                    </ol>
-                `;
-                // If it's Chrome on iOS, specifically add Safari-like instructions as a fallback
-                if (browser === 'Chrome iOS') {
-                    instructions += `<br><p class="text-sm text-gray-600">اگر گزینه نصب را پیدا نکردید، ممکن است نیاز باشد از طریق منوی اشتراک‌گذاری سافاری (مرورگر پیش‌فرض iOS) اقدام کنید:</p>${commonSafari}`;
+            case 'Samsung Browser':
+            case 'Brave':
+                if (platform === 'Mobile') {
+                    instructions = `
+                        <p><strong class="text-[#2563eb]">در مرورگر کروم، سامسونگ یا بریو (موبایل):</strong></p>
+                        <ol class="list-decimal list-inside text-sm leading-relaxed">
+                            <li>روی آیکون سه نقطه <i class="fas fa-ellipsis-v text-base text-[#2563eb]"></i> در بالای صفحه سمت چپ (منوی مرورگر) ضربه بزنید.</li>
+                            <li>گزینه "<strong>Add to Home screen</strong>" یا "<strong>Install app</strong>" را پیدا کرده و انتخاب کنید.</li>
+                            <li>دستورالعمل‌ها را دنبال کنید تا برنامه به صفحه اصلی شما اضافه شود.</li>
+                        </ol>
+                    `;
+                } else { // Desktop Chrome
+                    instructions = `
+                        <p><strong class="text-[#2563eb]">در مرورگر کروم، سامسونگ یا بریو (دسکتاپ):</strong></p>
+                        <ol class="list-decimal list-inside text-sm leading-relaxed">
+                            <li>به دنبال آیکون "نصب برنامه" <i class="fas fa-download text-base text-[#2563eb]"></i> یا <i class="fas fa-plus text-base text-[#2563eb]"></i> در نوار آدرس مرورگر (معمولاً سمت راست) بگردید و روی آن کلیک کنید.</li>
+                            <li>در پنجره باز شده، روی "<strong>Install</strong>" کلیک کنید.</li>
+                        </ol>
+                        <p class="text-sm mt-2 text-gray-600">یا از منوی مرورگر (سه نقطه <i class="fas fa-ellipsis-v text-base text-gray-600"></i>) گزینه "Install ZayTask..." را پیدا کنید.</p>
+                    `;
                 }
                 break;
             case 'Safari':
-                instructions = commonSafari;
+                if (platform === 'Mobile') {
+                    instructions = commonSafariMobile;
+                } else { // Desktop Safari (PWA install not natively supported like Chrome/Edge)
+                    instructions = `
+                        <p><strong class="text-[#2563eb]">در مرورگر سافاری (دسکتاپ):</strong></p>
+                        <p class="text-sm">سافاری در دسکتاپ امکان نصب مستقیم PWA را ندارد. می‌توانید آدرس این صفحه را برای دسترسی سریع ذخیره کنید (Bookmark).</p>
+                        <p class="text-sm mt-2 text-gray-600">اگر از آیفون یا آیپد استفاده می‌کنید، مراحل نصب متفاوت است:</p>
+                        ${commonSafariMobile}
+                    `;
+                }
                 break;
             case 'Firefox':
-                instructions = `
-                    <p><strong>برای نصب زای تسک در فایرفاکس (اندروید/دسکتاپ):</strong></p>
-                    <ol class="list-decimal list-inside text-sm">
-                        <li>به دنبال آیکون خانه با علامت مثبت <i class="fas fa-plus text-base"></i> یا نماد صفحه با فلش رو به پایین <i class="fas fa-arrow-alt-circle-down text-base"></i> در نوار آدرس بگردید.</li>
-                        <li>روی آن ضربه بزنید و دستورالعمل‌ها را دنبال کنید.</li>
-                        <li>(یا) به منوی مرورگر (سه نقطه/خط) بروید و گزینه "Install" را پیدا کنید.</li>
-                    </ol>
-                `;
+                if (platform === 'Mobile') {
+                    instructions = `
+                        <p><strong class="text-[#2563eb]">در مرورگر فایرفاکس (موبایل):</strong></p>
+                        <ol class="list-decimal list-inside text-sm leading-relaxed">
+                            <li>روی آیکون سه نقطه <i class="fas fa-ellipsis-v text-base text-[#2563eb]"></i> (منو) در پایین صفحه ضربه بزنید.</li>
+                            <li>گزینه "<strong>Install</strong>" را پیدا کرده و انتخاب کنید.</li>
+                        </ol>
+                    `;
+                } else { // Desktop Firefox
+                    instructions = `
+                        <p><strong class="text-[#2563eb]">در مرورگر فایرفاکس (دسکتاپ):</strong></p>
+                        <ol class="list-decimal list-inside text-sm leading-relaxed">
+                            <li>به دنبال آیکون خانه با علامت مثبت <i class="fas fa-plus text-base text-[#2563eb]"></i> یا نماد صفحه با فلش رو به پایین <i class="fas fa-arrow-alt-circle-down text-base text-[#2563eb]"></i> در نوار آدرس بگردید.</li>
+                            <li>روی آن کلیک کنید و دستورالعمل‌ها را دنبال کنید.</li>
+                        </ol>
+                        <p class="text-sm mt-2 text-gray-600">یا از منوی مرورگر (سه خط <i class="fas fa-bars text-base text-gray-600"></i>) گزینه "Install" را پیدا کنید.</p>
+                    `;
+                }
                 break;
             case 'Edge':
+                if (platform === 'Mobile') {
+                    instructions = `
+                        <p><strong class="text-[#2563eb]">در مرورگر اج (موبایل):</strong></p>
+                        <ol class="list-decimal list-inside text-sm leading-relaxed">
+                            <li>روی آیکون سه نقطه <i class="fas fa-ellipsis-v text-base text-[#2563eb]"></i> (منو) در پایین صفحه ضربه بزنید.</li>
+                            <li>گزینه "<strong>Add to phone</strong>" را پیدا کرده و انتخاب کنید.</li>
+                        </ol>
+                    `;
+                } else { // Desktop Edge
+                    instructions = `
+                        <p><strong class="text-[#2563eb]">در مرورگر اج (دسکتاپ):</strong></p>
+                        <ol class="list-decimal list-inside text-sm leading-relaxed">
+                            <li>به دنبال آیکون "App available" <i class="fas fa-download text-base text-[#2563eb]"></i> یا دکمه "Install" در نوار آدرس مرورگر بگردید و روی آن کلیک کنید.</li>
+                            <li>در پنجره باز شده، روی "<strong>Install</strong>" کلیک کنید.</li>
+                        </ol>
+                        <p class="text-sm mt-2 text-gray-600">یا از منوی مرورگر (سه نقطه <i class="fas fa-ellipsis-h text-base text-gray-600"></i>) گزینه "Apps" سپس "Install this site as an app" را پیدا کنید.</p>
+                    `;
+                }
+                break;
+            case 'Internet Explorer': // Fallback for very old browsers
                 instructions = `
-                    <p><strong>برای نصب زای تسک در مایکروسافت اج:</strong></p>
-                    <ol class="list-decimal list-inside text-sm">
-                        <li>به دنبال آیکون "App available" یا دکمه "Install" در نوار آدرس مرورگر بگردید.</li>
-                        <li>روی آن کلیک کنید و دستورالعمل‌ها را دنبال کنید.</li>
-                        <li>(یا) به منوی مرورگر (سه نقطه) بروید و گزینه "Apps" سپس "Install this site as an app" را پیدا کنید.</li>
-                    </ol>
+                    <p><strong class="text-[#ef4444]">مرورگر شما، Internet Explorer، به طور کامل از نصب برنامه‌های PWA پشتیبانی نمی‌کند.</strong></p>
+                    <p class="text-sm mt-2">برای بهترین تجربه، لطفاً از یک مرورگر مدرن مانند کروم، فایرفاکس یا اج استفاده کنید.</p>
+                `;
+                break;
+            case 'Opera':
+                instructions = `
+                    <p><strong class="text-[#2563eb]">در مرورگر اپرا (موبایل/دسکتاپ):</strong></p>
+                    <p class="text-sm">معمولاً می‌توانید اپلیکیشن را از طریق منوی مرورگر (آیکون اپرا <i class="fab fa-opera text-base text-[#2563eb]"></i> یا سه خط <i class="fas fa-bars text-base text-[#2563eb]"></i>) و جستجوی گزینه‌هایی مانند "<strong>Add to Home Screen</strong>" یا "<strong>Install app</strong>" نصب کنید.</p>
                 `;
                 break;
             case 'Other':
             default:
                 instructions = `
-                    <p><strong>برای نصب زای تسک در مرورگر شما:</strong></p>
-                    <p class="text-sm">معمولاً می‌توانید برنامه را از طریق منوی مرورگر (سه نقطه یا سه خط) و جستجوی گزینه‌هایی مانند "Add to Home screen", "Install app" یا "Install site" نصب کنید.</p>
-                    <p class="text-sm text-gray-600 mt-2">اگر مرورگر شما سافاری در iOS است:</p>
-                    ${commonSafari}
+                    <p><strong class="text-[#2563eb]">راهنمای نصب برای مرورگر شما (${browser} ${platform}):</strong></p>
+                    <p class="text-sm">معمولاً می‌توانید برنامه را از طریق منوی مرورگر (به دنبال آیکون سه نقطه <i class="fas fa-ellipsis-v text-base text-[#2563eb]"></i>، سه خط <i class="fas fa-bars text-base text-[#2563eb]"></i> یا آیکون اشتراک‌گذاری <i class="fas fa-share-alt text-base text-[#2563eb]"></i> بگردید) و جستجوی گزینه‌هایی مانند "<strong>Add to Home screen</strong>"، "<strong>Install app</strong>" یا "<strong>Install site</strong>" نصب کنید.</p>
+                    <p class="text-sm mt-2 text-gray-600">اگر از آیفون یا آیپد استفاده می‌کنید و مرورگر شما سافاری است، از دستورالعمل زیر پیروی کنید:</p>
+                    ${commonSafariMobile}
                 `;
                 break;
         }
@@ -4497,8 +4565,11 @@
     closeModalBtn.addEventListener('click', () => {
         installModal.classList.add('hidden');
     });
+    understoodBtn.addEventListener('click', () => { // "متوجه شدم" button
+        installModal.classList.add('hidden');
+    });
 
-    // Close modal if clicked outside (optional)
+    // Close modal if clicked outside (optional, but good UX)
     installModal.addEventListener('click', (e) => {
         if (e.target === installModal) {
             installModal.classList.add('hidden');
@@ -4532,10 +4603,13 @@
 
     // Optional: Hide install button if app is already installed
     // This part still relies on 'appinstalled' event, which works if the PWA was installed via browser's native prompt
+    // You might choose to remove this if you want the modal always available, or handle it differently.
     window.addEventListener('appinstalled', () => {
         console.log('Event: PWA was successfully installed (via native prompt).');
+        // If the user installed via native prompt, hide *your* manual install button.
         installAppLink.classList.add('hidden');
     });
+
 }); // End of DOMContentLoaded
         
         
