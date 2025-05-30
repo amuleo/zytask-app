@@ -4349,77 +4349,99 @@
 
         // new code
 
-       // --- Start: Share and Install Functionality ---
+      document.addEventListener('DOMContentLoaded', () => {
+    // --- اینجا کدهای موجود برنامه اصلی شما (مثلاً مدیریت وظایف، امتیاز و ...) قرار می‌گیرد ---
+    // مثال:
+    // const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    // function saveTasks() { /* ... */ }
+    // ... (بقیه کدهای موجود شما برای منطق اصلی برنامه) ...
 
-// Get references to the new HTML elements
-const shareAppLink = document.getElementById('shareAppLink');
-const installAppLink = document.getElementById('installAppLink');
-
-let deferredPrompt; // Variable to store the beforeinstallprompt event
-
-// Listen for the 'beforeinstallprompt' event. This should be as early as possible.
-// It does NOT need to be inside DOMContentLoaded or window.load.
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault(); // Prevent the browser's default prompt from appearing immediately
-    deferredPrompt = e; // Store the event for later use
-    installAppLink.classList.remove('hidden'); // Show the install button
-    console.log('Event: beforeinstallprompt fired. Install button is now visible.');
-});
-
-// Logic for the Share functionality (همان قبلی)
-if ('share' in navigator) {
-    shareAppLink.classList.remove('hidden');
-    shareAppLink.addEventListener('click', async (e) => {
-        e.preventDefault();
-        try {
-            await navigator.share({
-                title: 'زای تسک',
-                text: 'برنامه مدیریت تسک‌ها را امتحان کنید!',
-                url: window.location.href
+    // Register Service Worker for offline capability
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js')
+            .then(registration => {
+                console.log('Service Worker registered with scope:', registration.scope);
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            // A new service worker is installed and ready to take over
+                            // You might prompt the user to refresh here for updates
+                            // showMessageBox('نسخه جدید برنامه موجود است. برای بروزرسانی صفحه را رفرش کنید.', 'info');
+                        }
+                    });
+                });
+            })
+            .catch(error => {
+                console.error('Service Worker registration failed:', error);
             });
-            console.log('Content shared successfully.');
-        } catch (error) {
-            console.error('Error sharing:', error);
+    }
+
+    // --- Start: Share and Install Functionality ---
+
+    const shareAppLink = document.getElementById('shareAppLink');
+    const installAppLink = document.getElementById('installAppLink');
+
+    let deferredPrompt; // Variable to store the beforeinstallprompt event
+
+    // Listen for the 'beforeinstallprompt' event.
+    // This is the only way to get the deferredPrompt needed to show the install banner.
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault(); // Prevent browser's default prompt from showing immediately
+        deferredPrompt = e; // Store the event
+        installAppLink.classList.remove('hidden'); // Make the install item visible
+        console.log('EVENT: beforeinstallprompt fired. Install button is now visible.');
+    });
+
+    // Logic for the Share functionality
+    if ('share' in navigator) {
+        shareAppLink.classList.remove('hidden');
+        shareAppLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                await navigator.share({
+                    title: 'زای تسک',
+                    text: 'برنامه مدیریت تسک‌ها را امتحان کنید!',
+                    url: window.location.href
+                });
+                console.log('Action: Content shared successfully.');
+            } catch (error) {
+                console.error('Error sharing:', error);
+            }
+        });
+    } else {
+        shareAppLink.classList.add('hidden');
+        console.warn('Warning: Web Share API is not supported in this browser.');
+    }
+
+    // Logic for the Install App functionality (PWA)
+    installAppLink.addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (deferredPrompt) {
+            try {
+                console.log('Action: Attempting to show install prompt...');
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`Response: User choice on install prompt: ${outcome}`);
+                deferredPrompt = null; // Clear the stored prompt, it can only be used once
+                installAppLink.classList.add('hidden'); // Hide the button after prompt is shown
+            } catch (error) {
+                console.error('Error: Failed to show install prompt:', error);
+            }
+        } else {
+            console.warn('Warning: Install prompt not available (deferredPrompt is null). Ensure beforeinstallprompt event fired.');
         }
     });
-} else {
-    shareAppLink.classList.add('hidden');
-    console.warn('Web Share API is not supported in this browser.');
-}
 
-// Add click listener to the install button.
-installAppLink.addEventListener('click', async (e) => {
-    e.preventDefault();
+    // Hide install button if app is already installed
+    window.addEventListener('appinstalled', () => {
+        console.log('Event: PWA was successfully installed.');
+        installAppLink.classList.add('hidden');
+    });
 
-    if (deferredPrompt) {
-        try {
-            console.log('Attempting to show install prompt...');
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            console.log(`User response to install prompt: ${outcome}`);
-            deferredPrompt = null;
-            installAppLink.classList.add('hidden');
+    // --- End: Share and Install Functionality ---
 
-            if (outcome === 'accepted') {
-                console.log('PWA installation was accepted by the user.');
-            } else {
-                console.log('PWA installation was dismissed by the user.');
-            }
-        } catch (error) {
-            console.error('Error while trying to show install prompt:', error);
-        }
-    } else {
-        console.warn('Install prompt is not available (deferredPrompt is null). Ensure beforeinstallprompt event fired.');
-    }
-});
-
-// Listen for the 'appinstalled' event.
-window.addEventListener('appinstalled', () => {
-    console.log('Event: PWA was successfully installed.');
-    installAppLink.classList.add('hidden');
-});
-
-// --- End: Share and Install Functionality --
+}); // End of DOMContentLoaded-
         
     </script>
 </body>
