@@ -4349,51 +4349,137 @@
 
         // new code
 
-      document.addEventListener('DOMContentLoaded', () => {
-    // --- اینجا کدهای موجود برنامه اصلی شما (مثلاً مدیریت وظایف، امتیاز و ...) قرار می‌گیرد ---
-    // مثال:
-    // const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    // function saveTasks() { /* ... */ }
-    // ... (بقیه کدهای موجود شما برای منطق اصلی برنامه) ...
-
-    // Register Service Worker for offline capability
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/service-worker.js')
-            .then(registration => {
-                console.log('Service Worker registered with scope:', registration.scope);
-                registration.addEventListener('updatefound', () => {
-                    const newWorker = registration.installing;
-                    newWorker.addEventListener('statechange', () => {
-                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            // A new service worker is installed and ready to take over
-                            // You might prompt the user to refresh here for updates
-                            // showMessageBox('نسخه جدید برنامه موجود است. برای بروزرسانی صفحه را رفرش کنید.', 'info');
-                        }
-                    });
-                });
-            })
-            .catch(error => {
-                console.error('Service Worker registration failed:', error);
-            });
-    }
-
-    // --- Start: Share and Install Functionality ---
+       // --- Start: Share and Manual Install Modal Functionality ---
 
     const shareAppLink = document.getElementById('shareAppLink');
-    const installAppLink = document.getElementById('installAppLink');
+    const installAppLink = document.getElementById('installAppLink'); // This button is always visible now
 
-    let deferredPrompt; // Variable to store the beforeinstallprompt event
+    // --- Dynamically Add Modal HTML to the body ---
+    const modalHtml = `
+        <div id="installModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-[9999] hidden">
+            <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md text-right text-gray-800 relative" style="direction: rtl;">
+                <button id="closeModalBtn" class="absolute top-3 left-3 text-gray-400 hover:text-gray-600 focus:outline-none">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+                <h2 class="text-xl font-bold mb-4 text-center">نصب برنامه زای تسک</h2>
+                <div id="installInstructions" class="space-y-4">
+                    </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
 
-    // Listen for the 'beforeinstallprompt' event.
-    // This is the only way to get the deferredPrompt needed to show the install banner.
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault(); // Prevent browser's default prompt from showing immediately
-        deferredPrompt = e; // Store the event
-        installAppLink.classList.remove('hidden'); // Make the install item visible
-        console.log('EVENT: beforeinstallprompt fired. Install button is now visible.');
+    const installModal = document.getElementById('installModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const installInstructions = document.getElementById('installInstructions');
+
+    // Function to detect browser
+    function getBrowser() {
+        const userAgent = navigator.userAgent;
+        if (userAgent.includes('CriOS')) return 'Chrome iOS'; // Chrome on iOS
+        if (userAgent.includes('Chrome') && !userAgent.includes('Edge')) return 'Chrome'; // Chrome on Android/Desktop
+        if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) return 'Safari'; // Safari on iOS/Desktop
+        if (userAgent.includes('Firefox')) return 'Firefox';
+        if (userAgent.includes('Edg') || userAgent.includes('Edge')) return 'Edge';
+        if (userAgent.includes('SamsungBrowser')) return 'Samsung Browser';
+        if (userAgent.includes('Brave')) return 'Brave';
+        if (userAgent.includes('Opera') || userAgent.includes('OPR')) return 'Opera';
+        if (userAgent.includes('Trident') || userAgent.includes('MSIE')) return 'Internet Explorer'; // Legacy IE
+        return 'Other';
+    }
+
+    // Function to provide browser-specific instructions
+    function showInstallInstructions() {
+        const browser = getBrowser();
+        let instructions = '';
+
+        const commonSafari = `
+            <p><strong>برای نصب زای تسک در سافاری (iOS):</strong></p>
+            <ol class="list-decimal list-inside text-sm">
+                <li>روی دکمه <i class="fas fa-share-alt text-base"></i> (Share) در نوار پایین مرورگر ضربه بزنید.</li>
+                <li>به پایین اسکرول کنید و گزینه "Add to Home Screen" را انتخاب کنید.</li>
+                <li>در پنجره باز شده، روی "Add" در بالا سمت راست ضربه بزنید.</li>
+            </ol>
+        `;
+
+        switch (browser) {
+            case 'Chrome':
+            case 'Chrome iOS':
+            case 'Samsung Browser': // Often behaves like Chrome for PWA install
+            case 'Brave': // Chromium-based
+                instructions = `
+                    <p><strong>برای نصب زای تسک در ${browser} (اندروید/دسکتاپ):</strong></p>
+                    <ol class="list-decimal list-inside text-sm">
+                        <li>به دنبال دکمه "نصب برنامه" یا آیکون <i class="fas fa-download text-base"></i> / <i class="fas fa-ellipsis-v text-base"></i> در نوار آدرس مرورگر بگردید.</li>
+                        <li>روی آن ضربه بزنید و دستورالعمل‌ها را دنبال کنید.</li>
+                        <li>(یا) به منوی مرورگر (سه نقطه) بروید و گزینه "Add to Home screen" یا "Install app" را پیدا کنید.</li>
+                    </ol>
+                `;
+                // If it's Chrome on iOS, specifically add Safari-like instructions as a fallback
+                if (browser === 'Chrome iOS') {
+                    instructions += `<br><p class="text-sm text-gray-600">اگر گزینه نصب را پیدا نکردید، ممکن است نیاز باشد از طریق منوی اشتراک‌گذاری سافاری (مرورگر پیش‌فرض iOS) اقدام کنید:</p>${commonSafari}`;
+                }
+                break;
+            case 'Safari':
+                instructions = commonSafari;
+                break;
+            case 'Firefox':
+                instructions = `
+                    <p><strong>برای نصب زای تسک در فایرفاکس (اندروید/دسکتاپ):</strong></p>
+                    <ol class="list-decimal list-inside text-sm">
+                        <li>به دنبال آیکون خانه با علامت مثبت <i class="fas fa-plus text-base"></i> یا نماد صفحه با فلش رو به پایین <i class="fas fa-arrow-alt-circle-down text-base"></i> در نوار آدرس بگردید.</li>
+                        <li>روی آن ضربه بزنید و دستورالعمل‌ها را دنبال کنید.</li>
+                        <li>(یا) به منوی مرورگر (سه نقطه/خط) بروید و گزینه "Install" را پیدا کنید.</li>
+                    </ol>
+                `;
+                break;
+            case 'Edge':
+                instructions = `
+                    <p><strong>برای نصب زای تسک در مایکروسافت اج:</strong></p>
+                    <ol class="list-decimal list-inside text-sm">
+                        <li>به دنبال آیکون "App available" یا دکمه "Install" در نوار آدرس مرورگر بگردید.</li>
+                        <li>روی آن کلیک کنید و دستورالعمل‌ها را دنبال کنید.</li>
+                        <li>(یا) به منوی مرورگر (سه نقطه) بروید و گزینه "Apps" سپس "Install this site as an app" را پیدا کنید.</li>
+                    </ol>
+                `;
+                break;
+            case 'Other':
+            default:
+                instructions = `
+                    <p><strong>برای نصب زای تسک در مرورگر شما:</strong></p>
+                    <p class="text-sm">معمولاً می‌توانید برنامه را از طریق منوی مرورگر (سه نقطه یا سه خط) و جستجوی گزینه‌هایی مانند "Add to Home screen", "Install app" یا "Install site" نصب کنید.</p>
+                    <p class="text-sm text-gray-600 mt-2">اگر مرورگر شما سافاری در iOS است:</p>
+                    ${commonSafari}
+                `;
+                break;
+        }
+
+        installInstructions.innerHTML = instructions;
+        installModal.classList.remove('hidden'); // Show the modal
+    }
+
+    // --- Attach event listener to the "Install App" button ---
+    installAppLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        showInstallInstructions();
     });
 
-    // Logic for the Share functionality
+    // --- Close Modal Event Listener ---
+    closeModalBtn.addEventListener('click', () => {
+        installModal.classList.add('hidden');
+    });
+
+    // Close modal if clicked outside (optional)
+    installModal.addEventListener('click', (e) => {
+        if (e.target === installModal) {
+            installModal.classList.add('hidden');
+        }
+    });
+
+    // --- End: Share and Manual Install Modal Functionality ---
+
+
+    // --- Start: Share Functionality (same as before) ---
     if ('share' in navigator) {
         shareAppLink.classList.remove('hidden');
         shareAppLink.addEventListener('click', async (e) => {
@@ -4413,35 +4499,16 @@
         shareAppLink.classList.add('hidden');
         console.warn('Warning: Web Share API is not supported in this browser.');
     }
+    // --- End: Share Functionality ---
 
-    // Logic for the Install App functionality (PWA)
-    installAppLink.addEventListener('click', async (e) => {
-        e.preventDefault();
-        if (deferredPrompt) {
-            try {
-                console.log('Action: Attempting to show install prompt...');
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                console.log(`Response: User choice on install prompt: ${outcome}`);
-                deferredPrompt = null; // Clear the stored prompt, it can only be used once
-                installAppLink.classList.add('hidden'); // Hide the button after prompt is shown
-            } catch (error) {
-                console.error('Error: Failed to show install prompt:', error);
-            }
-        } else {
-            console.warn('Warning: Install prompt not available (deferredPrompt is null). Ensure beforeinstallprompt event fired.');
-        }
-    });
-
-    // Hide install button if app is already installed
+    // Optional: Hide install button if app is already installed
+    // This part still relies on 'appinstalled' event, which works if the PWA was installed via browser's native prompt
     window.addEventListener('appinstalled', () => {
-        console.log('Event: PWA was successfully installed.');
+        console.log('Event: PWA was successfully installed (via native prompt).');
         installAppLink.classList.add('hidden');
     });
-
-    // --- End: Share and Install Functionality ---
-
-}); // End of DOMContentLoaded-
+}); // End of DOMContentLoaded
+        
         
     </script>
 </body>
