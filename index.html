@@ -901,20 +901,14 @@
                 <a href="#" id="updateAppMenuItem" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-200 ease-in-out flex items-center">
                     <i class="fa-solid fa-sync-alt ml-2"></i> بروزرسانی برنامه
                 </a>
-
-                <li id="shareMenuItem" class="hidden"> <a href="#" id="shareAppLink" class="flex flex-col items-center text-[#6b7280] hover:text-[#2563eb] p-2">
-                        <i class="fas fa-share-alt text-xl mb-1"></i>
-                        <span class="text-xs">اشتراک‌گذاری</span>
-                    </a>
-                </li>
-                <li id="installMenuItem" class="hidden"> <a href="#" id="installAppLink" class="flex flex-col items-center text-[#6b7280] hover:text-[#2563eb] p-2">
-                        <i class="fas fa-download text-xl mb-1"></i>
-                        <span class="text-xs">نصب برنامه</span>
-                    </a>
-                </li>
-                
                 <a href="#" id="donateMenuItem" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-200 ease-in-out flex items-center">
                     <i class="fa-solid fa-hand-holding-dollar ml-2"></i> حمایت مالی
+                </a>
+                <a href="#" id="shareAppLink" class="hidden flex flex-col items-center text-[#6b7280] hover:text-[#2563eb] p-2">
+                    <i class="fas fa-share-alt text-xl mb-1"></i>>اشتراک‌گذاری
+                </a>
+                <a href="#" id="installAppLink" class="hidden flex flex-col items-center text-[#6b7280] hover:text-[#2563eb] p-2">
+                    <i class="fas fa-download text-xl mb-1"></i>>نصب برنامه
                 </a>
                 <a href="#" id="resetMenuItem" class="block px-4 py-2 text-sm text-red-700 dark:text-red-200 hover:bg-red-100 dark:hover:bg-red-600 transition duration-200 ease-in-out flex items-center">
                     <i class="fa-solid fa-arrows-rotate ml-2"></i> بازنشانی داده‌ها
@@ -4353,21 +4347,19 @@
             });
         }
 
-        // new codes
+        // new code
 
-         // --- Start: Minimal Share and Install Logic ---
+        // --- Start: Share and Install Functionality ---
 
-            // Get references to the new menu items
-            const shareMenuItem = document.getElementById('shareMenuItem');
+            // Get references to the new HTML elements
             const shareAppLink = document.getElementById('shareAppLink');
-            const installMenuItem = document.getElementById('installMenuItem');
             const installAppLink = document.getElementById('installAppLink');
 
-            let deferredPrompt; // To store the beforeinstallprompt event
+            let deferredPrompt; // Variable to store the beforeinstallprompt event
 
-            // Logic for the "Share" menu item
-            if (navigator.share) {
-                shareMenuItem.classList.remove('hidden'); // Show the menu item if Web Share API is supported
+            // Logic for the Share functionality
+            if ('share' in navigator) { // Check if Web Share API is supported
+                shareAppLink.classList.remove('hidden'); // Make the item visible
                 shareAppLink.addEventListener('click', async (e) => {
                     e.preventDefault(); // Prevent default link behavior
                     try {
@@ -4376,46 +4368,45 @@
                             text: 'برنامه مدیریت تسک‌ها را امتحان کنید!',
                             url: window.location.href
                         });
-                        console.log('محتوا با موفقیت به اشتراک گذاشته شد.');
+                        console.log('Content shared successfully.');
                     } catch (error) {
-                        console.error('خطا در اشتراک‌گذاری:', error);
-                        // No showMessageBox here as per request for no dialogs
+                        console.error('Error sharing:', error);
                     }
                 });
             } else {
-                shareMenuItem.classList.add('hidden'); // Hide the menu item if not supported
-                console.warn('Web Share API در این مرورگر پشتیبانی نمی‌شود.');
+                shareAppLink.classList.add('hidden'); // Keep the item hidden if not supported
+                console.warn('Web Share API is not supported in this browser.');
             }
 
-            // Logic for the "Install App" menu item
+            // Logic for the Install App functionality (PWA)
             window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault(); // Prevent the browser's default prompt
+                e.preventDefault(); // Prevent browser's default prompt from showing immediately
                 deferredPrompt = e; // Store the event
-                installMenuItem.classList.remove('hidden'); // Show the menu item
+                installAppLink.classList.remove('hidden'); // Make the install item visible
                 console.log('beforeinstallprompt event fired.');
             });
 
             installAppLink.addEventListener('click', async (e) => {
                 e.preventDefault(); // Prevent default link behavior
                 if (deferredPrompt) {
-                    deferredPrompt.prompt(); // Show the install prompt (this is a browser dialog, not one you create)
-                    const { outcome } = await deferredPrompt.userChoice;
+                    deferredPrompt.prompt(); // Show the browser's install prompt
+                    const { outcome } = await deferredPrompt.userChoice; // Wait for user's action
                     console.log(`User response to the install prompt: ${outcome}`);
-                    deferredPrompt = null; // Clear the prompt
-                    installMenuItem.classList.add('hidden'); // Hide the item after use
+                    deferredPrompt = null; // Clear the stored prompt
+                    installAppLink.classList.add('hidden'); // Hide the item after prompt is shown
                 } else {
-                    console.warn('امکان نصب در حال حاضر در دسترس نیست.');
-                    // No showMessageBox here as per request for no dialogs
+                    console.warn('Install prompt not available.');
                 }
             });
 
-            // Event listener for when the PWA is successfully installed
+            // Hide install button if app is already installed
             window.addEventListener('appinstalled', () => {
-                installMenuItem.classList.add('hidden'); // Hide the install item if already installed
+                installAppLink.classList.add('hidden');
                 console.log('PWA was installed.');
             });
 
-            // --- End: Minimal Share and Install Logic ---
+            // --- End: Share and Install Functionality ---
+
         
     </script>
 </body>
