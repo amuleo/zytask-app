@@ -4386,17 +4386,16 @@
     const shareAppLink = document.getElementById('shareAppLink');
     const installAppLink = document.getElementById('installAppLink');
 
-    // --- Dynamically Add Modal HTML to the body with theme colors ---
-    // Using TailwindCSS classes and your specified colors
+    // --- Dynamically Add Modal HTML to the body with theme colors and dark mode support ---
     const modalHtml = `
         <div id="installModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-[9999] hidden">
-            <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md text-right text-gray-800 relative" style="direction: rtl;">
-                <button id="closeModalBtn" class="absolute top-3 left-3 text-gray-400 hover:text-gray-600 focus:outline-none">
+            <div class="bg-white dark:bg-[#1f2937] rounded-lg shadow-xl p-6 w-full max-w-md text-right relative" style="direction: rtl;">
+                <button id="closeModalBtn" class="absolute top-3 left-3 text-gray-400 hover:text-gray-600 dark:text-[#9ca3af] dark:hover:text-[#e5e7eb] focus:outline-none">
                     <i class="fas fa-times text-xl"></i>
                 </button>
-                <h2 class="text-xl font-bold mb-4 text-center text-[#1d4ed8]">نصب برنامه زای تسک</h2>
-                <p class="text-sm text-gray-600 mb-4 text-center">برای تجربه بهتر، برنامه را روی دستگاه خود نصب کنید:</p>
-                <div id="installInstructions" class="space-y-4 text-gray-700">
+                <h2 class="text-xl font-bold mb-4 text-center text-[#1d4ed8] dark:text-[#2563eb]">نصب برنامه زای تسک</h2>
+                <p class="text-sm text-gray-600 dark:text-[#9ca3af] mb-4 text-center">برای تجربه بهتر، برنامه را روی دستگاه خود نصب کنید:</p>
+                <div id="installInstructions" class="space-y-4 text-gray-700 dark:text-[#e5e7eb]">
                     </div>
                 <div class="mt-6 text-center">
                     <button id="understoodBtn" class="bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-bold py-2 px-6 rounded-lg focus:outline-none focus:shadow-outline transition duration-200">
@@ -4413,18 +4412,35 @@
     const understoodBtn = document.getElementById('understoodBtn');
     const installInstructions = document.getElementById('installInstructions');
 
-    // Function to detect browser and platform
+    // Function to detect browser and platform (more refined)
     function getBrowserAndPlatform() {
         const userAgent = navigator.userAgent;
         let browser = 'Other';
         let platform = 'Desktop';
+        let os = 'Unknown OS';
 
-        if (/(android|iphone|ipad|ipod)/i.test(userAgent)) {
-            platform = 'Mobile';
-        } else if (/(windows|mac|linux)/i.test(userAgent)) {
+        // Detect Platform/OS first
+        if (/windows/i.test(userAgent)) {
+            os = 'Windows';
             platform = 'Desktop';
+        } else if (/macintosh|mac os x/i.test(userAgent)) {
+            os = 'macOS';
+            platform = 'Desktop';
+        } else if (/linux/i.test(userAgent)) {
+            os = 'Linux';
+            platform = 'Desktop';
+        } else if (/android/i.test(userAgent)) {
+            os = 'Android';
+            platform = 'Mobile';
+        } else if (/iphone|ipod/i.test(userAgent)) {
+            os = 'iOS';
+            platform = 'Mobile';
+        } else if (/ipad/i.test(userAgent)) {
+            os = 'iPadOS';
+            platform = 'Tablet'; // Distinguish tablet for iPad-specific instructions
         }
 
+        // Detect Browser
         if (userAgent.includes('CriOS')) browser = 'Chrome'; // Chrome on iOS
         else if (userAgent.includes('Chrome') && !userAgent.includes('Edge')) browser = 'Chrome'; // Chrome on Android/Desktop
         else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) browser = 'Safari'; // Safari on iOS/Desktop
@@ -4433,20 +4449,23 @@
         else if (userAgent.includes('SamsungBrowser')) browser = 'Samsung Browser';
         else if (userAgent.includes('Brave')) browser = 'Brave';
         else if (userAgent.includes('Opera') || userAgent.includes('OPR')) browser = 'Opera';
-        else if (userAgent.includes('Trident') || userAgent.includes('MSIE')) browser = 'Internet Explorer'; // Legacy IE
+        else if (userAgent.includes('MSIE') || userAgent.includes('Trident')) browser = 'Internet Explorer'; // Legacy IE
+        else if (userAgent.includes('Bing')) browser = 'Bing'; // Bing app/browser, often Chromium-based
 
-        return { browser, platform };
+        return { browser, platform, os };
     }
 
     // Function to provide browser- and platform-specific instructions
-    function showInstallInstructions() {
-        const { browser, platform } = getBrowserAndPlatform();
+    function getInstallInstructionsContent() {
+        const { browser, platform, os } = getBrowserAndPlatform();
         let instructions = '';
+        const blueIcon = 'text-[#2563eb] dark:text-[#1d4ed8]'; // Consistent icon color
+        const grayIcon = 'text-gray-600 dark:text-[#9ca3af]'; // For less prominent icons
 
-        const commonSafariMobile = `
-            <p><strong class="text-[#2563eb]">در مرورگر سافاری:</strong></p>
+        const commonSafariiOS = `
+            <p><strong class="text-[#1d4ed8] dark:text-[#2563eb]">در مرورگر سافاری (iOS/iPadOS):</strong></p>
             <ol class="list-decimal list-inside text-sm leading-relaxed">
-                <li>روی دکمه <i class="fas fa-share-alt text-base text-[#2563eb]"></i> (Share) در نوار پایین مرورگر ضربه بزنید.</li>
+                <li>روی دکمه <i class="fas fa-share-alt ${blueIcon}"></i> (Share) در نوار پایین مرورگر ضربه بزنید.</li>
                 <li>به پایین اسکرول کنید و گزینه "<strong>Add to Home Screen</strong>" را انتخاب کنید.</li>
                 <li>در پنجره باز شده، روی "Add" در بالا سمت راست ضربه بزنید.</li>
             </ol>
@@ -4455,98 +4474,106 @@
         switch (browser) {
             case 'Chrome':
             case 'Samsung Browser':
-            case 'Brave':
-                if (platform === 'Mobile') {
+            case 'Brave': // Chromium-based browsers
+                if (platform === 'Mobile' || platform === 'Tablet') {
                     instructions = `
-                        <p><strong class="text-[#2563eb]">در مرورگر کروم، سامسونگ یا بریو (موبایل):</strong></p>
+                        <p><strong class="text-[#1d4ed8] dark:text-[#2563eb]">در مرورگر ${browser} (${os}):</strong></p>
                         <ol class="list-decimal list-inside text-sm leading-relaxed">
-                            <li>روی آیکون سه نقطه <i class="fas fa-ellipsis-v text-base text-[#2563eb]"></i> در بالای صفحه سمت چپ (منوی مرورگر) ضربه بزنید.</li>
+                            <li>روی آیکون سه نقطه <i class="fas fa-ellipsis-v ${blueIcon}"></i> یا سه خط <i class="fas fa-bars ${blueIcon}"></i> در بالای صفحه سمت چپ (منوی مرورگر) ضربه بزنید.</li>
                             <li>گزینه "<strong>Add to Home screen</strong>" یا "<strong>Install app</strong>" را پیدا کرده و انتخاب کنید.</li>
                             <li>دستورالعمل‌ها را دنبال کنید تا برنامه به صفحه اصلی شما اضافه شود.</li>
                         </ol>
                     `;
-                } else { // Desktop Chrome
+                } else { // Desktop Chrome/Brave
                     instructions = `
-                        <p><strong class="text-[#2563eb]">در مرورگر کروم، سامسونگ یا بریو (دسکتاپ):</strong></p>
+                        <p><strong class="text-[#1d4ed8] dark:text-[#2563eb]">در مرورگر ${browser} (دسکتاپ ${os}):</strong></p>
                         <ol class="list-decimal list-inside text-sm leading-relaxed">
-                            <li>به دنبال آیکون "نصب برنامه" <i class="fas fa-download text-base text-[#2563eb]"></i> یا <i class="fas fa-plus text-base text-[#2563eb]"></i> در نوار آدرس مرورگر (معمولاً سمت راست) بگردید و روی آن کلیک کنید.</li>
+                            <li>به دنبال آیکون "نصب برنامه" <i class="fas fa-download ${blueIcon}"></i> یا <i class="fas fa-plus ${blueIcon}"></i> در نوار آدرس مرورگر (معمولاً سمت راست) بگردید و روی آن کلیک کنید.</li>
                             <li>در پنجره باز شده، روی "<strong>Install</strong>" کلیک کنید.</li>
                         </ol>
-                        <p class="text-sm mt-2 text-gray-600">یا از منوی مرورگر (سه نقطه <i class="fas fa-ellipsis-v text-base text-gray-600"></i>) گزینه "Install ZayTask..." را پیدا کنید.</p>
+                        <p class="text-sm mt-2 text-gray-600 dark:text-[#9ca3af]">یا از منوی مرورگر (سه نقطه <i class="fas fa-ellipsis-v ${grayIcon}"></i>) گزینه "Install ${document.title}..." را پیدا کنید.</p>
                     `;
                 }
                 break;
             case 'Safari':
-                if (platform === 'Mobile') {
-                    instructions = commonSafariMobile;
-                } else { // Desktop Safari (PWA install not natively supported like Chrome/Edge)
+                if (os === 'iOS' || os === 'iPadOS') {
+                    instructions = commonSafariiOS;
+                } else { // Desktop Safari (macOS)
                     instructions = `
-                        <p><strong class="text-[#2563eb]">در مرورگر سافاری (دسکتاپ):</strong></p>
-                        <p class="text-sm">سافاری در دسکتاپ امکان نصب مستقیم PWA را ندارد. می‌توانید آدرس این صفحه را برای دسترسی سریع ذخیره کنید (Bookmark).</p>
-                        <p class="text-sm mt-2 text-gray-600">اگر از آیفون یا آیپد استفاده می‌کنید، مراحل نصب متفاوت است:</p>
-                        ${commonSafariMobile}
+                        <p><strong class="text-[#1d4ed8] dark:text-[#2563eb]">در مرورگر سافاری (دسکتاپ macOS):</strong></p>
+                        <p class="text-sm">سافاری در دسکتاپ امکان نصب مستقیم برنامه (PWA) را ندارد. می‌توانید آدرس این صفحه را برای دسترسی سریع ذخیره کنید (Bookmark).</p>
+                        <p class="text-sm mt-2 text-gray-600 dark:text-[#9ca3af]">اگر از آیفون یا آیپد استفاده می‌کنید، مراحل نصب متفاوت است:</p>
+                        ${commonSafariiOS}
                     `;
                 }
                 break;
             case 'Firefox':
-                if (platform === 'Mobile') {
+                if (platform === 'Mobile' || platform === 'Tablet') {
                     instructions = `
-                        <p><strong class="text-[#2563eb]">در مرورگر فایرفاکس (موبایل):</strong></p>
+                        <p><strong class="text-[#1d4ed8] dark:text-[#2563eb]">در مرورگر فایرفاکس (موبایل ${os}):</strong></p>
                         <ol class="list-decimal list-inside text-sm leading-relaxed">
-                            <li>روی آیکون سه نقطه <i class="fas fa-ellipsis-v text-base text-[#2563eb]"></i> (منو) در پایین صفحه ضربه بزنید.</li>
+                            <li>روی آیکون سه نقطه <i class="fas fa-ellipsis-v ${blueIcon}"></i> (منو) در پایین صفحه ضربه بزنید.</li>
                             <li>گزینه "<strong>Install</strong>" را پیدا کرده و انتخاب کنید.</li>
                         </ol>
                     `;
                 } else { // Desktop Firefox
                     instructions = `
-                        <p><strong class="text-[#2563eb]">در مرورگر فایرفاکس (دسکتاپ):</strong></p>
+                        <p><strong class="text-[#1d4ed8] dark:text-[#2563eb]">در مرورگر فایرفاکس (دسکتاپ ${os}):</strong></p>
                         <ol class="list-decimal list-inside text-sm leading-relaxed">
-                            <li>به دنبال آیکون خانه با علامت مثبت <i class="fas fa-plus text-base text-[#2563eb]"></i> یا نماد صفحه با فلش رو به پایین <i class="fas fa-arrow-alt-circle-down text-base text-[#2563eb]"></i> در نوار آدرس بگردید.</li>
+                            <li>به دنبال آیکون خانه با علامت مثبت <i class="fas fa-plus-circle ${blueIcon}"></i> یا نماد صفحه با فلش رو به پایین <i class="fas fa-arrow-alt-circle-down ${blueIcon}"></i> در نوار آدرس بگردید.</li>
                             <li>روی آن کلیک کنید و دستورالعمل‌ها را دنبال کنید.</li>
                         </ol>
-                        <p class="text-sm mt-2 text-gray-600">یا از منوی مرورگر (سه خط <i class="fas fa-bars text-base text-gray-600"></i>) گزینه "Install" را پیدا کنید.</p>
+                        <p class="text-sm mt-2 text-gray-600 dark:text-[#9ca3af]">یا از منوی مرورگر (سه خط <i class="fas fa-bars ${grayIcon}"></i>) گزینه "Install" را پیدا کنید.</p>
                     `;
                 }
                 break;
             case 'Edge':
-                if (platform === 'Mobile') {
+            case 'Bing': // Bing browser app often uses Edge engine
+                if (platform === 'Mobile' || platform === 'Tablet') {
                     instructions = `
-                        <p><strong class="text-[#2563eb]">در مرورگر اج (موبایل):</strong></p>
+                        <p><strong class="text-[#1d4ed8] dark:text-[#2563eb]">در مرورگر اج/بینگ (موبایل ${os}):</strong></p>
                         <ol class="list-decimal list-inside text-sm leading-relaxed">
-                            <li>روی آیکون سه نقطه <i class="fas fa-ellipsis-v text-base text-[#2563eb]"></i> (منو) در پایین صفحه ضربه بزنید.</li>
-                            <li>گزینه "<strong>Add to phone</strong>" را پیدا کرده و انتخاب کنید.</li>
+                            <li>روی آیکون سه نقطه <i class="fas fa-ellipsis-h ${blueIcon}"></i> (منو) در پایین صفحه ضربه بزنید.</li>
+                            <li>گزینه "<strong>Add to phone</strong>" یا "<strong>Install app</strong>" را پیدا کرده و انتخاب کنید.</li>
                         </ol>
                     `;
                 } else { // Desktop Edge
                     instructions = `
-                        <p><strong class="text-[#2563eb]">در مرورگر اج (دسکتاپ):</strong></p>
+                        <p><strong class="text-[#1d4ed8] dark:text-[#2563eb]">در مرورگر اج (دسکتاپ ${os}):</strong></p>
                         <ol class="list-decimal list-inside text-sm leading-relaxed">
-                            <li>به دنبال آیکون "App available" <i class="fas fa-download text-base text-[#2563eb]"></i> یا دکمه "Install" در نوار آدرس مرورگر بگردید و روی آن کلیک کنید.</li>
+                            <li>به دنبال آیکون "App available" <i class="fas fa-download ${blueIcon}"></i> یا دکمه "Install" در نوار آدرس مرورگر بگردید و روی آن کلیک کنید.</li>
                             <li>در پنجره باز شده، روی "<strong>Install</strong>" کلیک کنید.</li>
                         </ol>
-                        <p class="text-sm mt-2 text-gray-600">یا از منوی مرورگر (سه نقطه <i class="fas fa-ellipsis-h text-base text-gray-600"></i>) گزینه "Apps" سپس "Install this site as an app" را پیدا کنید.</p>
+                        <p class="text-sm mt-2 text-gray-600 dark:text-[#9ca3af]">یا از منوی مرورگر (سه نقطه <i class="fas fa-ellipsis-h ${grayIcon}"></i>) گزینه "Apps" سپس "Install this site as an app" را پیدا کنید.</p>
                     `;
                 }
                 break;
-            case 'Internet Explorer': // Fallback for very old browsers
-                instructions = `
-                    <p><strong class="text-[#ef4444]">مرورگر شما، Internet Explorer، به طور کامل از نصب برنامه‌های PWA پشتیبانی نمی‌کند.</strong></p>
-                    <p class="text-sm mt-2">برای بهترین تجربه، لطفاً از یک مرورگر مدرن مانند کروم، فایرفاکس یا اج استفاده کنید.</p>
-                `;
-                break;
             case 'Opera':
+                if (platform === 'Mobile' || platform === 'Tablet') {
+                    instructions = `
+                        <p><strong class="text-[#1d4ed8] dark:text-[#2563eb]">در مرورگر اپرا (موبایل ${os}):</strong></p>
+                        <p class="text-sm">معمولاً می‌توانید برنامه را از طریق منوی مرورگر (آیکون اپرا <i class="fab fa-opera ${blueIcon}"></i> یا سه خط <i class="fas fa-bars ${blueIcon}"></i>) و جستجوی گزینه‌هایی مانند "<strong>Add to Home Screen</strong>" یا "<strong>Install app</strong>" نصب کنید.</p>
+                    `;
+                } else { // Desktop Opera
+                    instructions = `
+                        <p><strong class="text-[#1d4ed8] dark:text-[#2563eb]">در مرورگر اپرا (دسکتاپ ${os}):</strong></p>
+                        <p class="text-sm">معمولاً می‌توانید برنامه را از طریق منوی مرورگر (آیکون اپرا <i class="fab fa-opera ${blueIcon}"></i>) و جستجوی گزینه‌هایی مانند "<strong>Install app</strong>" یا "<strong>Add to Home Screen</strong>" نصب کنید.</p>
+                    `;
+                }
+                break;
+            case 'Internet Explorer':
                 instructions = `
-                    <p><strong class="text-[#2563eb]">در مرورگر اپرا (موبایل/دسکتاپ):</strong></p>
-                    <p class="text-sm">معمولاً می‌توانید اپلیکیشن را از طریق منوی مرورگر (آیکون اپرا <i class="fab fa-opera text-base text-[#2563eb]"></i> یا سه خط <i class="fas fa-bars text-base text-[#2563eb]"></i>) و جستجوی گزینه‌هایی مانند "<strong>Add to Home Screen</strong>" یا "<strong>Install app</strong>" نصب کنید.</p>
+                    <p><strong class="text-[#ef4444] dark:text-[#ef4444]">مرورگر شما، Internet Explorer، به طور کامل از نصب برنامه‌های PWA پشتیبانی نمی‌کند.</strong></p>
+                    <p class="text-sm mt-2 text-gray-700 dark:text-[#e5e7eb]">برای بهترین تجربه، لطفاً از یک مرورگر مدرن مانند کروم، فایرفاکس یا اج استفاده کنید.</p>
                 `;
                 break;
             case 'Other':
             default:
                 instructions = `
-                    <p><strong class="text-[#2563eb]">راهنمای نصب برای مرورگر شما (${browser} ${platform}):</strong></p>
-                    <p class="text-sm">معمولاً می‌توانید برنامه را از طریق منوی مرورگر (به دنبال آیکون سه نقطه <i class="fas fa-ellipsis-v text-base text-[#2563eb]"></i>، سه خط <i class="fas fa-bars text-base text-[#2563eb]"></i> یا آیکون اشتراک‌گذاری <i class="fas fa-share-alt text-base text-[#2563eb]"></i> بگردید) و جستجوی گزینه‌هایی مانند "<strong>Add to Home screen</strong>"، "<strong>Install app</strong>" یا "<strong>Install site</strong>" نصب کنید.</p>
-                    <p class="text-sm mt-2 text-gray-600">اگر از آیفون یا آیپد استفاده می‌کنید و مرورگر شما سافاری است، از دستورالعمل زیر پیروی کنید:</p>
-                    ${commonSafariMobile}
+                    <p><strong class="text-[#1d4ed8] dark:text-[#2563eb]">راهنمای نصب برای مرورگر شما (${browser} ${platform} ${os}):</strong></p>
+                    <p class="text-sm">معمولاً می‌توانید برنامه را از طریق منوی مرورگر (به دنبال آیکون سه نقطه <i class="fas fa-ellipsis-v ${blueIcon}"></i>، سه خط <i class="fas fa-bars ${blueIcon}"></i> یا آیکون اشتراک‌گذاری <i class="fas fa-share-alt ${blueIcon}"></i> بگردید) و جستجوی گزینه‌هایی مانند "<strong>Add to Home screen</strong>"، "<strong>Install app</strong>" یا "<strong>Install site</strong>" نصب کنید.</p>
+                    <p class="text-sm mt-2 text-gray-600 dark:text-[#9ca3af]">اگر از آیفون یا آیپد استفاده می‌کنید و مرورگر شما سافاری است، از دستورالعمل زیر پیروی کنید:</p>
+                    ${commonSafariiOS}
                 `;
                 break;
         }
@@ -4558,10 +4585,10 @@
     // --- Attach event listener to the "Install App" button ---
     installAppLink.addEventListener('click', (e) => {
         e.preventDefault();
-        showInstallInstructions();
+        getInstallInstructionsContent(); // Call the function to show instructions
     });
 
-    // --- Close Modal Event Listener ---
+    // --- Close Modal Event Listeners ---
     closeModalBtn.addEventListener('click', () => {
         installModal.classList.add('hidden');
     });
@@ -4580,6 +4607,7 @@
 
 
     // --- Start: Share Functionality (same as before) ---
+    // The share button is initially hidden and shown only if navigator.share is supported
     if ('share' in navigator) {
         shareAppLink.classList.remove('hidden');
         shareAppLink.addEventListener('click', async (e) => {
@@ -4603,7 +4631,6 @@
 
     // Optional: Hide install button if app is already installed
     // This part still relies on 'appinstalled' event, which works if the PWA was installed via browser's native prompt
-    // You might choose to remove this if you want the modal always available, or handle it differently.
     window.addEventListener('appinstalled', () => {
         console.log('Event: PWA was successfully installed (via native prompt).');
         // If the user installed via native prompt, hide *your* manual install button.
