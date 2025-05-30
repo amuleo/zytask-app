@@ -78,6 +78,31 @@
             background: #999;
         }
 
+        /* Custom scrollbar for dropdown (if content overflows) */
+        .dropdown-scrollable::-webkit-scrollbar {
+            width: 8px;
+        }
+        .dropdown-scrollable::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .dropdown-scrollable::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .dropdown-scrollable::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .dark .dropdown-scrollable::-webkit-scrollbar-track {
+            background: #333;
+        }
+        .dark .dropdown-scrollable::-webkit-scrollbar-thumb {
+            background: #666;
+        }
+        .dark .dropdown-scrollable::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+
         /* Main font for the entire body */
         body {
             font-family: 'Vazirmatn FD', sans-serif; /* Font changed to Vazirmatn FD */
@@ -86,6 +111,10 @@
             -moz-user-select: none;    /* Firefox */
             -ms-user-select: none;     /* Internet Explorer/Edge */
             user-select: none;         /* Standard */
+            display: flex; /* Added for new header layout */
+            flex-direction: column; /* Added for new header layout */
+            align-items: center; /* Added for new header layout */
+            min-height: 100vh; /* Added for new header layout */
         }
 
         /* Allow selection for inputs and textareas */
@@ -730,40 +759,22 @@
     </style>
 </head>
 <body class="px-0 py-0 sm:p-4 flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
-    <div class="container bg-white dark:bg-gray-800 rounded-none sm:rounded-xl p-0 sm:p-6 md:p-8 w-full max-w-4xl relative pt-16 md:pt-20 h-screen sm:h-auto">
-
-        <button id="themeToggleBtn" class="absolute top-4 left-4 md:top-6 md:left-6 p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="تغییر تم">
-            <svg id="themeIcon" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.325 6.675l-.707-.707M6.318 6.318l-.707-.707m12.728 0l-.707.707M6.318 17.682l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-            </svg>
-        </button>
-
-        <div class="flex flex-col items-center md:flex-row md:justify-between mb-6 border-b pb-4 border-gray-200 dark:border-gray-700 md:px-16 header-mobile-flex">
-            <h1 class="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-4 md:mb-0 text-center w-full md:w-auto sm:text-5xl md:text-6xl md:text-right whitespace-nowrap md:ml-5">زای تسک</h1>
-            <div class="flex flex-nowrap justify-center gap-2 sm:flex-row sm:space-x-4 sm:space-x-reverse w-full md:max-w-md header-mobile-stats overflow-x-auto whitespace-nowrap">
-                <div class="flex items-center bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 px-3 py-1 rounded-full flex-shrink-0">
-                    <i class="fa-solid fa-coins text-xl ml-2"></i>
-                    <span class="text-base sm:text-lg font-semibold">پوینت: <span id="zPoint1" class="text-yellow-800 dark:text-yellow-200">0</span></span>
-                </div>
-                <div class="flex items-center bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full clickable-item flex-shrink-0" id="currentLevelDisplay">
-                    <i id="levelIcon1" class="text-xl ml-2"></i>
-                    <span class="text-base sm:text-lg font-semibold">سطح: <span id="level1" class="text-blue-800 dark:text-blue-200">1</span></span>
-                </div>
-                <div class="flex items-center bg-purple-100 dark:bg-purple-800 text-purple-800 dark:text-purple-200 px-3 py-1 rounded-full flex-shrink-0">
-                    <i class="fa-solid fa-fire text-xl ml-2"></i>
-                    <span class="text-base sm:text-lg font-semibold">زنجیره: <span id="dailyStreak1" class="text-purple-800 dark:text-purple-200">0</span></span>
-                </div>
-            </div>
-        </div>
-
+    <div class="container bg-white dark:bg-gray-800 rounded-none sm:rounded-xl p-0 sm:p-6 md:p-8 w-full max-w-4xl relative h-screen sm:h-auto">
         <header class="relative p-4 flex items-center justify-between bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700">
-            <div class="absolute top-4 right-4 md:top-6 md:right-6 z-10">
-            <button id="menuBtn" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="باز کردن منو">
+            <button id="menuBtn" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="باز کردن منو">
                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 100-2 1 1 0 000 2zm0 7a1 1 0 100-2 1 1 0 000 2zm0 7a1 1 0 100-2 1 1 0 000 2z"></path>
                 </svg>
             </button>
-            <div id="menuDropdown" class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg py-1 hidden z-20">
+
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">زای تسک</h1>
+
+            <button id="themeToggleBtn" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="تغییر تم">
+                <svg id="themeIcon" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.325 6.675l-.707-.707M6.318 6.318l-.707-.707m12.728 0l-.707.707M6.318 17.682l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+            </button>
+            <div id="menuDropdown" class="absolute right-4 top-full mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg py-1 hidden z-20">
                 <a href="#" id="profileMenuItem" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-200 ease-in-out flex items-center">
                     <i class="fa-solid fa-user ml-2"></i> پروفایل
                 </a>
@@ -789,46 +800,36 @@
                     <i class="fa-solid fa-arrows-rotate ml-2"></i> بازنشانی داده‌ها
                 </a>
             </div>
-        </div>
-
-            <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">زای تسک</h1>
-
-            <button id="themeToggleBtn" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="تغییر تم">
-                <svg id="themeIcon" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.325 6.675l-.707-.707M6.318 6.318l-.707-.707m12.728 0l-.707.707M6.318 17.682l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                </svg>
-            </button>
         </header>
 
         <div class="relative w-full">
-            <div id="pointsDropdownToggle" class="flex items-center justify-between w-full py-3 px-4 bg-yellow-500 dark:bg-yellow-700 text-white cursor-pointer transition-all duration-200 ease-in-out hover:bg-yellow-600 dark:hover:bg-yellow-800 mb-10">
+            <div id="pointsDropdownToggle" class="flex items-center justify-between w-full py-3 px-4 bg-yellow-500 dark:bg-yellow-700 text-white cursor-pointer transition-all duration-200 ease-in-out hover:bg-yellow-600 dark:hover:bg-yellow-800">
                 <div class="flex items-center">
                     <i class="fa-solid fa-coins text-xl ml-2"></i>
-                    <span class="text-lg font-semibold">پوینت: <span id="zPoint">1234</span></span>
+                    <span class="text-lg font-semibold">پوینت: <span id="zPoint">0</span></span>
                 </div>
                 <i id="dropdownIndicator" class="fa-solid fa-chevron-down transition-transform duration-200"></i>
             </div>
 
             <div id="pointsDropdownContent" class="absolute top-full left-0 right-0 w-full bg-white dark:bg-gray-800 shadow-lg py-2 hidden z-10 transition-all duration-200 ease-in-out origin-top opacity-0 scale-y-95 transform dropdown-scrollable">
                 <div class="flex flex-col gap-2 p-2">
-                    <div class="flex items-center gap-2 theme-blue-bg theme-blue-text px-4 py-2 rounded-lg">
+                    <div class="flex items-center justify-between theme-blue-bg theme-blue-text px-4 py-2 rounded-lg">
                         <div class="flex items-center">
                             <i id="levelIcon" class="fa-solid fa-star text-xl ml-2"></i>
                             <span class="text-base font-semibold">سطح:</span>
                         </div>
-                        <span id="level" class="text-base font-semibold">5</span>
+                        <span id="level" class="text-base font-semibold">1</span>
                     </div>
-                    <div class="flex items-center gap-2 theme-purple-bg theme-purple-text px-4 py-2 rounded-lg">
+                    <div class="flex items-center justify-between theme-purple-bg theme-purple-text px-4 py-2 rounded-lg">
                         <div class="flex items-center">
                             <i class="fa-solid fa-fire text-xl ml-2"></i>
                             <span class="text-base font-semibold">زنجیره:</span>
                         </div>
-                        <span id="dailyStreak" class="text-base font-semibold">7 روز</span>
+                        <span id="dailyStreak" class="text-base font-semibold">0 روز</span>
                     </div>
-                    </div>
+                </div>
             </div>
         </div>
-
         <div class="mb-6 px-2 md:px-0">
             <h2 class="text-lg sm:text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">پیشرفت شما به سطح بعدی:</h2>
             <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
@@ -905,7 +906,7 @@
         </div>
     </div>
 
-    <div id="profileModal" class="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+    <div id="profileModal" class="fixed inset-0 bg-black bg-opacity50 dark:bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
         <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md relative text-gray-800 dark:text-gray-100 flex flex-col modal-box transition-transform duration-300 transform scale-95 opacity-0" id="profileModalContent">
             <h3 class="text-xl sm:text-2xl font-bold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">پروفایل کاربری</h3>
             <div id="profileModalBody" class="modal-scrollable-content text-justify text-sm leading-relaxed">
@@ -1193,6 +1194,10 @@
         const donateMenuItem = document.getElementById('donateMenuItem');
         const resetMenuItem = document.getElementById('resetMenuItem');
 
+        const pointsDropdownToggle = document.getElementById('pointsDropdownToggle'); // NEW
+        const pointsDropdownContent = document.getElementById('pointsDropdownContent'); // NEW
+        const dropdownIndicator = document.getElementById('dropdownIndicator'); // NEW
+
         const reorderBar = document.getElementById('reorderBar'); // New reorder bar
         const finishReorderBtn = document.getElementById('finishReorderBtn'); // New finish reorder button
 
@@ -1257,7 +1262,7 @@
         const toggleIcon = document.getElementById('toggleIcon');
         const zPointSpan = document.getElementById('zPoint');
         const levelSpan = document.getElementById('level');
-        const currentLevelDisplay = document.getElementById('currentLevelDisplay');
+        // const currentLevelDisplay = document.getElementById('currentLevelDisplay'); // Removed, now handled by pointsDropdownToggle
         const levelIcon = document.getElementById('levelIcon'); // New: Level icon element
         const dailyStreakSpan = document.getElementById('dailyStreak');
         const progressBar = document.getElementById('progressBar');
@@ -3130,6 +3135,42 @@
             }
         });
 
+        // Dropdown Toggle Logic for points dropdown (NEW)
+        pointsDropdownToggle.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent click from bubbling up to window and closing immediately
+
+            const isHidden = pointsDropdownContent.classList.contains('hidden');
+
+            if (isHidden) {
+                pointsDropdownContent.classList.remove('hidden');
+                void pointsDropdownContent.offsetHeight; // Force reflow for animation
+                pointsDropdownContent.classList.remove('opacity-0', 'scale-y-95');
+                pointsDropdownContent.classList.add('opacity-100', 'scale-y-100');
+                dropdownIndicator.classList.add('rotate-180'); // Rotate arrow up
+            } else {
+                pointsDropdownContent.classList.remove('opacity-100', 'scale-y-100');
+                pointsDropdownContent.classList.add('opacity-0', 'scale-y-95');
+                dropdownIndicator.classList.remove('rotate-180'); // Rotate arrow down
+                pointsDropdownContent.addEventListener('transitionend', () => {
+                    pointsDropdownContent.classList.add('hidden');
+                }, { once: true });
+            }
+        });
+
+        // Close points dropdown when clicking outside (NEW)
+        window.addEventListener('click', (e) => {
+            if (!pointsDropdownToggle.contains(e.target) && !pointsDropdownContent.contains(e.target)) {
+                if (!pointsDropdownContent.classList.contains('hidden')) {
+                    pointsDropdownContent.classList.remove('opacity-100', 'scale-y-100');
+                    pointsDropdownContent.classList.add('opacity-0', 'scale-y-95');
+                    dropdownIndicator.classList.remove('rotate-180');
+                    pointsDropdownContent.addEventListener('transitionend', () => {
+                        pointsDropdownContent.classList.add('hidden');
+                    }, { once: true });
+                }
+            }
+        });
+
 
         profileMenuItem.addEventListener('click', (e) => {
             e.preventDefault();
@@ -3840,56 +3881,64 @@
             };
             reader.onerror = (e) => {
                 console.error("Error reading file:", e);
-                showMessageBox('خطا در خواندن فایل. لطفاً دوباره امتحان کنید.', 'error');
+                showMessageBox('خطا در خواندن فایل.', 'error');
             };
             reader.readAsText(file);
         });
 
-        // --- Level/Achievement Detail Modal Logic ---
- function showDetailModal(type, identifier) {
-            detailModal.classList.remove('hidden');
-            void detailModalContent.offsetWidth; // Force reflow
-            // Add animation classes for modal entry
-            detailModalContent.classList.remove('opacity-0', 'scale-95');
-            detailModalContent.classList.add('opacity-100', 'scale-100');
+        // Function to show detail modal for levels and achievements
+        function showDetailModal(type, identifier, dataArray = null) {
+            detailModalTitle.textContent = '';
+            detailModalBody.innerHTML = '';
 
             let contentHtml = '';
-            let titleText = '';
+            let item;
 
             if (type === 'level') {
-                const levelNum = parseInt(identifier, 10);
-                // Ensure levelNum is a valid number and within bounds before accessing levelPointsThresholds
-                if (isNaN(levelNum) || levelNum < 1 || levelNum > levelPointsThresholds.length) {
-                    titleText = `خطا`;
-                    contentHtml = `<p class="text-red-500 text-justify">سطح نامعتبر است.</p>`;
-                } else {
-                    const levelInfo = levelPointsThresholds[levelNum - 1];
-                    titleText = `سطح ${levelNum}: ${levelInfo.name}`;
+                const levelNumber = identifier;
+                item = levelPointsThresholds[levelNumber - 1]; // Levels are 1-indexed in display
+                if (item) {
+                    detailModalTitle.textContent = `سطح ${levelNumber}: ${item.name}`;
                     contentHtml = `
-                        <p class="mb-2 text-gray-700 dark:text-gray-300 text-justify">${levelInfo.motivational}</p>
-                        <p class="mb-2 text-justify"><strong class="text-gray-600 dark:text-gray-300">پوینت مورد نیاز:</strong> ${levelInfo.points} پوینت</p>
+                        <p class="semi-formal-text mb-2"><strong class="text-blue-600 dark:text-blue-300">توضیحات:</strong> ${item.motivational}</p>
+                        <p class="semi-formal-text"><strong class="text-green-600 dark:text-green-300">پوینت مورد نیاز:</strong> ${item.points}</p>
+                        <p class="semi-formal-text"><strong class="text-purple-600 dark:text-purple-300">آیکون:</strong> <i class="${item.icon} text-xl ml-2"></i></p>
                     `;
+                } else {
+                    detailModalTitle.textContent = 'سطح نامشخص';
+                    contentHtml = '<p class="text-gray-700 dark:text-gray-300">اطلاعاتی برای این سطح یافت نشد.</p>';
                 }
-            } else if (type === 'achievement') { // This block handles 'achievement' type
-                const achievement = achievementsData.find(ach => ach.name === identifier);
+            } else if (type === 'achievement') {
+                const achievementName = identifier;
+                item = achievementsData.find(ach => ach.name === achievementName);
+                if (item) {
+                    detailModalTitle.textContent = `دستاورد: ${item.name}`;
+                    const isAchieved = unlockedAchievements.includes(item.name);
+                    const unlockedDate = achievementUnlockDates[item.name];
+                    const formattedDate = unlockedDate ? new Date(unlockedDate).toLocaleDateString('fa-IR', {
+                        year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'
+                    }) : 'هنوز باز نشده';
 
-                if (achievement) {
-                    titleText = `دستاورد: ${achievement.name}`;
                     contentHtml = `
-                        <p class="mb-2 text-justify"><strong class="text-gray-600 dark:text-gray-300">توضیحات:</strong> ${achievement.description || 'توضیحات در دسترس نیست.'}</p>
+                        <p class="semi-formal-text mb-2"><strong class="text-blue-600 dark:text-blue-300">توضیحات:</strong> ${item.description}</p>
+                        <p class="semi-formal-text"><strong class="text-green-600 dark:text-green-300">وضعیت:</strong> ${isAchieved ? 'باز شده' : 'باز نشده'}</p>
+                        <p class="semi-formal-text"><strong class="text-purple-600 dark:text-purple-300">تاریخ باز شدن:</strong> ${formattedDate}</p>
+                        <p class="semi-formal-text"><strong class="text-orange-600 dark:text-orange-300">آیکون:</strong> <i class="${item.icon} text-xl ml-2"></i></p>
                     `;
                 } else {
-                    titleText = `خطا`;
-                    contentHtml = `<p class="text-red-500 text-justify">دستاورد یافت نشد.</p>`;
+                    detailModalTitle.textContent = 'دستاورد نامشخص';
+                    contentHtml = '<p class="text-gray-700 dark:text-gray-300">اطلاعاتی برای این دستاورد یافت نشد.</p>';
                 }
-            } else { // Fallback for any other unexpected type
-                titleText = `خطا`;
-                contentHtml = `<p class="text-red-500 text-justify">نوع نامعتبر است.</p>`;
             }
 
-            detailModalTitle.textContent = titleText;
             detailModalBody.innerHTML = contentHtml;
+
+            detailModal.classList.remove('hidden');
+            void detailModalContent.offsetWidth; // Force reflow
+            detailModalContent.classList.remove('opacity-0', 'scale-95');
+            detailModalContent.classList.add('opacity-100', 'scale-100');
         }
+
         closeDetailModalBtn.addEventListener('click', () => {
             detailModalContent.classList.remove('opacity-100', 'scale-100');
             detailModalContent.classList.add('opacity-0', 'scale-95');
@@ -3898,76 +3947,22 @@
             }, 50);
         });
 
-        // Add click listener to current level display on main page
-        currentLevelDisplay.addEventListener('click', () => showDetailModal('level', level));
-
-
-        // --- Enter key logic (auto-handled removed) ---
-        // Global keydown listener for Enter key (only for specific modal buttons)
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                const activeElement = document.activeElement;
-
-                // 1. Welcome modal (only for userNameInput)
-                if (welcomeModal.classList.contains('show') || !welcomeModal.classList.contains('hidden')) {
-                    if (activeElement === userNameInput) {
-                        e.preventDefault(); // Prevent default Enter behavior (e.g., new line in textarea)
-                        // startBtn.click(); // Removed to disable Enter key submission
-                        return;
-                    }
-                }
-
-                // 2. Add task section (only for customPointsInput)
-                if (addTaskSection.contains(activeElement)) {
-                    // If taskInput or customPointsInput is focused
-                    if (activeElement === taskInput || activeElement === customPointsInput) {
-                        e.preventDefault();
-                        // addTaskBtn.click(); // Removed to disable Enter key submission
-                        return;
-                    }
-                }
-
-                // 3. Edit task modal (only for customPointsInput)
-                if (editTaskModal && (editTaskModal.classList.contains('show') || !editTaskModal.classList.contains('hidden'))) {
-                    if (editTaskModalContent && editTaskModalContent.contains(activeElement)) {
-                        // If editTaskNameInput or editTaskCustomPointsInput is focused
-                        if (activeElement === editTaskNameInput || activeElement === editTaskCustomPointsInput) {
-                            e.preventDefault();
-                            // saveEditedTaskBtn.click(); // Removed to disable Enter key submission
-                            return;
-                        }
-                    }
-                }
-            }
-        });
-
-        // Load data from local storage and initialize theme on window load
-        window.onload = () => {
-            loadFromLocalStorage(); // Load all data
-            initializeTheme(); // Initialize theme
-            renderTasks(); // Render tasks based on loaded data (without gamification update yet)
-
-            // Explicitly unlock "نوب" if zPoint is 0 and it's not already unlocked
-            const noobAchievement = achievementsData.find(ach => ach.name === 'نوب' && ach.type === 'level');
-            if (noobAchievement && zPoint === 0 && !unlockedAchievements.includes(noobAchievement.name)) {
-                unlockedAchievements.push(noobAchievement.name);
-                achievementUnlockDates[noobAchievement.name] = new Date().toISOString();
-                saveToLocalStorage();
-                console.log(`Achievement Unlocked: ${noobAchievement.name} (forced on load)`);
-            }
-
-            // Show welcome modal if user name is not set
+        // Initial load and render
+        window.onload = function () {
+            initializeTheme();
+            loadFromLocalStorage();
             if (!userName) {
+                // If no username, show welcome modal
                 welcomeModal.classList.remove('hidden');
                 void welcomeModalContent.offsetWidth; // Force reflow
-                welcomeModalContent.classList.remove('opacity-0', 'scale-95'); // Ensure animation starts
+                welcomeModalContent.classList.remove('opacity-0', 'scale-95');
                 welcomeModalContent.classList.add('opacity-100', 'scale-100');
                 userNameInput.focus();
             } else {
-                // If welcome modal is not shown (user already has a name),
-                // then it's safe to update gamification and process notifications.
-                updateGamificationDisplay(); // Now it's safe to run
-                // Add a small delay before processing notifications after welcome modal closes
+                // If username exists, render tasks and update gamification display
+                renderTasks();
+                updateGamificationDisplay(); // Call here for existing users
+                // Add a small delay before processing notifications on load for existing users
                 setTimeout(() => {
                     processNotificationQueue(); // Start processing general notifications
                     processAchievementNotificationQueue(); // Also process achievement queue on load
@@ -3998,51 +3993,6 @@
                     });
             });
         }
-
-        // new script
-
-        
-        const pointsDropdownToggle = document.getElementById('pointsDropdownToggle');
-        const pointsDropdownContent = document.getElementById('pointsDropdownContent');
-        const dropdownIndcator = document.getElementById('dropdownIndicator');
-        
-
-        // Dropdown Toggle Logic
-        pointsDropdownToggle.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent click from bubbling up to window and closing immediately
-
-            const isHidden = pointsDropdownContent.classList.contains('hidden');
-
-            if (isHidden) {
-                pointsDropdownContent.classList.remove('hidden');
-                void pointsDropdownContent.offsetHeight; // Force reflow for animation
-                pointsDropdownContent.classList.remove('opacity-0', 'scale-y-95');
-                pointsDropdownContent.classList.add('opacity-100', 'scale-y-100');
-                dropdownIndicator.classList.add('rotate-180'); // Rotate arrow up
-            } else {
-                pointsDropdownContent.classList.remove('opacity-100', 'scale-y-100');
-                pointsDropdownContent.classList.add('opacity-0', 'scale-y-95');
-                dropdownIndicator.classList.remove('rotate-180'); // Rotate arrow down
-                pointsDropdownContent.addEventListener('transitionend', () => {
-                    pointsDropdownContent.classList.add('hidden');
-                }, { once: true });
-            }
-        });
-
-        // Close dropdown when clicking outside
-        window.addEventListener('click', (e) => {
-            if (!pointsDropdownToggle.contains(e.target) && !pointsDropdownContent.contains(e.target)) {
-                if (!pointsDropdownContent.classList.contains('hidden')) {
-                    pointsDropdownContent.classList.remove('opacity-100', 'scale-y-100');
-                    pointsDropdownContent.classList.add('opacity-0', 'scale-y-95');
-                    dropdownIndicator.classList.remove('rotate-180');
-                    pointsDropdownContent.addEventListener('transitionend', () => {
-                        pointsDropdownContent.classList.add('hidden');
-                    }, { once: true });
-                }
-            }
-        });
-        
     </script>
 </body>
 </html>
