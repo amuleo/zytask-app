@@ -21,29 +21,29 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <style>
-        /* CSS variables for dynamic theming */
+        /* CSS variables for dynamic theming (Updated to Blue Theme) */
         :root {
-            /* Light mode colors (minimal: gray, black, white) */
-            --theme-primary: #4b5563; /* Gray-700 */
-            --theme-secondary: #6b7280; /* Gray-600 */
-            --theme-accent-bg: #f3f4f6; /* Gray-100 */
-            --theme-accent-text: #1f2937; /* Gray-900 */
-            --theme-progress-from: #4b5563; /* Gray-700 */
-            --theme-progress-to: #6b7280; /* Gray-600 */
-            --theme-input-border: #9ca3af; /* Gray-400 */
-            --theme-input-focus-ring: #6b7280; /* Gray-600 */
+            /* Light mode colors (Blue theme) */
+            --theme-primary: #2563eb; /* blue-600 */
+            --theme-secondary: #1d4ed8; /* blue-700 */
+            --theme-accent-bg: #eff6ff; /* blue-50 */
+            --theme-accent-text: #1e3a8a; /* blue-900 */
+            --theme-progress-from: #2563eb; /* blue-600 */
+            --theme-progress-to: #1d4ed8; /* blue-700 */
+            --theme-input-border: #93c5fd; /* blue-300 */
+            --theme-input-focus-ring: #60a5fa; /* blue-400 */
         }
 
         .dark {
-            /* Dark mode colors (minimal: gray, black, white) */
-            --theme-primary: #d1d5db; /* Gray-300 */
-            --theme-secondary: #9ca3af; /* Gray-400 */
-            --theme-accent-bg: #1f2937; /* Gray-900 */
-            --theme-accent-text: #f9fafb; /* Gray-50 */
-            --theme-progress-from: #d1d5db; /* Gray-300 */
-            --theme-progress-to: #9ca3af; /* Gray-400 */
-            --theme-input-border: #4b5563; /* Gray-700 */
-            --theme-input-focus-ring: #9ca3af; /* Gray-400 */
+            /* Dark mode colors (Blue theme) */
+            --theme-primary: #93c5fd; /* blue-300 */
+            --theme-secondary: #60a5fa; /* blue-400 */
+            --theme-accent-bg: #1e3a8a; /* blue-900 */
+            --theme-accent-text: #eff6ff; /* blue-50 */
+            --theme-progress-from: #93c5fd; /* blue-300 */
+            --theme-progress-to: #60a5fa; /* blue-400 */
+            --theme-input-border: #2563eb; /* blue-600 */
+            --theme-input-focus-ring: #3b82f6; /* blue-500 */
         }
 
         /* Custom scrollbar for modals */
@@ -714,6 +714,7 @@
             text-align: justify;
             text-justify: inter-word;
         }
+        /* Adjusted semi-formal-text margin-bottom for tighter spacing */
         .semi-formal-text {
             font-family: 'Vazirmatn FD', sans-serif; /* Already default, but good to be explicit */
             font-size: 0.95rem; /* Slightly smaller for minimal feel */
@@ -721,6 +722,7 @@
             color: #4a5568; /* Darker gray for semi-formal */
             padding: 0.5rem 0; /* Some vertical padding */
             text-align: justify; /* Ensure semi-formal text is justified */
+            margin-bottom: 0.5rem; /* Adjusted for tighter spacing */
         }
         .dark .semi-formal-text {
             color: #cbd5e0; /* Lighter gray for dark mode */
@@ -803,7 +805,7 @@
         </header>
 
         <div class="relative w-full">
-            <div id="pointsDropdownToggle" class="flex items-center justify-between w-full py-3 px-4 bg-yellow-500 dark:bg-yellow-700 text-white cursor-pointer transition-all duration-200 ease-in-out hover:bg-yellow-600 dark:hover:bg-yellow-800">
+            <div id="pointsDropdownToggle" class="flex items-center justify-between w-full py-3 px-4 bg-blue-500 dark:bg-blue-700 text-white cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-600 dark:hover:bg-blue-800">
                 <div class="flex items-center">
                     <i class="fa-solid fa-coins text-xl ml-2"></i>
                     <span class="text-lg font-semibold">پوینت: <span id="zPoint">0</span></span>
@@ -1550,22 +1552,22 @@
         function applyLevelTheme(currentLevel) {
             const isDarkMode = document.documentElement.classList.contains('dark');
 
-            // Define minimal color palette
+            // Define blue color palette based on Tailwind CSS classes
             const lightThemeColors = {
-                primary: '#4b5563', // Gray-700
-                secondary: '#6b7280', // Gray-600
-                accentBg: '#f3f4f6', // Gray-100
-                accentText: '#1f2937', // Gray-900
-                inputBorder: '#9ca3af', // Gray-400
-                inputFocusRing: '#6b7280' // Gray-600
+                primary: '#2563eb', /* blue-600 */
+                secondary: '#1d4ed8', /* blue-700 */
+                accentBg: '#eff6ff', /* blue-50 */
+                accentText: '#1e3a8a', /* blue-900 */
+                inputBorder: '#93c5fd', /* blue-300 */
+                inputFocusRing: '#60a5fa' /* blue-400 */
             };
             const darkThemeColors = {
-                primary: '#d1d5db', /* Gray-300 */
-                secondary: '#9ca3af', /* Gray-400 */
-                accentBg: '#1f2937', /* Gray-900 */
-                accentText: '#f9fafb', /* Gray-50 */
-                inputBorder: '#4b5563', /* Gray-700 */
-                inputFocusRing: '#9ca3af' /* Gray-400 */
+                primary: '#93c5fd', /* blue-300 */
+                secondary: '#60a5fa', /* blue-400 */
+                accentBg: '#1e3a8a', /* blue-900 */
+                accentText: '#eff6ff', /* blue-50 */
+                inputBorder: '#2563eb', /* blue-600 */
+                inputFocusRing: '#3b82f6' /* blue-500 */
             };
 
             const currentThemeData = isDarkMode ? darkThemeColors : lightThemeColors;
@@ -1621,9 +1623,10 @@
                 }
             }
 
-            // Check if level has actually changed
-            if (newLevel !== level) {
+            // Check if level has actually changed OR if it's the "Noob" level and hasn't been unlocked yet
+            if (newLevel !== level || (newLevel === 1 && !unlockedAchievements.includes('نوب'))) {
                 // Trigger achievement for each level gained between oldLevel and newLevel
+                // Or specifically for 'نوب' if it's level 1 and not yet unlocked
                 for (let i = oldLevel; i < newLevel; i++) {
                     const achievedLevelInfo = levelPointsThresholds[i]; // i is 0-indexed, so corresponds to level (i+1)
                     if (achievedLevelInfo && !unlockedAchievements.includes(achievedLevelInfo.name)) {
@@ -1638,6 +1641,19 @@
                         });
                     }
                 }
+                // Special handling for 'نوب' (Level 1) if it wasn't triggered by the loop
+                if (newLevel === 1 && !unlockedAchievements.includes('نوب')) {
+                    const noobAchievement = levelPointsThresholds[0];
+                    unlockedAchievements.push(noobAchievement.name);
+                    achievementUnlockDates[noobAchievement.name] = new Date().toISOString();
+                    console.log(`Achievement Unlocked: ${noobAchievement.name}`);
+                    showMessageBox(`دستاورد: ${noobAchievement.name}`, 'success', {
+                        type: 'achievement',
+                        iconClass: noobAchievement.icon,
+                        description: noobAchievement.motivational
+                    });
+                }
+
                 level = newLevel; // Update global level variable AFTER processing all intermediate achievements
             }
             levelSpan.textContent = level;
@@ -1645,7 +1661,7 @@
             // Update dynamic level icon
             levelIcon.className = `${currentLevelInfo.icon} text-xl ml-2`; // Apply the icon class
 
-            dailyStreakSpan.textContent = dailyStreak; // Update daily streak display
+            dailyStreakSpan.textContent = dailyStreak + " روز"; // Update daily streak display with " روز"
 
             // Progress bar logic up to level 15
             if (level <= levelPointsThresholds.length) {
@@ -1786,9 +1802,7 @@
                 totalCustomTasksCompleted = parseInt(storedTotalCustomTasksCompleted, 10);
                 if (isNaN(totalCustomTasksCompleted)) totalCustomTasksCompleted = 0; // Ensure it's a number
             }
-            if (storedUserName) {
-                userName = storedUserName;
-            }
+            // userName is handled in window.onload for initial check
             if (storedUserCreationDate && storedUserCreationDate !== 'null') {
                 userCreationDate = storedUserCreationDate;
             } else {
@@ -1900,7 +1914,7 @@
          * @param {object} task - The task object.
          * @param {boolean} [isNew=false] - True if this is a newly added task, for animation.
          * @param {boolean} [inReorderMode=false] - True if currently in reordering mode.
-         * @param {string|null} [reorderingTaskId=null] - The ID of the task being reordered.
+         * @param {string|null} [reorderingTaskId=null] - The ID of the task currently being reordered.
          * @returns {HTMLElement} The created task item element.
          */
         function createTaskElement(task, isNew = false, inReorderMode = false, reorderingTaskId = null) {
@@ -2396,26 +2410,24 @@
 
                     achievementItem.className = `achievement-item-card ${isAchieved ? '' : 'unachieved'}`;
 
-                    // Determine which icon to show
-                    const displayIcon = isAchieved ? achievement.icon : 'fa-solid fa-lock';
-
+                    // Add icon based on achievement status
                     achievementItem.innerHTML = `
-                        <i class="${displayIcon} icon"></i>
+                        <i class="${isAchieved ? achievement.icon : 'fa-solid fa-lock'} icon"></i>
                         <span class="name">${achievement.name}</span>
                         `;
 
                     // Add click listener to show details only for achieved items
                      if (isAchieved) {
-    achievementItem.addEventListener('click', () => {
-        if (achievement.type === 'level') {
-            // اگر نوع دستاورد 'level' باشد، اطلاعات سطح را ارسال کنید
-            showDetailModal(achievement.type, achievement.level, levelPointsThresholds);
-        } else {
-            // در غیر این صورت، اطلاعات دستاورد را ارسال کنید
-            showDetailModal('achievement', achievement.name);
-        }
-    });
-}
+                        achievementItem.addEventListener('click', () => {
+                            if (achievement.type === 'level') {
+                                // اگر نوع دستاورد 'level' باشد، اطلاعات سطح را ارسال کنید
+                                showDetailModal(achievement.type, achievement.name); // Pass name for level
+                            } else {
+                                // در غیر این صورت، اطلاعات دستاورد را ارسال کنید
+                                showDetailModal('achievement', achievement.name);
+                            }
+                        });
+                    }
 
                     achievementsModalBody.appendChild(achievementItem);
                 });
@@ -2768,10 +2780,12 @@
                 if (!menu.contains(e.target) && !buttonElement.contains(e.target) && !isInteractiveElement) {
                     menu.remove();
                     document.removeEventListener('click', closeMenu);
+                    console.log('Clicked outside menu, closing');
                 } else if (isInteractiveElement && !menu.contains(e.target)) {
                     // If an interactive element outside the menu was clicked, close the menu, but allow the element's action.
                     menu.remove();
                     document.removeEventListener('click', closeMenu);
+                    console.log('Clicked on interactive element outside menu, closing');
                 }
             };
             // Add a small delay to allow the menu to render before attaching the global click listener
@@ -3114,6 +3128,17 @@
         // --- Menu and Modal Logic ---
         menuBtn.addEventListener('click', (e) => {
             e.stopPropagation(); // Prevent click propagation to window and closing dropdown
+
+            // If points dropdown is open, close it
+            if (!pointsDropdownContent.classList.contains('hidden')) {
+                pointsDropdownContent.classList.remove('opacity-100', 'scale-y-100');
+                pointsDropdownContent.classList.add('opacity-0', 'scale-y-95');
+                dropdownIndicator.classList.remove('rotate-180');
+                pointsDropdownContent.addEventListener('transitionend', () => {
+                    pointsDropdownContent.classList.add('hidden');
+                }, { once: true });
+            }
+
             menuDropdown.classList.toggle('hidden');
         });
 
@@ -3129,15 +3154,22 @@
             // If it's an interactive element, we still want the menu to close, but the element's action to proceed.
             if (!isClickInsideMenu && !isInteractiveElement) {
                 menuDropdown.classList.add('hidden');
+                console.log('Clicked outside menu, closing');
             } else if (isInteractiveElement && !isClickInsideMenu) {
                 // If an interactive element outside the menu was clicked, close the menu.
                 menuDropdown.classList.add('hidden');
+                console.log('Clicked on interactive element outside menu, closing');
             }
         });
 
         // Dropdown Toggle Logic for points dropdown (NEW)
         pointsDropdownToggle.addEventListener('click', (e) => {
             e.stopPropagation(); // Prevent click from bubbling up to window and closing immediately
+
+            // If menu dropdown is open, close it
+            if (!menuDropdown.classList.contains('hidden')) {
+                menuDropdown.classList.add('hidden');
+            }
 
             const isHidden = pointsDropdownContent.classList.contains('hidden');
 
@@ -3247,7 +3279,7 @@
 
                 return `
                     <div class="p-3 rounded-lg bg-${item.color}-50 dark:bg-${item.color}-900 text-${item.color}-800 dark:text-${item.color}-200 flex items-center justify-between ${colSpanClass}">
-                        <span class="font-semibold"><i class="fa-solid ${item.icon} ml-2"></i> ${item.label}:</span>
+                        <span class="font-semibold">${item.label}:</span>
                         <span>${item.value}</span>
                     </div>
                 `;
@@ -3337,83 +3369,95 @@
             // Dynamically update help modal content with current point values
             helpModalBody.innerHTML = `
                 <h3 class="text-xl sm:text-2xl font-bold mb-2 help-heading-blue">به زای تسک خوش آمدید!</h3>
-                <p class="mb-3 text-gray-700 dark:text-gray-300 text-justify">زای تسک یک پلتفرم مدیریت وظایف گیمیفای شده است که با هدف افزایش انگیزه و بهره‌وری شما طراحی شده است. با انجام وظایف، پوینت کسب می‌کنید، سطح خود را ارتقا می‌دهید و دستاوردهای ویژه‌ای را باز می‌کنید.</p>
+                <p class="semi-formal-text">زای تسک یک پلتفرم مدیریت وظایف گیمیفای شده است که با هدف افزایش انگیزه و بهره‌وری شما طراحی شده است. با انجام وظایف، پوینت کسب می‌کنید، سطح خود را ارتقا می‌دهید و دستاوردهای ویژه‌ای را باز می‌کنید.</p>
 
                 <h3 class="text-xl sm:text-2xl font-bold mb-2 mt-4 help-heading-green">نحوه استفاده از برنامه</h3>
-                <p class="mb-2 text-justify"><strong class="text-gray-600 dark:text-gray-300">۱. افزودن وظیفه جدید:</strong>
+                <p class="semi-formal-text">
+                    <strong class="text-gray-600 dark:text-gray-300">۱. افزودن وظیفه جدید:</strong>
                     برای اضافه کردن یک وظیفه، نام آن را در فیلد "نام وظیفه" وارد کنید. سپس، می‌توانید اهمیت آن را از طریق منوی کشویی "اهمیت" انتخاب کنید:
                     <ul class="list-disc list-inside mt-2 mb-2 text-justify">
-                        <li><strong class="text-red-600 dark:text-red-300">مهم:</strong> وظایف با اولویت بالا که پوینت بیشتری به شما می‌دهند.</li>
-                        <li><strong class="text-gray-600 dark:text-gray-300">عادی:</strong> وظایف روزمره با پوینت استاندارد.</li>
-                        <li><strong class="text-purple-600 dark:text-purple-300">سفارشی:</strong> می‌توانید میزان پوینت دریافتی برای این وظیفه را (تا حداکثر ${MAX_CUSTOM_POINTS} پوینت) به صورت دستی وارد کنید.</li>
-                        <li><strong class="text-orange-600 dark:text-orange-300">یادداشت:</strong> این نوع وظایف برای ثبت نکات، ایده‌ها یا اطلاعاتی هستند که نیازی به تکمیل شدن ندارند و پوینت گیمیفیکیشن نمی‌دهند. حداکثر طول متن برای یادداشت‌ها ۱۵۰ کاراکتر است.</li>
+                        <li class="semi-formal-text"><strong class="text-red-600 dark:text-red-300">مهم:</strong> وظایف با اولویت بالا که پوینت بیشتری به شما می‌دهند.</li>
+                        <li class="semi-formal-text"><strong class="text-gray-600 dark:text-gray-300">عادی:</strong> وظایف روزمره با پوینت استاندارد.</li>
+                        <li class="semi-formal-text"><strong class="text-purple-600 dark:text-purple-300">سفارشی:</strong> می‌توانید میزان پوینت دریافتی برای این وظیفه را (تا حداکثر ${MAX_CUSTOM_POINTS} پوینت) به صورت دستی وارد کنید.</li>
+                        <li class="semi-formal-text"><strong class="text-orange-600 dark:text-orange-300">یادداشت:</strong> این نوع وظایف برای ثبت نکات، ایده‌ها یا اطلاعاتی هستند که نیازی به تکمیل شدن ندارند و پوینت گیمیفیکیشن نمی‌دهند. حداکثر طول متن برای یادداشت‌ها ۱۵۰ کاراکتر است.</li>
                     </ul>
                 </p>
-                <p class="mb-2 text-justify">پس از وارد کردن اطلاعات، روی دکمه "افزودن وظیفه" کلیک کنید.</p>
-                <p class="mb-2 text-justify"><strong class="text-gray-600 dark:text-gray-300">۲. تکمیل وظیفه:</strong>
+                <p class="semi-formal-text">پس از وارد کردن اطلاعات، روی دکمه "افزودن وظیفه" کلیک کنید.</p>
+                <p class="semi-formal-text">
+                    <strong class="text-gray-600 dark:text-gray-300">۲. تکمیل وظیفه:</strong>
                     برای علامت زدن یک وظیفه به عنوان "تکمیل شده" (به جز یادداشت‌ها)، کافیست روی چک‌باکس کنار آن کلیک کنید. با این کار، وظیفه به بخش "وظایف تکمیل شده" منتقل می‌شود و پوینت‌های مربوطه به حساب شما اضافه می‌گردد.
                 </p>
-                <p class="mb-2 text-justify"><strong class="text-gray-600 dark:text-gray-300">۳. ویرایش وظیفه:</strong>
+                <p class="semi-formal-text">
+                    <strong class="text-gray-600 dark:text-gray-300">۳. ویرایش وظیفه:</strong>
                     برای تغییر نام یا اهمیت یک وظیفه فعال، روی آیکون سه نقطه (<i class="fa-solid fa-ellipsis-v"></i>) در کنار آن کلیک کرده و گزینه "ویرایش" را انتخاب کنید.
                 </p>
-                <p class="mb-2 text-justify"><strong class="text-gray-600 dark:text-gray-300">۴. حذف وظیفه:</strong>
+                <p class="semi-formal-text">
+                    <strong class="text-gray-600 dark:text-gray-300">۴. حذف وظیفه:</strong>
                     برای حذف یک وظیفه (فعال یا تکمیل شده)، روی آیکون سه نقطه (<i class="fa-solid fa-ellipsis-v"></i>) کنار آن کلیک کرده و گزینه "حذف" را انتخاب کنید. پس از حذف، یک پیام "بازگردانی" برای مدت کوتاهی ظاهر می‌شود تا در صورت اشتباه، بتوانید وظیفه را برگردانید.
                 </p>
-                <p class="mb-2 text-justify"><strong class="text-gray-600 dark:text-gray-300">۵. تغییر چیدمان وظایف:</strong>
+                <p class="semi-formal-text">
+                    <strong class="text-gray-600 dark:text-gray-300">۵. تغییر چیدمان وظایف:</strong>
                     برای تغییر دستی ترتیب وظایف فعال، روی آیکون سه نقطه (<i class="fa-solid fa-ellipsis-v"></i>) کنار وظیفه مورد نظر کلیک کرده و "تغییر چیدمان" را انتخاب کنید. سپس با استفاده از فلش‌های بالا و پایین، موقعیت وظیفه را جابجا کنید. پس از اتمام، دکمه "پایان" را فشار دهید.
                 </p>
-                <p class="mb-2 text-justify"><strong class="text-gray-600 dark:text-gray-300">۶. پین کردن وظیفه:</strong>
+                <p class="semi-formal-text">
+                    <strong class="text-gray-600 dark:text-gray-300">۶. پین کردن وظیفه:</strong>
                     می‌توانید وظایف مهم را به بالای لیست وظایف فعال "پین" کنید. برای این کار، روی آیکون سه نقطه (<i class="fa-solid fa-thumbtack"></i>) کنار وظیفه کلیک کرده و "پین کردن" را انتخاب کنید. وظایف پین شده همیشه در ابتدای لیست نمایش داده می‌شوند.
                 </p>
-                <p class="mb-2 text-justify"><strong class="text-gray-600 dark:text-gray-300">۷. مشاهده وظایف تکمیل شده:</strong>
+                <p class="semi-formal-text">
+                    <strong class="text-gray-600 dark:text-gray-300">۷. مشاهده وظایف تکمیل شده:</strong>
                     برای نمایش یا پنهان کردن لیست وظایف تکمیل شده، روی دکمه "وظایف تکمیل شده" در پایین صفحه کلیک کنید.
                 </p>
 
-                <h3 class="text-xl sm:text-2xl font-bold mb-1 mt-4 help-heading-purple">سیستم گیمیفیکیشن</h3>
-                <p class="mb-2 text-justify"><strong class="text-gray-600 dark:text-gray-300">پوینت:</strong>
+                <h3 class="text-xl sm:text-2xl font-bold mb-2 mt-4 help-heading-purple">سیستم گیمیفیکیشن</h3>
+                <p class="semi-formal-text">
+                    <strong class="text-gray-600 dark:text-gray-300">پوینت:</strong>
                     پوینت‌ها نمادین هستند و میزان فعالیت و پیشرفت شما را نشان می‌دهند.
                     <ul class="list-disc list-inside mt-2 mb-2 text-justify">
-                        <li>وظایف عادی: ${pointsPerNormalTask} پوینت</li>
-                        <li>وظایف مهم: ${pointsPerImportantTask} پوینت</li>
-                        <li>وظایف سفارشی: تا ${MAX_CUSTOM_POINTS} پوینت (بر اساس مقدار وارد شده)</li>
+                        <li class="semi-formal-text">وظایف عادی: ${pointsPerNormalTask} پوینت</li>
+                        <li class="semi-formal-text">وظایف مهم: ${pointsPerImportantTask} پوینت</li>
+                        <li class="semi-formal-text">وظایف سفارشی: تا ${MAX_CUSTOM_POINTS} پوینت (بر اساس مقدار وارد شده)</li>
                     </ul>
                 </p>
-                <p class="mb-1 text-justify">
+                <p class="semi-formal-text">
                     <strong class="text-gray-600 dark:text-gray-300">سطوح:</strong> با کسب پوینت، به سطوح بالاتر صعود خواهید کرد. هر سطح جدید، یک نام و آیکون منحصر به فرد دارد. می‌توانید با کلیک بر روی نمایشگر سطح در بالای صفحه، جزئیات هر سطح را مشاهده کنید. در زیر لیست تمامی سطوح را مشاهده می‌کنید:
                 </p>
                 <div id="helpLevelsContainer" class="flex flex-wrap gap-2 mt-1 mb-4">
                     </div>
-                <p class="mb-2 text-justify"><strong class="text-gray-600 dark:text-gray-300">زنجیره روزانه:</strong>
+                <p class="semi-formal-text">
+                    <strong class="text-gray-600 dark:text-gray-300">زنجیره روزانه:</strong>
                     با تکمیل حداقل یک وظیفه در هر روز، "زنجیره روزانه" شما افزایش می‌یابد. حفظ این زنجیره به شما کمک می‌کند تا عادت‌های مثبت بسازید و دستاوردهای ویژه‌ای کسب کنید. اگر یک روز وظیفه‌ای تکمیل نکنید، زنجیره بازنشانی می‌شود.
                 </p>
-                <p class="mb-1 text-justify">
+                <p class="semi-formal-text">
                     <strong class="text-gray-600 dark:text-gray-300">دستاوردها:</strong> زای تسک دارای مجموعه‌ای از دستاوردها است که با رسیدن به نقاط عطف خاصی (مانند تکمیل تعداد مشخصی وظیفه، رسیدن به سطح خاص، یا حفظ زنجیره روزانه) باز می‌شوند. می‌توانید تمام دستاوردهای خود را از طریق منوی اصلی (آیکون سه نقطه در بالا سمت چپ) و انتخاب "دستاوردها" مشاهده کنید. دستاوردهای بازنشده به صورت قفل نمایش داده می‌شوند. در زیر لیست تمامی دستاوردها را مشاهده می‌کنید:
                 </p>
                 <div id="helpAchievementsContainer" class="flex flex-wrap gap-2 mt-1 mb-4">
                     </div>
 
-                <h3 class="text-xl sm:text-2xl font-bold mb-1 mt-4 help-heading-orange">پشتیبان‌گیری و بازیابی داده‌ها</h3>
-                <p class="mb-2 text-justify"><strong class="text-gray-600 dark:text-gray-300">امنیت داده‌ها:</strong>
+                <h3 class="text-xl sm:text-2xl font-bold mb-2 mt-4 help-heading-orange">پشتیبان‌گیری و بازیابی داده‌ها</h3>
+                <p class="semi-formal-text">
+                    <strong class="text-gray-600 dark:text-gray-300">امنیت داده‌ها:</strong>
                     تمام داده‌های شما به صورت امن و فقط در حافظه محلی مرورگر شما ذخیره می‌شوند و هیچ اطلاعاتی به هیچ سروری ارسال نمی‌شود. این به معنای حریم خصوصی کامل است، اما مسئولیت پشتیبان‌گیری از داده‌ها با خود شماست.
                 </p>
-                <p class="mb-2 text-justify"><strong class="text-gray-600 dark:text-gray-300">پشتیبان‌گیری (خروجی گرفتن):</strong>
+                <p class="semi-formal-text">
+                    <strong class="text-gray-600 dark:text-gray-300">پشتیبان‌گیری (خروجی گرفتن):</strong>
                     برای ایجاد یک نسخه پشتیبان از داده‌های خود، از منوی اصلی، گزینه "پشتیبان‌گیری" را انتخاب کرده و سپس روی دکمه "ذخیره داده‌ها" کلیک کنید. یک فایل JSON حاوی تمام وظایف، پوینت‌ها، سطح و دستاوردهای شما دانلود خواهد شد. این فایل را در مکانی امن نگهداری کنید.
                 </p>
-                <p class="mb-2 text-justify"><strong class="text-gray-600 dark:text-gray-300">بازیابی (ورودی گرفتن):</strong>
+                <p class="semi-formal-text">
+                    <strong class="text-gray-600 dark:text-gray-300">بازیابی (ورودی گرفتن):</strong>
                     برای بازیابی داده‌ها از یک فایل پشتیبان، در همان بخش "پشتیبان‌گیری"، روی "انتخاب فایل" کلیک کرده و فایل JSON پشتیبان خود را انتخاب کنید. سپس "بارگذاری از فایل" را فشار دهید. این کار داده‌های فعلی برنامه شما را با داده‌های موجود در فایل جایگزین می‌کند.
                 </p>
 
-                <h3 class="text-xl sm:text-2xl font-bold mb-1 mt-4 help-heading-red">بروزرسانی برنامه</h3>
-                <p class="mb-2 text-justify">
+                <h3 class="text-xl sm:text-2xl font-bold mb-2 mt-4 help-heading-red">بروزرسانی برنامه</h3>
+                <p class="semi-formal-text">
                     این برنامه از <strong class="text-gray-600 dark:text-gray-300">سرویس پس‌زمینه (Service Worker)</strong> برای ارائه تجربه آفلاین و بارگذاری سریع استفاده می‌کند. برای اطمینان از اینکه همیشه آخرین نسخه برنامه را دارید و از جدیدترین ویژگی‌ها بهره‌مند می‌شوید، می‌توانید روی گزینه "بروزرسانی برنامه" در منوی اصلی کلیک کنید. این کار کش برنامه را پاک کرده و آخرین نسخه را از سرور بارگذاری می‌کند.
                 </p>
 
-                <h3 class="text-xl sm:text-2xl font-bold mb-1 mt-4 text-gray-600 dark:text-gray-300">حمایت مالی</h3>
-                <p class="mb-2 text-gray-700 dark:text-gray-300 text-justify">
-                    این بخش در حال حاضر غیرفعال است.
+                <h3 class="text-xl sm:text-2xl font-bold mb-2 mt-4 text-gray-600 dark:text-gray-300">حمایت مالی</h3>
+                <p class="semi-formal-text">
+                    این بخش در حال حاضر غیرفعال است. از علاقه شما سپاسگزاریم!
                 </p>
 
-                <p class="mt-4 text-center text-gray-700 dark:text-gray-300 text-justify">
+                <p class="semi-formal-text text-center">
                     هدف زای تسک ایجاد انگیزه و کمک به سازماندهی بهتر وظایف شماست. امیدواریم از استفاده از آن لذت ببرید و در مسیر موفقیت خود پیشرفت کنید!
                 </p>
             `;
@@ -3439,18 +3483,16 @@
             helpLevelsContainer.innerHTML = ''; // Clear previous content
             helpAchievementsContainer.innerHTML = ''; // Clear previous content
 
-            // Render Levels
+            // Render Levels (with icons)
             levelPointsThresholds.forEach((levelInfo, index) => {
                 const levelSpan = document.createElement('span');
                 levelSpan.className = `clickable-badge level-badge`;
-                // Icon is the first child, then text. With flex-direction: row and justify-content: flex-end,
-                // the icon will be on the right, and the text will be on its left.
-                levelSpan.innerHTML = `<i class="${levelInfo.icon}"></i> <span>سطح ${index + 1}: ${levelInfo.name}</span>`;
-                levelSpan.onclick = () => showDetailModal('level', index + 1);
+                levelSpan.innerHTML = `<i class="${levelInfo.icon} ml-2"></i><span>سطح ${index + 1}: ${levelInfo.name}</span>`; // Icon added
+                levelSpan.onclick = () => showDetailModal('level', levelInfo.name); // Pass name for level
                 helpLevelsContainer.appendChild(levelSpan);
             });
 
-            // Render Achievements
+            // Render Achievements (with icons)
             // Sort achievements by type and then value/level for consistent display
             const sortedAchievementsForHelp = [...achievementsData].sort((a, b) => {
                 // Prioritize level achievements, then streak, then totalTasks, then points, then firstPin
@@ -3466,9 +3508,7 @@
             sortedAchievementsForHelp.forEach(achievement => {
                 const achievementSpan = document.createElement('span');
                 achievementSpan.className = `clickable-badge achievement-badge`;
-                // Icon is the first child, then text. With flex-direction: row and justify-content: flex-end,
-                // the icon will be on the right, and the text will be on its left.
-                achievementSpan.innerHTML = `<i class="${achievement.icon}"></i> <span>${achievement.name}</span>`;
+                achievementSpan.innerHTML = `<i class="${achievement.icon} ml-2"></i><span>${achievement.name}</span>`; // Icon added
                 achievementSpan.onclick = () => showDetailModal('achievement', achievement.name);
                 helpAchievementsContainer.appendChild(achievementSpan);
             });
@@ -3486,13 +3526,13 @@
             aboutModalContent.classList.add('opacity-100', 'scale-100');
 
             aboutModalBody.innerHTML = `
-                <p class="mb-3 text-justify">این برنامه به منظور مدیریت وظایف و افزایش انگیزه طراحی شده است.</p>
-                <p class="mb-3 text-justify">این پروژه به صورت اختصاصی توسط <strong class="text-gray-600 dark:text-gray-300"><a href="https://amuleo.ir" target="_blank" rel="noopener noreferrer">سایت عمو لئو</a></strong> طراحی شده است. این نسخه، اولین و آخرین نسخه از این پروژه است.</p>
+                <p class="semi-formal-text">این برنامه به منظور مدیریت وظایف و افزایش انگیزه طراحی شده است.</p>
+                <p class="semi-formal-text">این پروژه به صورت اختصاصی توسط <strong class="text-gray-600 dark:text-gray-300"><a href="https://amuleo.ir" target="_blank" rel="noopener noreferrer">سایت عمو لئو</a></strong> طراحی شده است. این نسخه، اولین و آخرین نسخه از این پروژه است.</p>
                 <div class="semi-formal-text text-justify mt-4 mb-4">
-                    <p>برای ساخت این برنامه، ۷ روز از مهم‌ترین روزهای عمرم صرف شد. روزهایی که امتحان داشتم، اما ۲۴ ساعت تمرکزم روی این پروژه بود و روزی ۱۶ ساعت، معادل ۱۴ روز کاری روی این پروژه کار کردم. این پروژه بیش از ۲۰۰ یا ۳۰۰ بار دیباگ شده تا متناسب با هر صفحه نمایشی واکنش‌گرا باشد. برای همین، این پروژه پایان و خداحافظی من از دنیای برنامه‌نویسی است و دیگر این سایت آپدیت نمی‌شود.</p>
+                    <p class="semi-formal-text">برای ساخت این برنامه، ۷ روز از مهم‌ترین روزهای عمرم صرف شد. روزهایی که امتحان داشتم، اما ۲۴ ساعت تمرکزم روی این پروژه بود و روزی ۱۶ ساعت، معادل ۱۴ روز کاری روی این پروژه کار کردم. این پروژه بیش از ۲۰۰ یا ۳۰۰ بار دیباگ شده تا متناسب با هر صفحه نمایشی واکنش‌گرا باشد. برای همین، این پروژه پایان و خداحافظی من از دنیای برنامه‌نویسی است و دیگر این سایت آپدیت نمی‌شود.</p>
                 </div>
-                <p class="mb-3 text-justify">تمامی حقوق متعلق به <strong class="text-gray-600 dark:text-gray-300"><a href="https://amuleo.ir" target="_blank" rel="noopener noreferrer">عمو لئو</a></strong> است.</p>
-                <p class="mb-3 text-justify">تاریخ: ۷ خرداد ۱۴۰۴</p>
+                <p class="semi-formal-text">تمامی حقوق متعلق به <strong class="text-gray-600 dark:text-gray-300"><a href="https://amuleo.ir" target="_blank" rel="noopener noreferrer">عمو لئو</a></strong> است.</p>
+                <p class="semi-formal-text">تاریخ: ۷ خرداد ۱۴۰۴</p>
             `;
         });
 
@@ -3887,7 +3927,7 @@
         });
 
         // Function to show detail modal for levels and achievements
-        function showDetailModal(type, identifier, dataArray = null) {
+        function showDetailModal(type, identifier) { // Removed dataArray as it's no longer needed
             detailModalTitle.textContent = '';
             detailModalBody.innerHTML = '';
 
@@ -3895,18 +3935,23 @@
             let item;
 
             if (type === 'level') {
-                const levelNumber = identifier;
-                item = levelPointsThresholds[levelNumber - 1]; // Levels are 1-indexed in display
+                const levelName = identifier; // Now identifier is the level name
+                item = levelPointsThresholds.find(l => l.name === levelName);
                 if (item) {
-                    detailModalTitle.textContent = `سطح ${levelNumber}: ${item.name}`;
+                    const unlockedDate = achievementUnlockDates[item.name];
+                    const formattedDate = unlockedDate ? new Date(unlockedDate).toLocaleDateString('fa-IR', {
+                        year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'
+                    }) : 'هنوز باز نشده';
+
+                    detailModalTitle.textContent = `سطح ${item.level || (levelPointsThresholds.indexOf(item) + 1)}: ${item.name}`;
                     contentHtml = `
-                        <p class="semi-formal-text mb-2"><strong class="text-blue-600 dark:text-blue-300">توضیحات:</strong> ${item.motivational}</p>
+                        <p class="semi-formal-text"><strong class="text-blue-600 dark:text-blue-300">توضیحات:</strong> ${item.motivational}</p>
                         <p class="semi-formal-text"><strong class="text-green-600 dark:text-green-300">پوینت مورد نیاز:</strong> ${item.points}</p>
-                        <p class="semi-formal-text"><strong class="text-purple-600 dark:text-purple-300">آیکون:</strong> <i class="${item.icon} text-xl ml-2"></i></p>
-                    `;
+                        <p class="semi-formal-text"><strong class="text-purple-600 dark:text-purple-300">تاریخ کسب:</strong> ${formattedDate}</p>
+                    `; // Icon removed
                 } else {
                     detailModalTitle.textContent = 'سطح نامشخص';
-                    contentHtml = '<p class="text-gray-700 dark:text-gray-300">اطلاعاتی برای این سطح یافت نشد.</p>';
+                    contentHtml = '<p class="semi-formal-text">اطلاعاتی برای این سطح یافت نشد.</p>';
                 }
             } else if (type === 'achievement') {
                 const achievementName = identifier;
@@ -3920,14 +3965,13 @@
                     }) : 'هنوز باز نشده';
 
                     contentHtml = `
-                        <p class="semi-formal-text mb-2"><strong class="text-blue-600 dark:text-blue-300">توضیحات:</strong> ${item.description}</p>
+                        <p class="semi-formal-text"><strong class="text-blue-600 dark:text-blue-300">توضیحات:</strong> ${item.description}</p>
                         <p class="semi-formal-text"><strong class="text-green-600 dark:text-green-300">وضعیت:</strong> ${isAchieved ? 'باز شده' : 'باز نشده'}</p>
                         <p class="semi-formal-text"><strong class="text-purple-600 dark:text-purple-300">تاریخ باز شدن:</strong> ${formattedDate}</p>
-                        <p class="semi-formal-text"><strong class="text-orange-600 dark:text-orange-300">آیکون:</strong> <i class="${item.icon} text-xl ml-2"></i></p>
-                    `;
+                    `; // Icon removed
                 } else {
                     detailModalTitle.textContent = 'دستاورد نامشخص';
-                    contentHtml = '<p class="text-gray-700 dark:text-gray-300">اطلاعاتی برای این دستاورد یافت نشد.</p>';
+                    contentHtml = '<p class="semi-formal-text">اطلاعاتی برای این دستاورد یافت نشد.</p>';
                 }
             }
 
@@ -3949,17 +3993,20 @@
 
         // Initial load and render
         window.onload = function () {
-            initializeTheme();
-            loadFromLocalStorage();
-            if (!userName) {
-                // If no username, show welcome modal
-                welcomeModal.classList.remove('hidden');
-                void welcomeModalContent.offsetWidth; // Force reflow
-                welcomeModalContent.classList.remove('opacity-0', 'scale-95');
-                welcomeModalContent.classList.add('opacity-100', 'scale-100');
-                userNameInput.focus();
+            let storedUserName = localStorage.getItem('userName');
+            console.log("storedUserName on window.onload:", storedUserName); // Debugging
+            if (storedUserName && storedUserName !== 'null') { // Check for 'null' string explicitly
+                userName = storedUserName;
+                console.log("userName set from localStorage:", userName); // Debugging
             } else {
-                // If username exists, render tasks and update gamification display
+                console.log("userName is null or 'null', showing welcomeModal"); // Debugging
+                welcomeModal.classList.remove('hidden');
+            }
+            initializeTheme();
+            loadFromLocalStorage(); // Keep this in case it does other necessary initializations
+            console.log("userName after loadFromLocalStorage:", userName); // Debugging
+
+            if (userName) { // Only render tasks and update gamification if userName is set
                 renderTasks();
                 updateGamificationDisplay(); // Call here for existing users
                 // Add a small delay before processing notifications on load for existing users
@@ -3967,8 +4014,16 @@
                     processNotificationQueue(); // Start processing general notifications
                     processAchievementNotificationQueue(); // Also process achievement queue on load
                 }, 100); // 100ms delay
+            } else {
+                // If userName is still null (e.g., first time user or cleared data), ensure welcome modal is visible and focus input
+                welcomeModal.classList.remove('hidden');
+                void welcomeModalContent.offsetWidth; // Force reflow
+                welcomeModalContent.classList.remove('opacity-0', 'scale-95');
+                welcomeModalContent.classList.add('opacity-100', 'scale-100');
+                userNameInput.focus();
             }
         };
+
 
         // Register Service Worker for offline capability
         if ('serviceWorker' in navigator) {
