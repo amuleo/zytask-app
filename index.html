@@ -32,6 +32,9 @@
             --theme-progress-to: #1d4ed8; /* blue-700 */
             --theme-input-border: #93c5fd; /* blue-300 */
             --theme-input-focus-ring: #60a5fa; /* blue-400 */
+            --theme-orange-text: #ea580c; /* orange-600 */ /* New variable for orange text */
+            --theme-orange-dark-text: #fdba74; /* orange-300 */ /* New variable for dark mode orange text */
+            --theme-blue-motivation-icon: #2563eb; /* blue-600 for motivation icon */
         }
 
         .dark {
@@ -44,6 +47,9 @@
             --theme-progress-to: #60a5fa; /* blue-400 */
             --theme-input-border: #2563eb; /* blue-600 */
             --theme-input-focus-ring: #3b82f6; /* blue-500 */
+            --theme-orange-text: #fdba74; /* orange-300 */ /* New variable for orange text in dark mode */
+            --theme-orange-dark-text: #ea580c; /* orange-600 */ /* New variable for dark mode orange text */
+            --theme-blue-motivation-icon: #93c5fd; /* blue-300 for motivation icon in dark mode */
         }
 
         /* Custom scrollbar for modals */
@@ -553,7 +559,7 @@
             background-color: rgba(0, 0, 0, 0.6); /* Slightly darker overlay */
         }
         #achievementNotificationModalContent {
-            background: linear-gradient(to bottom right, #6366f1, #8b5cf6); /* Vibrant gradient */
+            background: linear-gradient(to bottom right, var(--theme-primary), var(--theme-secondary)); /* Minimal blue gradient */
             color: white;
             border-radius: 1rem; /* More rounded */
             padding: 1.5rem; /* Adjusted padding */
@@ -569,7 +575,7 @@
             overflow-x: hidden; /* Hide horizontal overflow */
         }
         .dark #achievementNotificationModalContent {
-            background: linear-gradient(to bottom right, #4f46e5, #7c3aed); /* Darker vibrant gradient */
+            background: linear-gradient(to bottom right, var(--theme-secondary), var(--theme-primary)); /* Darker blue gradient */
         }
 
         /* Adjusted icon size for achievement notification modal to be consistent with achievement cards */
@@ -722,41 +728,125 @@
             color: #4a5568; /* Darker gray for semi-formal */
             padding: 0.5rem 0; /* Some vertical padding */
             text-align: justify; /* Ensure semi-formal text is justified */
-            margin-bottom: 0.5rem; /* Adjusted for tighter spacing */
+            margin-bottom: 0.25rem; /* Adjusted for tighter spacing (mb-1) */
         }
         .dark .semi-formal-text {
             color: #cbd5e0; /* Lighter gray for dark mode */
         }
         /* Specific styles for help modal headings */
         .help-heading-blue {
-            color: #2563eb; /* blue-600 */
+            color: var(--theme-primary); /* blue-600 */
         }
         .dark .help-heading-blue {
-            color: #93c5fd; /* blue-300 */
+            color: var(--theme-primary); /* blue-300 */
         }
         .help-heading-green {
-            color: #16a34a; /* green-600 */
+            color: var(--theme-primary); /* green-600 changed to blue */
         }
         .dark .help-heading-green {
-            color: #86efac; /* green-300 */
+            color: var(--theme-primary); /* green-300 changed to blue */
         }
-        .help-heading-purple {
-            color: #7c3aed; /* purple-600 */
+        .help-heading-orange { /* Changed from purple to orange */
+            color: var(--theme-primary); /* Use new orange variable, changed to blue */
         }
-        .dark .help-heading-purple {
-            color: #d8b4fe; /* purple-300 */
-        }
-        .help-heading-orange {
-            color: #ea580c; /* orange-600 */
-        }
-        .dark .help-heading-orange {
-            color: #fdba74; /* orange-300 */
+        .dark .help-heading-orange { /* Changed from purple to orange */
+            color: var(--theme-primary); /* Use new orange variable for dark mode, changed to blue */
         }
         .help-heading-red {
-            color: #dc2626; /* red-600 */
+            color: var(--theme-primary); /* red-600 changed to blue */
         }
         .dark .help-heading-red {
-            color: #fca5a5; /* red-300 */
+            color: var(--theme-primary); /* red-300 changed to blue */
+        }
+
+        /* Styles for About Us links */
+        #aboutModalBody a {
+            color: var(--theme-primary); /* Blue color for links */
+            transition: color 0.2s ease-in-out;
+        }
+        #aboutModalBody a:hover {
+            color: var(--theme-secondary); /* Darker blue on hover */
+        }
+        .dark #aboutModalBody a {
+            color: var(--theme-primary); /* Light blue for links in dark mode */
+        }
+        .dark #aboutModalBody a:hover {
+            color: var(--theme-secondary); /* Darker light blue on hover */
+        }
+
+        /* Motivation Section Styles */
+        #motivationContainer {
+            min-height: 3rem; /* Ensure enough height for the text */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative; /* For absolute positioning of text */
+            overflow: hidden; /* Hide overflowing text during transition */
+        }
+
+        #motivationText {
+            position: absolute; /* Allow smooth transitions */
+            width: 90%; /* Constrain width */
+            max-width: 600px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(10px); /* Start slightly below */
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out; /* Changed to 0.6s */
+        }
+
+        #motivationText.fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #motivationText.fade-out {
+            opacity: 0;
+            transform: translateY(-10px); /* Move slightly up when fading out */
+        }
+
+        /* Dropdown Corners Styling */
+        #pointsDropdownToggle {
+            border-radius: 0.5rem; /* Tailwind rounded-lg */
+            transition: border-bottom-left-radius 0.3s ease-in-out, border-bottom-right-radius 0.3s ease-in-out;
+        }
+        #pointsDropdownToggle.is-open {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        #pointsDropdownContent {
+            border-radius: 0.5rem; /* Tailwind rounded-lg */
+            transition: all 0.3s ease-in-out; /* Smooth transition for opening/closing */
+        }
+
+        /* When dropdown is open, adjust its top corners */
+        #pointsDropdownContent.is-open {
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            border-bottom-left-radius: 0.5rem; /* Keep bottom corners rounded */
+            border-bottom-right-radius: 0.5rem; /* Keep bottom corners rounded */
+            overflow: hidden; /* Crucial for clipping content to rounded corners */
+        }
+
+        /* Adjust inner panels when dropdown is open */
+        #pointsDropdownContent.is-open > div { /* This targets the flex container inside dropdown */
+            border-radius: 0; /* Remove rounding from container */
+        }
+
+        /* Target the first child of the inner flex container (level panel) */
+        #pointsDropdownContent.is-open > div > div:first-child {
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        /* Target the last child of the inner flex container (streak panel) */
+        #pointsDropdownContent.is-open > div > div:last-child {
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            border-bottom-left-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
         }
     </style>
 </head>
@@ -773,7 +863,7 @@
 
             <button id="themeToggleBtn" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="تغییر تم">
                 <svg id="themeIcon" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.325 6.675l-.707-.707M6.318 6.318l-.707-.707m12.728 0l-.707.707M6.318 17.682l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.325 6.675l-.707-.707M6.318 6.318l-.707-.707m12.728 0l-.707.707M6.318 17.682l-.707.707M16 12a4 0 11-8 0 4 0 018 0z"></path>
                 </svg>
             </button>
             <div id="menuDropdown" class="absolute right-4 top-full mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg py-1 hidden z-20">
@@ -805,7 +895,7 @@
         </header>
 
         <div class="relative w-full">
-            <div id="pointsDropdownToggle" class="flex items-center justify-between w-full py-3 px-4 bg-blue-500 dark:bg-blue-700 text-white cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-600 dark:hover:bg-blue-800">
+            <div id="pointsDropdownToggle" class="flex items-center justify-between w-full py-3 px-4 bg-blue-500 dark:bg-blue-700 text-white cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-600 dark:hover:bg-blue-800 rounded-lg">
                 <div class="flex items-center">
                     <i class="fa-solid fa-coins text-xl ml-2"></i>
                     <span class="text-lg font-semibold">پوینت: <span id="zPoint">0</span></span>
@@ -832,12 +922,21 @@
                 </div>
             </div>
         </div>
-        <div class="mb-6 px-2 md:px-0">
-            <h2 class="text-lg sm:text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">پیشرفت شما به سطح بعدی:</h2>
+        <div class="mb-6 px-2 md:px-0 mt-5"> <h2 class="text-lg sm:text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">پیشرفت شما به سطح بعدی:</h2>
             <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
                 <div id="progressBar" class="h-4 rounded-full transition-all duration-500 ease-out" style="width: 0%;"></div>
             </div>
             <p id="progressText" class="text-sm text-gray-500 dark:text-gray-400 mt-1 text-left">0%</p>
+        </div>
+
+        <div class="mb-8 p-4 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 relative overflow-hidden">
+            <h2 class="text-xl sm:text-2xl font-semibold mb-4 flex items-center justify-center">
+                <i class="fa-solid fa-lightbulb ml-2" style="color: var(--theme-blue-motivation-icon);"></i>
+                تلنگر
+            </h2>
+            <div id="motivationContainer" class="text-center text-lg sm:text-xl font-medium flex items-center justify-center">
+                <span id="motivationText"></span>
+            </div>
         </div>
 
         <div class="mb-8 p-4 rounded-lg bg-gray-100 dark:bg-gray-900" id="addTaskSection">
@@ -981,7 +1080,7 @@
                 </button>
 
                 <div class="flex items-center gap-2 mt-2">
-                    <label for="importFileInput" class="bg-violet-500 hover:bg-violet-600 dark:bg-violet-700 dark:hover:bg-violet-800 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400">
+                    <label for="importFileInput" class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400">
                         انتخاب فایل
                     </label>
                     <span id="selectedFileName" class="text-sm text-gray-600 dark:text-gray-300 truncate max-w-[calc(100%-120px)]">فایلی انتخاب نشده است.</span>
@@ -1025,7 +1124,7 @@
             <ul class="list-disc list-inside mb-6 text-sm text-gray-700 dark:text-gray-300 space-y-2 text-justify">
                 <li><strong class="text-blue-600 dark:text-blue-300">پاکسازی کش برنامه:</strong> تمامی فایل‌های کش شده حذف می‌شوند تا از جدیدترین نسخه‌ها استفاده شود.</li>
                 <li><strong class="text-green-600 dark:text-green-300">حفظ داده‌های شما:</strong> اطلاعات شخصی شما مانند وظایف، پوینت‌ها، سطح و دستاوردها <strong class="font-bold">حفظ خواهند شد</strong> و پاک نمی‌شوند.</li>
-                <li><strong class="text-purple-600 dark:text-purple-300">بارگذاری مجدد صفحه:</strong> پس از اتمام فرآیند، صفحه به طور خودکار بارگذاری مجدد می‌شود تا تغییرات اعمال گردند.</li>
+                <li><strong class="text-blue-600 dark:text-blue-300">بارگذاری مجدد صفحه:</strong> پس از اتمام فرآیند، صفحه به طور خودکار بارگذاری مجدد می‌شود تا تغییرات اعمال گردند.</li>
             </ul>
             <p class="mb-6 text-sm text-gray-700 dark:text-gray-300 font-bold text-justify">
                 آیا مایل به ادامه هستید؟
@@ -1096,6 +1195,7 @@
         let unlockedAchievements = []; // Array to store IDs of unlocked achievements
         let achievementUnlockDates = {}; // New: Object to store unlock dates for achievements
         let hasPinnedTaskEver = false; // New: Tracks if a task has ever been pinned
+        let currentMotivationIndex = 0; // New: Index for motivation quotes
 
         const pointsPerNormalTask = 10; // Points for normal tasks
         const pointsPerImportantTask = 25; // Points for important tasks
@@ -1119,16 +1219,16 @@
             { name: 'جنگجو', points: 120, icon: 'fa-solid fa-hand-fist', motivational: 'شما با هر چallenge، قوی‌تر و مصمم‌تر می‌شوید. روحیه جنگجویانه شما ستودنی است!' },
             { name: 'شوالیه', points: 220, icon: 'fa-solid fa-shield-halved', motivational: 'با هر وظیفه، زره‌ای از تجربه بر تن می‌کنید. شجاعت شما راهگشاست!' },
             { name: 'هیرو', points: 350, icon: 'fa-solid fa-mask', motivational: 'شما الهام‌بخش دیگران هستید. قدم‌هایتان ردپایی از موفقیت بر جای می‌گذارد!' },
-            { name: 'استاد', points: 500, icon: 'fa-solid fa-graduation-cap', motivational: 'دانش و مهارت شما در حال شکوفایی است. از هر تجربه درسی بیاموزید!' },
-            { name: 'فرمانده', points: 700, icon: 'fa-solid fa-star', motivational: 'اکنون می‌توانید رهبری کنید و مسیر را برای دیگران هموار سازید. قدرت در دستان شماست!' },
-            { name: 'سلطان', points: 950, icon: 'fa-solid fa-crown', motivational: 'شما بر قلمرو وظایف خود مسلط شده‌اید. با اقتدار به سوی اهداف بزرگتر گام بردارید!' },
-            { name: 'کار درست', points: 1250, icon: 'fa-solid fa-dragon', motivational: 'شما به قدرتی بی‌نظیر دست یافته‌اید. هیچ مانعی جلودار شما نخواهد بود!' },
-            { name: 'خفن', points: 1600, icon: 'fa-solid fa-fire-alt', motivational: 'شما به یک ستاره درخشان تبدیل شده‌اید. انرژی و خلاقیت شما بی‌حد و مرز است و هر کاری را به بهترین شکل ممکن انجام می‌دهید!' },
-            { level: 11, name: 'جاودان', icon: 'fa-solid fa-infinity', motivational: 'پشتکار شما بی‌حد و مرز است. این مسیر، راهی برای جاودانگی دستاوردهای شماست!' },
-            { level: 12, name: 'کیهان‌سالار', icon: 'fa-solid fa-bolt', motivational: 'شما با سرعتی باورنکردنی در حال پیشرفت هستید. انرژی شما جهان را به حرکت درمی‌آورد!' },
-            { level: 13, name: 'کیهان‌نورد', icon: 'fa-solid fa-rocket', motivational: 'شما مرزها را درنوردیده‌اید و به سوی ناشناخته‌ها پرواز می‌کنید. آسمان حد شما نیست!' },
-            { level: 14, name: 'بتمن', icon: 'fa-solid fa-user-secret', motivational: 'شما در سایه‌ها نیز قدرتمندید. با هوش و اراده، هر مشکلی را حل می‌کنید!' },
-            { level: 15, name: 'سیگما', icon: 'fa-solid fa-chess-king', motivational: 'شما به اوج رسیده‌اید. با خرد و استراتژی، هر بازی را به نفع خود به پایان می‌رسانید!' }
+            { level: 6, name: 'استاد', points: 500, icon: 'fa-solid fa-graduation-cap', motivational: 'دانش و مهارت شما در حال شکوفایی است. از هر تجربه درسی بیاموزید!' },
+            { level: 7, name: 'فرمانده', points: 700, icon: 'fa-solid fa-star', motivational: 'اکنون می‌توانید رهبری کنید و مسیر را برای دیگران هموار سازید. قدرت در دستان شماست!' },
+            { level: 8, name: 'سلطان', points: 950, icon: 'fa-solid fa-crown', motivational: 'شما بر قلمرو وظایف خود مسلط شده‌اید. با اقتدار به سوی اهداف بزرگتر گام بردارید!' },
+            { level: 9, name: 'کار درست', points: 1250, icon: 'fa-solid fa-dragon', motivational: 'شما به قدرتی بی‌نظیر دست یافته‌اید. هیچ مانعی جلودار شما نخواهد بود!' },
+            { level: 10, name: 'خفن', points: 1600, icon: 'fa-solid fa-fire-alt', motivational: 'شما به یک ستاره درخشان تبدیل شده‌اید. انرژی و خلاقیت شما بی‌حد و مرز است و هر کاری را به بهترین شکل ممکن انجام می‌دهید!' },
+            { level: 11, name: 'جاودان', points: 2000, icon: 'fa-solid fa-infinity', motivational: 'پشتکار شما بی‌حد و مرز است. این مسیر، راهی برای جاودانگی دستاوردهای شماست!' },
+            { level: 12, name: 'کیهان‌سالار', points: 2500, icon: 'fa-solid fa-bolt', motivational: 'شما با سرعتی باورنکردنی در حال پیشرفت هستید. انرژی شما جهان را به حرکت درمی‌آورد!' },
+            { level: 13, name: 'کیهان‌نورد', points: 3000, icon: 'fa-solid fa-rocket', motivational: 'شما مرزها را درنوردیده‌اید و به سوی ناشناخته‌ها پرواز می‌کنید. آسمان حد شما نیست!' },
+            { level: 14, name: 'بتمن', points: 3600, icon: 'fa-solid fa-user-secret', motivational: 'شما در سایه‌ها نیز قدرتمندید. با هوش و اراده، هر مشکلی را حل می‌کنید!' },
+            { level: 15, name: 'سیگما', points: 4300, icon: 'fa-solid fa-chess-king', motivational: 'شما به اوج رسیده‌اید. با خرد و استراتژی، هر بازی را به نفع خود به پایان می‌رسانید!' }
         ];
 
         // Achievement data with Font Awesome icons
@@ -1144,11 +1244,11 @@
             { level: 8, name: 'سلطان', icon: 'fa-solid fa-crown', type: 'level', description: 'شما بر قلمرو وظایف خود مسلط شده‌اید. با اقتدار به سوی اهداف بزرگتر گام بردارید!' },
             { level: 9, name: 'کار درست', icon: 'fa-solid fa-dragon', type: 'level', description: 'شما به قدرتی بی‌نظیر دست یافته‌اید. هیچ مانعی جلودار شما نخواهد بود!' },
             { level: 10, name: 'خفن', icon: 'fa-solid fa-fire-alt', type: 'level', description: 'شما به یک ستاره درخشان تبدیل شده‌اید. انرژی و خلاقیت شما بی‌حد و مرز است و هر کاری را به بهترین شکل ممکن انجام می‌دهید!' },
-            { level: 11, name: 'جاودان', icon: 'fa-solid fa-infinity', type: 'level', description: 'پشتکار شما بی‌حد و مرز است. این مسیر، راهی برای جاودانگی دستاوردهای شماست!' },
-            { level: 12, name: 'کیهان‌سالار', icon: 'fa-solid fa-bolt', type: 'level', description: 'شما با سرعتی باورنکردنی در حال پیشرفت هستید. انرژی شما جهان را به حرکت درمی‌آورد!' },
-            { level: 13, name: 'کیهان‌نورد', icon: 'fa-solid fa-rocket', type: 'level', description: 'شما مرزها را درنوردیده‌اید و به سوی ناشناخته‌ها پرواز می‌کنید. آسمان حد شما نیست!' },
-            { level: 14, name: 'بتمن', icon: 'fa-solid fa-user-secret', type: 'level', description: 'شما در سایه‌ها نیز قدرتمندید. با هوش و اراده، هر مشکلی را حل می‌کنید!' },
-            { level: 15, name: 'سیگما', icon: 'fa-solid fa-chess-king', type: 'level', description: 'شما به اوج رسیده‌اید. با خرد و استراتژی، هر بازی را به نفع خود به پایان می‌رسانید!' },
+            { level: 11, name: 'جاودان', points: 2000, icon: 'fa-solid fa-infinity', type: 'level', description: 'پشتکار شما بی‌حد و مرز است. این مسیر، راهی برای جاودانگی دستاوردهای شماست!' },
+            { level: 12, name: 'کیهان‌سالار', points: 2500, icon: 'fa-solid fa-bolt', type: 'level', description: 'شما با سرعتی باورنکردنی در حال پیشرفت هستید. انرژی شما جهان را به حرکت درمی‌آورد!' },
+            { level: 13, name: 'کیهان‌نورد', points: 3000, icon: 'fa-solid fa-rocket', type: 'level', description: 'شما مرزها را درنوردیده‌اید و به سوی ناشناخته‌ها پرواز می‌کنید. آسمان حد شما نیست!' },
+            { level: 14, name: 'بتمن', points: 3600, icon: 'fa-solid fa-user-secret', type: 'level', description: 'شما در سایه‌ها نیز قدرتمندید. با هوش و اراده، هر مشکلی را حل می‌کنید!' },
+            { level: 15, name: 'سیگما', points: 4300, icon: 'fa-solid fa-chess-king', type: 'level', description: 'شما به اوج رسیده‌اید. با خرد و استراتژی، هر بازی را به نفع خود به پایان می‌رسانید!' },
             // Total Tasks Achievements (Updated as per request)
             { type: 'totalTasks', value: 1, name: 'اولین قدم', icon: 'fa-solid fa-shoe-prints', description: 'اولین وظیفه خود را با موفقیت تکمیل کنید. هر سفر طولانی با یک قدم آغاز می‌شود!' },
             { type: 'totalTasks', value: 5, name: 'پنج ستاره', icon: 'fa-solid fa-star-half-stroke', description: 'با تکمیل ۵ وظیفه، نشان می‌دهید که در مسیر درستی هستید. به همین ترتیب ادامه دهید!' },
@@ -1181,6 +1281,56 @@
             // First Pin Achievement (remain as is)
             { type: 'firstPin', value: 1, name: 'اولین پین', icon: 'fa-solid fa-thumbtack', description: 'اولین وظیفه خود را پین کردید. شما سازمان‌دهی را جدی می‌گیرید!' }
         ];
+
+        // Motivation Quotes (45 quotes - psychological, value of tasks, step-by-step, small tasks)
+        const motivationQuotes = [
+            "هر گام کوچک، پیشرفت بزرگ است.",
+            "آغاز کن، کمال خود می‌آید.",
+            "پایداری، رمز موفقیت شماست.",
+            "کارهای خرد، نتایج کلان می‌سازند.",
+            "امروز را بهترین سازید.",
+            "کوشش مستمر، رویاها را زنده کند.",
+            "هر وظیفه، گامی به سوی هدف.",
+            "باور کن، می‌توانی، انجام ده.",
+            "قدرت شما در همین لحظه است.",
+            "کوچک آغاز کن، بزرگ بیندیش.",
+            "هر روز، فرصت رشد است.",
+            "تغییر از درون شماست.",
+            "بهترین نسخه خود باش.",
+            "پشتکار، سرنوشت را می‌سازد.",
+            "چالش، فرصت یادگیری است.",
+            "تمرکز، قدرت آفریند.",
+            "هر روز، یک گام پیش رو.",
+            "شادی در عمل است.",
+            "بر تلاش تمرکز کن، نه نتیجه.",
+            "انضباط، آزادی آورد.",
+            "هر کار کوچک، شما را قوی کند.",
+            "به توانایی‌هایت اعتماد کن.",
+            "کمال‌گرایی، مانع عمل است.",
+            "همین اکنون شروع کن، نترس.",
+            "تغییرات خرد، زندگی را دگرگون کند.",
+            "موفقیت، تکرار است.",
+            "هر شکست، درس پیروزی است.",
+            "به جای عالی، آغاز کن.",
+            "کارهای ناتمام را به پایان رسان.",
+            "با برنامه، به همه چیز رسی.",
+            "ذهن آرام، عملکرد بهتر.",
+            "هر روز، بهتر از دیروز باش.",
+            "با اقدام، ترس را زایل کن.",
+            "کوچک اما پیوسته، برنده می‌شوی.",
+            "تلاش امروز، موفقیت فردا.",
+            "بهترین سرمایه‌گذاری، خودت هستی.",
+            "هر کار، فرصت درخشش است.",
+            "با اراده، همه چیز ممکن است.",
+            "قدرت انتخاب با شماست.",
+            "بهترین زمان، همین حالاست.",
+            "از منطقه امن خود بیرون آی.",
+            "هر روز، یک پیروزی کوچک.",
+            "با انگیزه، کوه‌ها را جابجا کن.",
+            "به مسیر خویش ایمان داشته باش.",
+            "تو قهرمان زندگی خویشی."
+        ];
+
 
         // DOM elements
         const themeToggleBtn = document.getElementById('themeToggleBtn');
@@ -1315,6 +1465,11 @@
         const confirmUpdateBtn = document.getElementById('confirmUpdateBtn');
         const cancelUpdateBtn = document.getElementById('cancelUpdateBtn');
         const closeUpdateModalBtn = document.getElementById('closeUpdateModalBtn');
+
+        // Motivation section elements
+        const motivationContainer = document.getElementById('motivationContainer');
+        const motivationTextSpan = document.getElementById('motivationText');
+        let motivationInterval = null;
 
 
         // Helper function to convert Persian numbers to English
@@ -1559,7 +1714,8 @@
                 accentBg: '#eff6ff', /* blue-50 */
                 accentText: '#1e3a8a', /* blue-900 */
                 inputBorder: '#93c5fd', /* blue-300 */
-                inputFocusRing: '#60a5fa' /* blue-400 */
+                inputFocusRing: '#60a5fa', /* blue-400 */
+                motivationIcon: '#2563eb' /* blue-600 */
             };
             const darkThemeColors = {
                 primary: '#93c5fd', /* blue-300 */
@@ -1567,7 +1723,8 @@
                 accentBg: '#1e3a8a', /* blue-900 */
                 accentText: '#eff6ff', /* blue-50 */
                 inputBorder: '#2563eb', /* blue-600 */
-                inputFocusRing: '#3b82f6' /* blue-500 */
+                inputFocusRing: '#3b82f6', /* blue-500 */
+                motivationIcon: '#93c5fd' /* blue-300 */
             };
 
             const currentThemeData = isDarkMode ? darkThemeColors : lightThemeColors;
@@ -1581,6 +1738,8 @@
             document.documentElement.style.setProperty('--theme-progress-to', currentThemeData.secondary);
             document.documentElement.style.setProperty('--theme-input-border', currentThemeData.inputBorder);
             document.documentElement.style.setProperty('--theme-input-focus-ring', currentThemeData.inputFocusRing);
+            document.documentElement.style.setProperty('--theme-blue-motivation-icon', currentThemeData.motivationIcon);
+
 
             // Update elements that use these variables
             // Add task button
@@ -1747,6 +1906,7 @@
             localStorage.setItem('unlockedAchievements', JSON.stringify(unlockedAchievements)); // Save unlocked achievements
             localStorage.setItem('achievementUnlockDates', JSON.stringify(achievementUnlockDates)); // Save achievement unlock dates
             localStorage.setItem('hasPinnedTaskEver', hasPinnedTaskEver); // Save new flag
+            localStorage.setItem('currentMotivationIndex', currentMotivationIndex); // Save current motivation index
             // Theme is saved separately in initializeTheme/themeToggleBtn
         }
 
@@ -1764,6 +1924,7 @@
             const storedUnlockedAchievements = localStorage.getItem('unlockedAchievements'); // Load unlocked achievements
             const storedAchievementUnlockDates = localStorage.getItem('achievementUnlockDates'); // Load achievement unlock dates
             const storedHasPinnedTaskEver = localStorage.getItem('hasPinnedTaskEver'); // Load new flag
+            const storedCurrentMotivationIndex = localStorage.getItem('currentMotivationIndex'); // Load motivation index
 
             if (storedTasks) {
                 try {
@@ -1842,6 +2003,14 @@
                 lastCompletionDate = null; // Explicitly set to null if not found or was 'null' string
             }
 
+            if (storedCurrentMotivationIndex) {
+                currentMotivationIndex = parseInt(storedCurrentMotivationIndex, 10);
+                if (isNaN(currentMotivationIndex)) currentMotivationIndex = 0;
+            } else {
+                currentMotivationIndex = 0;
+            }
+
+
             // Check and update daily streak on load
             const today = new Date().toDateString();
 
@@ -1881,7 +2050,6 @@
                 if (lastDate.toDateString() === yesterday.toDateString()) {
                     // Streak continues, no need to change dailyStreak if it was already correctly loaded
                     // We only need to ensure it's not incorrectly reset if it was already continuous.
-                    // This scenario is mainly for when the app is opened on a new day after import.
                     // If the imported lastCompletionDate is today, streak should not be affected.
                     // If imported lastCompletionDate is yesterday, streak should be current + 1.
                     // If imported lastCompletionDate is older than yesterday, streak should be 0.
@@ -2148,7 +2316,7 @@
                 if (taskElement) {
                     // Update existing element (e.e.g., for completion status change, pin status)
                     const newElement = createTaskElement(task, false, inReorderMode, reorderingTaskId); // Create a new element to get updated classes
-                    taskElement.className = newElement.className; // Update classes
+                    taskElement.className = newElement.className; (task.importance !== 'note' ? 'ml-3' : '') // Update classes
                     // Only update checkbox if it exists in the new element (i.e., not a note)
                     const newCheckbox = newElement.querySelector('input[type="checkbox"]');
                     const existingCheckbox = taskElement.querySelector('input[type="checkbox"]');
@@ -2759,7 +2927,8 @@
                     document.removeEventListener('click', closeMenu); // Remove global listener
                     if (action === 'edit-task') {
                         showEditTaskModal(taskId);
-                    } else if (action === 'activate-reorder') {
+                    }
+                    else if (action === 'activate-reorder') {
                         activateReorderMode(taskId);
                     } else if (action === 'delete-task') {
                         deleteTask(taskId);
@@ -3100,7 +3269,7 @@
             } else {
                 htmlElement.classList.remove('dark');
                 // Sun icon for light mode
-                themeIcon.innerHTML = `<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.325 6.675l-.707-.707M6.318 6.318l-.707-.707m12.728 0l-.707.707M6.318 17.682l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>`;
+                themeIcon.innerHTML = `<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.325 6.675l-.707-.707M6.318 6.318l-.707-.707m12.728 0l-.707.707M6.318 17.682l-.707.707M16 12a4 0 11-8 0 4 0 018 0z"></path>`;
             }
             // Re-apply level theme after overall light/dark mode change
             applyLevelTheme(level);
@@ -3131,9 +3300,10 @@
 
             // If points dropdown is open, close it
             if (!pointsDropdownContent.classList.contains('hidden')) {
-                pointsDropdownContent.classList.remove('opacity-100', 'scale-y-100');
+                pointsDropdownContent.classList.remove('opacity-100', 'scale-y-100', 'is-open'); // Remove is-open
                 pointsDropdownContent.classList.add('opacity-0', 'scale-y-95');
                 dropdownIndicator.classList.remove('rotate-180');
+                pointsDropdownToggle.classList.remove('is-open'); // Ensure toggle's corners reset
                 pointsDropdownContent.addEventListener('transitionend', () => {
                     pointsDropdownContent.classList.add('hidden');
                 }, { once: true });
@@ -3177,12 +3347,14 @@
                 pointsDropdownContent.classList.remove('hidden');
                 void pointsDropdownContent.offsetHeight; // Force reflow for animation
                 pointsDropdownContent.classList.remove('opacity-0', 'scale-y-95');
-                pointsDropdownContent.classList.add('opacity-100', 'scale-y-100');
+                pointsDropdownContent.classList.add('opacity-100', 'scale-y-100', 'is-open'); // Add is-open
                 dropdownIndicator.classList.add('rotate-180'); // Rotate arrow up
+                pointsDropdownToggle.classList.add('is-open'); // Add is-open to toggle for corner change
             } else {
-                pointsDropdownContent.classList.remove('opacity-100', 'scale-y-100');
+                pointsDropdownContent.classList.remove('opacity-100', 'scale-y-100', 'is-open'); // Remove is-open
                 pointsDropdownContent.classList.add('opacity-0', 'scale-y-95');
                 dropdownIndicator.classList.remove('rotate-180'); // Rotate arrow down
+                pointsDropdownToggle.classList.remove('is-open'); // Remove is-open from toggle for corner change
                 pointsDropdownContent.addEventListener('transitionend', () => {
                     pointsDropdownContent.classList.add('hidden');
                 }, { once: true });
@@ -3193,9 +3365,10 @@
         window.addEventListener('click', (e) => {
             if (!pointsDropdownToggle.contains(e.target) && !pointsDropdownContent.contains(e.target)) {
                 if (!pointsDropdownContent.classList.contains('hidden')) {
-                    pointsDropdownContent.classList.remove('opacity-100', 'scale-y-100');
+                    pointsDropdownContent.classList.remove('opacity-100', 'scale-y-100', 'is-open'); // Remove is-open
                     pointsDropdownContent.classList.add('opacity-0', 'scale-y-95');
                     dropdownIndicator.classList.remove('rotate-180');
+                    pointsDropdownToggle.classList.remove('is-open'); // Remove is-open from toggle for corner change
                     pointsDropdownContent.addEventListener('transitionend', () => {
                         pointsDropdownContent.classList.add('hidden');
                     }, { once: true });
@@ -3258,13 +3431,22 @@
 
             const totalAchievements = achievementsData.length;
 
+            // Format userCreationDate for display
+            let formattedCreationDate = 'نامشخص';
+            if (userCreationDate) {
+                const date = new Date(userCreationDate);
+                formattedCreationDate = date.toLocaleDateString('fa-IR', {
+                    year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'
+                });
+            }
+
             // Prepare profile items as an array for dynamic rendering and responsive layout
             const profileItems = [
                 { label: 'نام کاربری', value: userName || 'ناشناس', color: 'blue', icon: 'fa-user' },
                 { label: 'کل وظایف', value: totalTasks, color: 'green', icon: 'fa-list-check' },
                 { label: 'وظایف تکمیل شده', value: completedTasksCount, color: 'teal', icon: 'fa-check-double' },
                 { label: 'تعداد پوینت', value: zPoint, color: 'yellow', icon: 'fa-coins' },
-                { label: 'سطح', value: level, color: 'purple', icon: levelPointsThresholds[level - 1].icon.replace('fa-solid ', '') },
+                { label: 'سطح', value: level, color: 'orange', icon: levelPointsThresholds[level - 1].icon.replace('fa-solid ', '') }, /* Changed color to orange */
                 { label: 'زنجیره', value: `${dailyStreak} روز`, color: 'orange', icon: 'fa-fire' },
                 { label: 'بیشترین زنجیره', value: `${highestDailyStreak} روز`, color: 'pink', icon: 'fa-fire-alt' },
                 { label: 'عمر کاربری', value: `${daysSinceCreation} روز`, color: 'sky', icon: 'fa-calendar-days' },
@@ -3284,6 +3466,15 @@
                     </div>
                 `;
             }).join('');
+
+            // Add the new "آغاز سفر شما" section as a single column
+            profileItemsHtml += `
+                <div class="p-3 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 flex items-center justify-between col-span-full">
+                    <span class="font-semibold">آغاز سفر شما با زای تسک:</span>
+                    <span>${formattedCreationDate}</span>
+                </div>
+            `;
+
 
             profileModalBody.innerHTML = `
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
@@ -3371,15 +3562,14 @@
                 <h3 class="text-xl sm:text-2xl font-bold mb-2 help-heading-blue">به زای تسک خوش آمدید!</h3>
                 <p class="semi-formal-text">زای تسک یک پلتفرم مدیریت وظایف گیمیفای شده است که با هدف افزایش انگیزه و بهره‌وری شما طراحی شده است. با انجام وظایف، پوینت کسب می‌کنید، سطح خود را ارتقا می‌دهید و دستاوردهای ویژه‌ای را باز می‌کنید.</p>
 
-                <h3 class="text-xl sm:text-2xl font-bold mb-2 mt-4 help-heading-green">نحوه استفاده از برنامه</h3>
+                <h3 class="text-xl sm:text-2xl font-bold mb-2 mt-4 help-heading-blue">نحوه استفاده از برنامه</h3>
                 <p class="semi-formal-text">
                     <strong class="text-gray-600 dark:text-gray-300">۱. افزودن وظیفه جدید:</strong>
                     برای اضافه کردن یک وظیفه، نام آن را در فیلد "نام وظیفه" وارد کنید. سپس، می‌توانید اهمیت آن را از طریق منوی کشویی "اهمیت" انتخاب کنید:
                     <ul class="list-disc list-inside mt-2 mb-2 text-justify">
                         <li class="semi-formal-text"><strong class="text-red-600 dark:text-red-300">مهم:</strong> وظایف با اولویت بالا که پوینت بیشتری به شما می‌دهند.</li>
                         <li class="semi-formal-text"><strong class="text-gray-600 dark:text-gray-300">عادی:</strong> وظایف روزمره با پوینت استاندارد.</li>
-                        <li class="semi-formal-text"><strong class="text-purple-600 dark:text-purple-300">سفارشی:</strong> می‌توانید میزان پوینت دریافتی برای این وظیفه را (تا حداکثر ${MAX_CUSTOM_POINTS} پوینت) به صورت دستی وارد کنید.</li>
-                        <li class="semi-formal-text"><strong class="text-orange-600 dark:text-orange-300">یادداشت:</strong> این نوع وظایف برای ثبت نکات، ایده‌ها یا اطلاعاتی هستند که نیازی به تکمیل شدن ندارند و پوینت گیمیفیکیشن نمی‌دهند. حداکثر طول متن برای یادداشت‌ها ۱۵۰ کاراکتر است.</li>
+                        <li class="semi-formal-text"><strong class="text-blue-600 dark:text-blue-300">سفارشی:</strong> می‌توانید میزان پوینت دریافتی برای این وظیفه را (تا حداکثر ${MAX_CUSTOM_POINTS} پوینت) به صورت دستی وارد کنید.</li> <li class="semi-formal-text"><strong class="text-orange-600 dark:text-orange-300">یادداشت:</strong> این نوع وظایف برای ثبت نکات، ایده‌ها یا اطلاعاتی هستند که نیازی به تکمیل شدن ندارند و پوینت گیمیفیکیشن نمی‌دهند. حداکثر طول متن برای یادداشت‌ها ۱۵۰ کاراکتر است.</li>
                     </ul>
                 </p>
                 <p class="semi-formal-text">پس از وارد کردن اطلاعات، روی دکمه "افزودن وظیفه" کلیک کنید.</p>
@@ -3408,8 +3598,7 @@
                     برای نمایش یا پنهان کردن لیست وظایف تکمیل شده، روی دکمه "وظایف تکمیل شده" در پایین صفحه کلیک کنید.
                 </p>
 
-                <h3 class="text-xl sm:text-2xl font-bold mb-2 mt-4 help-heading-purple">سیستم گیمیفیکیشن</h3>
-                <p class="semi-formal-text">
+                <h3 class="text-xl sm:text-2xl font-bold mb-2 mt-4 help-heading-blue">سیستم گیمیفیکیشن</h3> <p class="semi-formal-text">
                     <strong class="text-gray-600 dark:text-gray-300">پوینت:</strong>
                     پوینت‌ها نمادین هستند و میزان فعالیت و پیشرفت شما را نشان می‌دهند.
                     <ul class="list-disc list-inside mt-2 mb-2 text-justify">
@@ -3433,7 +3622,7 @@
                 <div id="helpAchievementsContainer" class="flex flex-wrap gap-2 mt-1 mb-4">
                     </div>
 
-                <h3 class="text-xl sm:text-2xl font-bold mb-2 mt-4 help-heading-orange">پشتیبان‌گیری و بازیابی داده‌ها</h3>
+                <h3 class="text-xl sm:text-2xl font-bold mb-2 mt-4 help-heading-blue">پشتیبان‌گیری و بازیابی داده‌ها</h3>
                 <p class="semi-formal-text">
                     <strong class="text-gray-600 dark:text-gray-300">امنیت داده‌ها:</strong>
                     تمام داده‌های شما به صورت امن و فقط در حافظه محلی مرورگر شما ذخیره می‌شوند و هیچ اطلاعاتی به هیچ سروری ارسال نمی‌شود. این به معنای حریم خصوصی کامل است، اما مسئولیت پشتیبان‌گیری از داده‌ها با خود شماست.
@@ -3447,12 +3636,12 @@
                     برای بازیابی داده‌ها از یک فایل پشتیبان، در همان بخش "پشتیبان‌گیری"، روی "انتخاب فایل" کلیک کرده و فایل JSON پشتیبان خود را انتخاب کنید. سپس "بارگذاری از فایل" را فشار دهید. این کار داده‌های فعلی برنامه شما را با داده‌های موجود در فایل جایگزین می‌کند.
                 </p>
 
-                <h3 class="text-xl sm:text-2xl font-bold mb-2 mt-4 help-heading-red">بروزرسانی برنامه</h3>
+                <h3 class="text-xl sm:text-2xl font-bold mb-2 mt-4 help-heading-blue">بروزرسانی برنامه</h3>
                 <p class="semi-formal-text">
                     این برنامه از <strong class="text-gray-600 dark:text-gray-300">سرویس پس‌زمینه (Service Worker)</strong> برای ارائه تجربه آفلاین و بارگذاری سریع استفاده می‌کند. برای اطمینان از اینکه همیشه آخرین نسخه برنامه را دارید و از جدیدترین ویژگی‌ها بهره‌مند می‌شوید، می‌توانید روی گزینه "بروزرسانی برنامه" در منوی اصلی کلیک کنید. این کار کش برنامه را پاک کرده و آخرین نسخه را از سرور بارگذاری می‌کند.
                 </p>
 
-                <h3 class="text-xl sm:text-2xl font-bold mb-2 mt-4 text-gray-600 dark:text-gray-300">حمایت مالی</h3>
+                <h3 class="text-xl sm:text-2xl font-bold mb-2 mt-4 help-heading-blue">حمایت مالی</h3>
                 <p class="semi-formal-text">
                     این بخش در حال حاضر غیرفعال است. از علاقه شما سپاسگزاریم!
                 </p>
@@ -3529,7 +3718,7 @@
                 <p class="semi-formal-text">این برنامه به منظور مدیریت وظایف و افزایش انگیزه طراحی شده است.</p>
                 <p class="semi-formal-text">این پروژه به صورت اختصاصی توسط <strong class="text-gray-600 dark:text-gray-300"><a href="https://amuleo.ir" target="_blank" rel="noopener noreferrer">سایت عمو لئو</a></strong> طراحی شده است. این نسخه، اولین و آخرین نسخه از این پروژه است.</p>
                 <div class="semi-formal-text text-justify mt-4 mb-4">
-                    <p class="semi-formal-text">برای ساخت این برنامه، ۷ روز از مهم‌ترین روزهای عمرم صرف شد. روزهایی که امتحان داشتم، اما ۲۴ ساعت تمرکزم روی این پروژه بود و روزی ۱۶ ساعت، معادل ۱۴ روز کاری روی این پروژه کار کردم. این پروژه بیش از ۲۰۰ یا ۳۰۰ بار دیباگ شده تا متناسب با هر صفحه نمایشی واکنش‌گرا باشد. برای همین، این پروژه پایان و خداحافظی من از دنیای برنامه‌نویسی است و دیگر این سایت آپدیت نمی‌شود.</p>
+                    <p>برای ساخت این برنامه، ۷ روز از مهم‌ترین روزهای عمرم صرف شد. روزهایی که امتحان داشتم، اما ۲۴ ساعت تمرکزم روی این پروژه بود و روزی ۱۶ ساعت، معادل ۱۴ روز کاری روی این پروژه کار کردم. این پروژه بیش از ۲۰۰ یا ۳۰۰ بار دیباگ شده تا متناسب با هر صفحه نمایشی واکنش‌گرا باشد. برای همین، این پروژه پایان و خداحافظی من از دنیای برنامه‌نویسی است و دیگر این سایت آپدیت نمی‌شود.</p>
                 </div>
                 <p class="semi-formal-text">تمامی حقوق متعلق به <strong class="text-gray-600 dark:text-gray-300"><a href="https://amuleo.ir" target="_blank" rel="noopener noreferrer">عمو لئو</a></strong> است.</p>
                 <p class="semi-formal-text">تاریخ: ۷ خرداد ۱۴۰۴</p>
@@ -3732,6 +3921,7 @@
             setTimeout(() => {
                 welcomeModal.classList.add('hidden');
                 updateGamificationDisplay(); // Call here after userName is set
+                startMotivationRotation(); // <-- ADDED THIS LINE HERE
                 // Add a small delay before processing notifications after welcome modal closes
                 setTimeout(() => {
                     processNotificationQueue(); // Start processing general notifications
@@ -3756,6 +3946,7 @@
                 unlockedAchievements: unlockedAchievements, // Include unlocked achievements in export
                 achievementUnlockDates: achievementUnlockDates, // Include achievement unlock dates in export
                 hasPinnedTaskEver: hasPinnedTaskEver, // Include new flag in export
+                currentMotivationIndex: currentMotivationIndex, // Include motivation index
                 theme: localStorage.getItem('theme') // Include theme in export
             };
             const jsonString = JSON.stringify(dataToSave, null, 2);
@@ -3811,6 +4002,7 @@
                     unlockedAchievements = [];
                     achievementUnlockDates = {};
                     hasPinnedTaskEver = false;
+                    currentMotivationIndex = 0; // Initialize for import
                     let importedTheme = null;
 
                     // Assign properties with robust type checking and fallbacks
@@ -3882,6 +4074,11 @@
                         } else {
                             hasPinnedTaskEver = false; // Default if invalid
                         }
+                        if (typeof importedData.currentMotivationIndex === 'number') {
+                            currentMotivationIndex = importedData.currentMotivationIndex;
+                        } else {
+                            currentMotivationIndex = 0; // Default if invalid
+                        }
                         if (typeof importedData.theme === 'string') {
                             importedTheme = importedData.theme;
                         } else {
@@ -3905,6 +4102,8 @@
                     saveToLocalStorage(); // Save imported data to local storage
                     updateDailyStreakOnImport(); // Re-evaluate daily streak based on imported data
                     renderTasks(); // Re-render UI with new data
+                    updateMotivationQuote(false); // Update motivation quote immediately after import, without fade-out
+                    startMotivationRotation(); // Restart motivation rotation
 
                     // Hide backup modal with animation
                     backupModalContent.classList.remove('opacity-100', 'scale-95');
@@ -3946,9 +4145,8 @@
                     detailModalTitle.textContent = `سطح ${item.level || (levelPointsThresholds.indexOf(item) + 1)}: ${item.name}`;
                     contentHtml = `
                         <p class="semi-formal-text"><strong class="text-blue-600 dark:text-blue-300">توضیحات:</strong> ${item.motivational}</p>
-                        <p class="semi-formal-text"><strong class="text-green-600 dark:text-green-300">پوینت مورد نیاز:</strong> ${item.points}</p>
-                        <p class="semi-formal-text"><strong class="text-purple-600 dark:text-purple-300">تاریخ کسب:</strong> ${formattedDate}</p>
-                    `; // Icon removed
+                        <p class="semi-formal-text"><strong class="text-blue-600 dark:text-blue-300">پوینت مورد نیاز:</strong> ${item.points}</p>
+                        <p class="semi-formal-text"><strong class="text-blue-600 dark:text-blue-300">تاریخ کسب:</strong> ${formattedDate}</p> `; // Icon removed
                 } else {
                     detailModalTitle.textContent = 'سطح نامشخص';
                     contentHtml = '<p class="semi-formal-text">اطلاعاتی برای این سطح یافت نشد.</p>';
@@ -3966,9 +4164,8 @@
 
                     contentHtml = `
                         <p class="semi-formal-text"><strong class="text-blue-600 dark:text-blue-300">توضیحات:</strong> ${item.description}</p>
-                        <p class="semi-formal-text"><strong class="text-green-600 dark:text-green-300">وضعیت:</strong> ${isAchieved ? 'باز شده' : 'باز نشده'}</p>
-                        <p class="semi-formal-text"><strong class="text-purple-600 dark:text-purple-300">تاریخ باز شدن:</strong> ${formattedDate}</p>
-                    `; // Icon removed
+                        <p class="semi-formal-text"><strong class="text-blue-600 dark:text-blue-300">وضعیت:</strong> ${isAchieved ? 'باز شده' : 'باز نشده'}</p>
+                        <p class="semi-formal-text"><strong class="text-blue-600 dark:text-blue-300">تاریخ باز شدن:</strong> ${formattedDate}</p> `; // Icon removed
                 } else {
                     detailModalTitle.textContent = 'دستاورد نامشخص';
                     contentHtml = '<p class="semi-formal-text">اطلاعاتی برای این دستاورد یافت نشد.</p>';
@@ -3991,6 +4188,42 @@
             }, 50);
         });
 
+        // Function to update motivation quote with animation
+        function updateMotivationQuote(animate = true) {
+            console.log("Updating motivation quote. Current index:", currentMotivationIndex);
+            console.log("Quote to display:", motivationQuotes[currentMotivationIndex]);
+            if (animate) {
+                motivationTextSpan.classList.add('fade-out');
+                setTimeout(() => {
+                    motivationTextSpan.textContent = motivationQuotes[currentMotivationIndex];
+                    motivationTextSpan.classList.remove('fade-out');
+                    motivationTextSpan.classList.add('fade-in');
+                    setTimeout(() => {
+                        motivationTextSpan.classList.remove('fade-in'); // Remove after animation for next cycle
+                    }, 600); // Duration of fade-in (0.6s)
+                }, 600); // Duration of fade-out before changing text (0.6s)
+            } else {
+                motivationTextSpan.textContent = motivationQuotes[currentMotivationIndex];
+                motivationTextSpan.classList.remove('fade-out', 'fade-in'); // Ensure no animation classes
+                motivationTextSpan.style.opacity = '1';
+                motivationTextSpan.style.transform = 'translateY(0)';
+            }
+
+            currentMotivationIndex = (currentMotivationIndex + 1) % motivationQuotes.length;
+            saveToLocalStorage(); // Save the new index
+        }
+
+        // Function to start the motivation quote rotation
+        function startMotivationRotation() {
+            if (motivationInterval) {
+                clearInterval(motivationInterval); // Clear any existing interval
+            }
+            // Initial display
+            updateMotivationQuote(false); // Display first quote without animation on load
+            motivationInterval = setInterval(updateMotivationQuote, 7000); // Change every 7 seconds
+        }
+
+
         // Initial load and render
         window.onload = function () {
             let storedUserName = localStorage.getItem('userName');
@@ -4009,6 +4242,7 @@
             if (userName) { // Only render tasks and update gamification if userName is set
                 renderTasks();
                 updateGamificationDisplay(); // Call here for existing users
+                startMotivationRotation(); // Start motivation rotation for existing users
                 // Add a small delay before processing notifications on load for existing users
                 setTimeout(() => {
                     processNotificationQueue(); // Start processing general notifications
