@@ -901,6 +901,17 @@
                 <a href="#" id="updateAppMenuItem" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-200 ease-in-out flex items-center">
                     <i class="fa-solid fa-sync-alt ml-2"></i> بروزرسانی برنامه
                 </a>
+
+                <a id="shareButton"
+                    class="w-full bg-gray-200 text-gray-800 p-3 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50 mb-2">
+                    <i class="fas fa-share-alt ml-2"></i> اشتراک‌گذاری برنامه
+                </a>
+        
+                <a id="installButton"
+                    class="hidden w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
+                    <i class="fas fa-download ml-2"></i> نصب برنامه
+                </a>
+                
                 <a href="#" id="donateMenuItem" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-200 ease-in-out flex items-center">
                     <i class="fa-solid fa-hand-holding-dollar ml-2"></i> حمایت مالی
                 </a>
@@ -4340,6 +4351,74 @@
                     });
             });
         }
+
+        // new codes
+         const shareButton = document.getElementById('shareButton');
+            const installButton = document.getElementById('installButton');
+            let deferredPrompt; // برای ذخیره رویداد beforeinstallprompt
+
+            // منطق برای دکمه "اشتراک‌گذاری"
+            if (navigator.share) {
+                shareButton.addEventListener('click', async () => {
+                    try {
+                        await navigator.share({
+                            title: 'زای تسک',
+                            text: 'برنامه مدیریت تسک‌ها را امتحان کنید!',
+                            url: window.location.href // آدرس فعلی برنامه شما
+                        });
+                        console.log('محتوا با موفقیت به اشتراک گذاشته شد.');
+                    } catch (error) {
+                        console.error('خطا در اشتراک‌گذاری:', error);
+                        showMessageBox('قابلیت اشتراک‌گذاری در دسترس نیست یا خطایی رخ داد.', 'error');
+                    }
+                });
+                shareButton.classList.remove('hidden'); // اگر navigator.share پشتیبانی شود، دکمه را نمایش بده
+            } else {
+                shareButton.classList.add('hidden'); // اگر پشتیبانی نشود، دکمه را مخفی کن
+                console.warn('Web Share API در این مرورگر پشتیبانی نمی‌شود.');
+            }
+
+
+            // منطق برای دکمه "نصب برنامه" (Add to Home Screen)
+            window.addEventListener('beforeinstallprompt', (e) => {
+                // جلوگیری از نمایش خودکار prompt
+                e.preventDefault();
+                // ذخیره رویداد برای نمایش در زمان مناسب
+                deferredPrompt = e;
+                // نمایش دکمه "نصب" به کاربر
+                installButton.classList.remove('hidden');
+                console.log('beforeinstallprompt event fired.');
+            });
+
+            installButton.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    // نمایش prompt نصب
+                    deferredPrompt.prompt();
+                    // منتظر پاسخ کاربر باش
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log(`User response to the install prompt: ${outcome}`);
+                    // دکمه را مخفی کن چون prompt یک بار استفاده شده است
+                    deferredPrompt = null;
+                    installButton.classList.add('hidden');
+
+                    if (outcome === 'accepted') {
+                        showMessageBox('برنامه با موفقیت نصب شد!', 'success');
+                    } else {
+                        showMessageBox('نصب برنامه لغو شد.', 'info');
+                    }
+                } else {
+                    showMessageBox('امکان نصب در حال حاضر در دسترس نیست.', 'info');
+                }
+            });
+
+            // رویداد وقتی برنامه نصب شده و از صفحه اصلی باز می‌شود
+            window.addEventListener('appinstalled', () => {
+                // دکمه نصب را مخفی کن
+                installButton.classList.add('hidden');
+                showMessageBox('برنامه قبلاً نصب شده است.', 'info');
+                console.log('PWA was installed.');
+            });
+        
     </script>
 </body>
 </html>
