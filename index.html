@@ -2455,7 +2455,7 @@
 
             // Previous button
             const prevBtn = document.createElement('button');
-            prevBtn.className = `p-2 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`;
+            prevBtn.className = `p-1 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`;
             prevBtn.innerHTML = `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>`;
             prevBtn.disabled = currentPage === 1;
             prevBtn.title = "صفحه قبلی";
@@ -2541,7 +2541,7 @@
 
             // Next button
             const nextBtn = document.createElement('button');
-            nextBtn.className = `p-2 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400 ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`;
+            nextBtn.className = `p-1 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400 ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`;
             nextBtn.innerHTML = `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>`;
             nextBtn.disabled = currentPage === totalPages;
             nextBtn.title = "صفحه بعدی";
