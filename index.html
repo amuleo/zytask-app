@@ -796,25 +796,34 @@
             overflow: hidden; /* Hide overflowing text during transition */
         }
 
+        /* New Motivation Animation */
+        @keyframes motivation-slide-out {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); } /* Slide up and fade out */
+        }
+
+        @keyframes motivation-slide-in {
+            0% { opacity: 0; transform: translateY(20px); } /* Start from below and fade in */
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
         #motivationText {
-            position: absolute; /* Allow smooth transitions */
-            width: 90%; /* Constrain width */
+            position: absolute;
+            width: 90%;
             max-width: 600px;
             text-align: center;
-            opacity: 0;
-            transform: translateY(10px); /* Start slightly below */
-            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out; /* Changed to 0.6s */
+            opacity: 0; /* Default hidden */
+            transform: translateY(0); /* Default position */
         }
 
-        #motivationText.fade-in {
-            opacity: 1;
-            transform: translateY(0);
+        #motivationText.animate-out {
+            animation: motivation-slide-out 0.6s ease-out forwards;
         }
 
-        #motivationText.fade-out {
-            opacity: 0;
-            transform: translateY(-10px); /* Move slightly up when fading out */
+        #motivationText.animate-in {
+            animation: motivation-slide-in 0.6s ease-out forwards;
         }
+
 
         /* Dropdown Corners Styling */
         #pointsDropdownToggle {
@@ -864,20 +873,15 @@
 </head>
 <body class="px-0 py-0 sm:p-4 flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
     <div class="container bg-white dark:bg-gray-800 rounded-none sm:rounded-xl p-0 sm:p-6 md:p-8 w-full max-w-4xl relative h-screen sm:h-auto">
-        <header class="relative p-4 flex items-center justify-between bg-transparent text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700">
+        <header class="relative p-4 flex items-center bg-transparent text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700">
             <button id="menuBtn" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="باز کردن منو">
                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 100-2 1 1 0 000 2zm0 7a1 1 0 100-2 1 1 0 000 2zm0 7a1 1 0 100-2 1 1 0 000 2z"></path>
                 </svg>
             </button>
 
-            <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">زای تسک</h1>
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mr-2">زای تسک</h1>
 
-            <button id="themeToggleBtn" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="تغییر تم">
-                <svg id="themeIcon" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.325 6.675l-.707-.707M6.318 6.318l-.707-.707m12.728 0l-.707.707M6.318 17.682l-.707.707M16 12a4 0 11-8 0 4 0 018 0z"></path>
-                </svg>
-            </button>
             <div id="menuDropdown" class="absolute right-4 top-full mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg py-1 hidden z-20">
                 <a href="#" id="profileMenuItem" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-200 ease-in-out flex items-center">
                     <i class="fa-solid fa-user ml-2"></i> پروفایل
@@ -937,7 +941,7 @@
             <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
                 <div id="progressBar" class="h-4 rounded-full transition-all duration-500 ease-out" style="width: 0%;"></div>
             </div>
-            <p id="progressText" class="text-sm text-gray-500 dark:text-gray-400 mt-1 text-left">0%</p>
+            <p id="progressText" class="text-sm text-gray-500 dark:text-gray-400 mt-1 text-center">0%</p>
         </div>
 
         <div class="mb-8 p-4 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 relative overflow-hidden">
@@ -1293,7 +1297,7 @@
 
         // Motivation Quotes (45 quotes - psychological, value of tasks, step-by-step, small tasks)
         const motivationQuotes = [
-            "هر گام کوچک، پیشرفت بزرگیه.",
+            "هر قدم کوچک، پیشرفت بزرگیه.",
             "فقط شروع کن، بقیه‌اش میاد.",
             "پایداری، رمز موفقیت توئه.",
             "کارهای کوچیک، نتایج بزرگ میسازن.",
@@ -1342,8 +1346,7 @@
 
 
         // DOM elements
-        const themeToggleBtn = document.getElementById('themeToggleBtn');
-        const themeIcon = document.getElementById('themeIcon');
+        // Removed themeToggleBtn and themeIcon
         const menuBtn = document.getElementById('menuBtn');
         const menuDropdown = document.getElementById('menuDropdown');
         const profileMenuItem = document.getElementById('profileMenuItem');
@@ -1514,6 +1517,35 @@
             }
             return text;
         }
+
+        /**
+         * Formats an ISO date string into a Persian date string including "سال".
+         * Example: "پنجشنبه، ۶ خرداد سال ۱۴۰۳"
+         * @param {string} isoDateString The ISO date string (e.g., "2023-05-25T10:00:00.000Z").
+         * @returns {string} The formatted Persian date string or "نامشخص".
+         */
+        function formatPersianDate(isoDateString) {
+            if (!isoDateString || isoDateString === 'null') return 'نامشخص';
+            const date = new Date(isoDateString);
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const parts = new Intl.DateTimeFormat('fa-IR', options).formatToParts(date);
+
+            let weekday = '';
+            let day = '';
+            let month = '';
+            let year = '';
+
+            parts.forEach(part => {
+                if (part.type === 'weekday') weekday = part.value;
+                if (part.type === 'day') day = part.value;
+                if (part.type === 'month') month = part.value;
+                if (part.type === 'year') year = part.value;
+            });
+
+            // Reassemble in the desired order and insert "سال"
+            return `${weekday}، ${day} ${month} سال ${year}`;
+        }
+
 
         /**
          * Function to display a custom message box instead of alert().
@@ -2294,7 +2326,6 @@
 
         /**
          * Updates the DOM for a given task list to reflect the current tasks.
-         * This function handles adding, removing, and reordering elements with animations.
          * @param {HTMLElement} container - The DOM element representing the task list container.
          * @param {Array<object>} newTasks - The array of task objects to be rendered.
          * @param {boolean} isEmptyMessageNeeded - True if an "empty list" message should be shown.
@@ -2703,7 +2734,8 @@
                     const action = target.closest('button')?.dataset.action;
                     if (action === 'move-up') {
                         moveTask(taskId, 'up');
-                    } else if (action === 'move-down') {
+                    }
+                    else if (action === 'move-down') {
                         moveTask(taskId, 'down');
                     }
                 }
@@ -3289,23 +3321,16 @@
 
 
         // --- Theme Toggle Logic ---
-        themeToggleBtn.addEventListener('click', () => {
-            const isDarkMode = document.documentElement.classList.contains('dark');
-            const newTheme = isDarkMode ? 'light' : 'dark';
-            applyTheme(newTheme);
-            localStorage.setItem('theme', newTheme); // Save user's preference
-        });
+        // Removed themeToggleBtn.addEventListener('click', ...)
 
         function applyTheme(theme) {
             const htmlElement = document.documentElement;
             if (theme === 'dark') {
                 htmlElement.classList.add('dark');
-                // Moon icon for dark mode
-                themeIcon.className = 'h-6 w-6 fa-solid fa-moon'; // Changed to Font Awesome class
+                // Removed themeIcon.className update
             } else {
                 htmlElement.classList.remove('dark');
-                // Sun icon for light mode
-                themeIcon.className = 'h-6 w-6 fa-solid fa-sun'; // Changed to Font Awesome class
+                // Removed themeIcon.className update
             }
             // Re-apply level theme after overall light/dark mode change
             applyLevelTheme(level);
@@ -3467,14 +3492,9 @@
 
             const totalAchievements = achievementsData.length;
 
-            // Format userCreationDate for display
-            let formattedCreationDate = 'نامشخص';
-            if (userCreationDate) {
-                const date = new Date(userCreationDate);
-                formattedCreationDate = date.toLocaleDateString('fa-IR', {
-                    year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'
-                });
-            }
+            // Format userCreationDate for display - CHANGED FORMAT HERE
+            let formattedCreationDate = formatPersianDate(userCreationDate);
+
 
             // Prepare profile items as an array for dynamic rendering and responsive layout
             const profileItems = [
@@ -3623,7 +3643,7 @@
                 </p>
                 <p class="semi-formal-text">
                     <strong class="text-gray-600 dark:text-gray-300">۵. تغییر چیدمان وظایف:</strong>
-                    برای تغییر دستی ترتیب وظایف فعال، روی آیکون سه نقطه (<i class="fa-solid fa-ellipsis-v"></i>) کنار وظیفه مورد نظر کلیک کرده و "تغییر چیدمان" را انتخاب کنید. سپس با استفاده از فلش‌های بالا و پایین، موقعیت وظیفه را جابجا کنید. پس از اتمام، دکمه "پایان" را فشار دهید.
+                    برای تغییر دستی ترتیب وظایف فعال، روی آیکون سه نقطه (<i class="fa-solid fa-arrows-up-down"></i>) کنار وظیفه مورد نظر کلیک کرده و "تغییر چیدمان" را انتخاب کنید. سپس با استفاده از فلش‌های بالا و پایین، موقعیت وظیفه را جابجا کنید. پس از اتمام، دکمه "پایان" را فشار دهید.
                 </p>
                 <p class="semi-formal-text">
                     <strong class="text-gray-600 dark:text-gray-300">۶. پین کردن وظیفه:</strong>
@@ -3641,6 +3661,7 @@
                         <li class="semi-formal-text">وظایف عادی: ${pointsPerNormalTask} پوینت</li>
                         <li class="semi-formal-text">وظایف مهم: ${pointsPerImportantTask} پوینت</li>
                         <li class="semi-formal-text">وظایف سفارشی: تا ${MAX_CUSTOM_POINTS} پوینت (بر اساس مقدار وارد شده)</li>
+                        <li class="semi-formal-text"><strong class="text-orange-600 dark:text-orange-300">یادداشت:</strong> این نوع وظایف برای ثبت نکات، ایده‌ها یا اطلاعاتی هستند که نیازی به تکمیل شدن ندارند و پوینت گیمیفیکیشن نمی‌دهند. حداکثر طول متن برای یادداشت‌ها ۱۵۰ کاراکتر است.</li>
                     </ul>
                 </p>
                 <p class="semi-formal-text">
@@ -4174,9 +4195,8 @@
                 item = levelPointsThresholds.find(l => l.name === levelName);
                 if (item) {
                     const unlockedDate = achievementUnlockDates[item.name];
-                    const formattedDate = unlockedDate ? new Date(unlockedDate).toLocaleDateString('fa-IR', {
-                        year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'
-                    }) : 'هنوز باز نشده';
+                    // Changed date format here
+                    const formattedDate = formatPersianDate(unlockedDate);
 
                     detailModalTitle.textContent = `سطح ${item.level || (levelPointsThresholds.indexOf(item) + 1)}: ${item.name}`;
                     contentHtml = `
@@ -4194,9 +4214,8 @@
                     detailModalTitle.textContent = `دستاورد: ${item.name}`;
                     const isAchieved = unlockedAchievements.includes(item.name);
                     const unlockedDate = achievementUnlockDates[item.name];
-                    const formattedDate = unlockedDate ? new Date(unlockedDate).toLocaleDateString('fa-IR', {
-                        year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'
-                    }) : 'هنوز باز نشده';
+                    // Changed date format here
+                    const formattedDate = formatPersianDate(unlockedDate);
 
                     contentHtml = `
                         <p class="semi-formal-text"><strong class="text-blue-600 dark:text-blue-300">توضیحات:</strong> ${item.description}</p>
@@ -4229,23 +4248,25 @@
             console.log("Updating motivation quote. Current index:", currentMotivationIndex);
             console.log("Quote to display:", motivationQuotes[currentMotivationIndex]);
             if (animate) {
-                motivationTextSpan.classList.add('fade-out');
-                setTimeout(() => {
+                motivationTextSpan.classList.add('animate-out');
+                motivationTextSpan.addEventListener('animationend', function handler() {
+                    motivationTextSpan.removeEventListener('animationend', handler);
+                    motivationTextSpan.classList.remove('animate-out');
+                    currentMotivationIndex = (currentMotivationIndex + 1) % motivationQuotes.length;
                     motivationTextSpan.textContent = motivationQuotes[currentMotivationIndex];
-                    motivationTextSpan.classList.remove('fade-out');
-                    motivationTextSpan.classList.add('fade-in');
-                    setTimeout(() => {
-                        motivationTextSpan.classList.remove('fade-in'); // Remove after animation for next cycle
-                    }, 600); // Duration of fade-in (0.6s)
-                }, 600); // Duration of fade-out before changing text (0.6s)
+                    motivationTextSpan.classList.add('animate-in');
+                    motivationTextSpan.addEventListener('animationend', function handler2() {
+                        motivationTextSpan.removeEventListener('animationend', handler2);
+                        motivationTextSpan.classList.remove('animate-in');
+                    }, { once: true });
+                }, { once: true });
             } else {
                 motivationTextSpan.textContent = motivationQuotes[currentMotivationIndex];
-                motivationTextSpan.classList.remove('fade-out', 'fade-in'); // Ensure no animation classes
+                motivationTextSpan.classList.remove('animate-out', 'animate-in'); // Ensure no animation classes
                 motivationTextSpan.style.opacity = '1';
                 motivationTextSpan.style.transform = 'translateY(0)';
+                currentMotivationIndex = (currentMotivationIndex + 1) % motivationQuotes.length; // Still increment index
             }
-
-            currentMotivationIndex = (currentMotivationIndex + 1) % motivationQuotes.length;
             saveToLocalStorage(); // Save the new index
         }
 
