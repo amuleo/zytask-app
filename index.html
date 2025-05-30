@@ -4386,18 +4386,7 @@
                 console.log('beforeinstallprompt event fired.');
             });
 
-            installAppLink.addEventListener('click', async (e) => {
-                e.preventDefault(); // Prevent default link behavior
-                if (deferredPrompt) {
-                    deferredPrompt.prompt(); // Show the browser's install prompt
-                    const { outcome } = await deferredPrompt.userChoice; // Wait for user's action
-                    console.log(`User response to the install prompt: ${outcome}`);
-                    deferredPrompt = null; // Clear the stored prompt
-                    installAppLink.classList.add('hidden'); // Hide the item after prompt is shown
-                } else {
-                    console.warn('Install prompt not available.');
-                }
-            });
+            installAppLink.addEventListener('click', async (e) => { e.preventDefault(); // Prevent default link behavior (e.g., navigating to #) if (deferredPrompt) { try { console.log('Attempting to show install prompt...'); // Trigger the browser's native install prompt deferredPrompt.prompt(); // Wait for the user to respond to the prompt (accept or dismiss) const { outcome } = await deferredPrompt.userChoice; console.log(`User response to install prompt: ${outcome}`); // Clear the deferred prompt, as it can only be used once deferredPrompt = null; // Hide the install button after the prompt has been shown (regardless of user's choice) installAppLink.classList.add('hidden'); if (outcome === 'accepted') {console.log('PWA installation was accepted by the user.'); } else { console.log('PWA installation was dismissed by the user.'); } } catch (error) { console.error('Error while trying to show install prompt:', error); // If there's an error calling prompt() (unlikely but possible), log it. // The button will remain visible if the prompt couldn't be shown successfully. } } else { console.warn('Install prompt is not available (deferredPrompt is null). Ensure beforeinstallprompt event fired.'); // This message appears if the button was clicked but the 'beforeinstallprompt' event never fired. } });
 
             // Hide install button if app is already installed
             window.addEventListener('appinstalled', () => {
