@@ -2,7 +2,8 @@
 // این Service Worker به طور خاص برای مدیریت کش و بروزرسانی‌های برنامه index.html طراحی شده است.
 // تمامی عملیات کشینگ و پاکسازی داده‌ها در محدوده این برنامه انجام می‌شود.
 
-const CACHE_NAME = 'my-app-v1.0.3'; // نسخه کش بروزرسانی شده
+const CACHE_NAME = 'my-app-v1.0.3'; // نسخه کش بروزرسانی شده برای منابع استاتیک
+const API_CACHE_NAME = 'api-cache-v1'; // کش جداگانه برای پاسخ‌های API
 const urlsToCache = [
     '/', // کش کردن مسیر ریشه، با فرض اینکه index.html از آنجا سرو می‌شود
     '/index.html', // کش کردن صریح فایل HTML
@@ -26,7 +27,7 @@ self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
-                console.log('[Service Worker] در حال کش کردن تمامی محتوا...');
+                console.log('[Service Worker] در حال کش کردن منابع ضروری...');
                 return cache.addAll(urlsToCache);
             })
             .catch(error => {
@@ -38,68 +39,93 @@ self.addEventListener('install', (event) => {
 // شنونده رویداد 'fetch': هر درخواست شبکه را رهگیری می‌کند.
 // این رویداد ابتدا سعی می‌کند پاسخ را از کش برگرداند؛ اگر در کش نبود، درخواست را از شبکه دریافت می‌کند.
 // این رفتار، قابلیت آفلاین را برای index.html و منابع وابسته به آن فراهم می‌کند.
-self.addEventListener('fetch', (event) => {
+self.addEventListener('fetch', event => {
     // فقط درخواست‌های GET را رهگیری می‌کنیم
     if (event.request.method !== 'GET') {
         return;
     }
 
-    event.respondWith(
-        caches.match(event.request)
-            .then((response) => {
-                // اگر در کش یافت شد، پاسخ را برگردان
-                if (response) {
-                    return response;
-                }
-
-                // مهم: درخواست را کلون کنید. یک درخواست یک جریان است و فقط یک بار می‌تواند مصرف شود.
-                // ما باید آن را کلون کنیم تا بتوانیم جریان را دو بار مصرف کنیم: یک بار برای کش و یک بار برای شبکه.
-                const fetchRequest = event.request.clone();
-
-                return fetch(fetchRequest).then((response) => {
-                    // بررسی می‌کنیم که آیا پاسخ معتبری دریافت کرده‌ایم.
-                    // response.ok برای کدهای وضعیت 2xx صحیح است.
-                    // ما معمولاً می‌خواهیم تمامی پاسخ‌های موفقیت‌آمیز را، صرف نظر از نوع (basic, cors)، کش کنیم.
-                    // پاسخ‌های مبهم (نوع 'opaque') پیچیده هستند زیرا وضعیت آن‌ها قابل بررسی نیست،
-                    // اما برای فونت‌ها، کش کردن آن‌ها اغلب ضروری است.
-                    if (!response || !response.ok) {
+    // مدیریت درخواست‌های API (فرض می‌کنیم URLهای API با '/api/' شروع می‌شوند)
+    // شما باید این شرط را بر اساس ساختار واقعی URLهای API خود تنظیم کنید.
+    if (event.request.url.includes('/api/')) {
+        event.respondWith(
+            caches.open(API_CACHE_NAME).then(cache => {
+                return cache.match(event.request).then(cachedResponse => {
+                    const networkPromise = fetch(event.request).then(networkResponse => {
+                        // کش کردن پاسخ‌های موفقیت‌آمیز API
+                        if (networkResponse.ok) {
+                            // مهم: پاسخ را کلون کنید قبل از قرار دادن در کش
+                            cache.put(event.request.clone(), networkResponse.clone());
+                        }
+                        return networkResponse;
+                    }).catch(() => {
+                        // اگر شبکه قطع بود یا درخواست شبکه با خطا مواجه شد، پاسخ کش شده را برگردان
+                        console.warn('[Service Worker] درخواست API با شکست مواجه شد، در حال بازگشت به کش:', event.request.url);
+                        return cachedResponse;
+                    });
+                    // استراتژی: ابتدا کش را بررسی کن، اگر نبود یا شبکه قطع بود، به شبکه برو و کش کن.
+                    // اگر شبکه در دسترس نبود، از پاسخ کش شده استفاده کن.
+                    return cachedResponse || networkPromise;
+                });
+            })
+        );
+    }
+    // مدیریت درخواست‌های سایر منابع (CSS، JS، تصاویر، HTML و غیره)
+    else {
+        event.respondWith(
+            caches.match(event.request)
+                .then((response) => {
+                    // اگر در کش یافت شد، پاسخ را برگردان
+                    if (response) {
                         return response;
                     }
 
-                    // مهم: پاسخ را کلون کنید. یک پاسخ یک جریان است
-                    // و فقط یک بار می‌تواند مصرف شود. ما باید آن را کلون کنیم تا
-                    // بتوانیم جریان را دو بار مصرف کنیم.
-                    const responseToCache = response.clone();
+                    // مهم: درخواست را کلون کنید. یک درخواست یک جریان است و فقط یک بار می‌تواند مصرف شود.
+                    const fetchRequest = event.request.clone();
 
-                    caches.open(CACHE_NAME)
-                        .then((cache) => {
-                            cache.put(event.request, responseToCache);
-                        })
-                        .catch(cacheError => {
-                            console.error('خطا در قرار دادن پاسخ در کش:', cacheError);
-                        });
+                    return fetch(fetchRequest).then((networkResponse) => {
+                        // بررسی می‌کنیم که آیا پاسخ معتبری دریافت کرده‌ایم.
+                        // response.ok برای کدهای وضعیت 2xx صحیح است.
+                        if (!networkResponse || !networkResponse.ok) {
+                            return networkResponse;
+                        }
 
-                    return response;
-                }).catch((error) => {
-                    // اگر درخواست شبکه با شکست مواجه شد (مثلاً آفلاین بود)، سعی کنید به عنوان یک جایگزین از کش دریافت کنید.
-                    console.error('دریافت اطلاعات با شکست مواجه شد؛ در صورت موجود بودن، منبع کش شده برگردانده می‌شود:', error);
-                    return caches.match(event.request); // سعی کنید در صورت شکست شبکه، از کش برگردانید
-                });
-            })
-    );
+                        // کش کردن پویا منابع موفقیت‌آمیز (به جز مواردی که قبلاً در install کش شده‌اند)
+                        // و همچنین بررسی کنید که URL در لیست urlsToCache نباشد تا از کش کردن مجدد جلوگیری شود.
+                        // این برای منابعی مانند تصاویر که به صورت پویا بارگیری می‌شوند، مفید است.
+                        if (!urlsToCache.includes(event.request.url)) {
+                            // مهم: پاسخ را کلون کنید قبل از قرار دادن در کش
+                            caches.open(CACHE_NAME)
+                                .then((cache) => {
+                                    cache.put(event.request, networkResponse.clone());
+                                })
+                                .catch(cacheError => {
+                                    console.error('خطا در قرار دادن پاسخ پویا در کش:', cacheError);
+                                });
+                        }
+                        return networkResponse;
+                    }).catch((error) => {
+                        // اگر درخواست شبکه با شکست مواجه شد (مثلاً آفلاین بود)، سعی کنید به عنوان یک جایگزین از کش دریافت کنید.
+                        console.error('دریافت اطلاعات با شکست مواجه شد؛ در صورت موجود بودن، منبع کش شده برگردانده می‌شود:', error);
+                        return caches.match(event.request); // سعی کنید در صورت شکست شبکه، از کش برگردانید
+                    });
+                })
+        );
+    }
 });
 
 // شنونده رویداد 'activate': هنگام فعال شدن Service Worker فراخوانی می‌شود.
 // این رویداد کش‌های قدیمی را پاک می‌کند تا اطمینان حاصل شود که فقط آخرین نسخه برنامه استفاده می‌شود.
 self.addEventListener('activate', (event) => {
     console.log('[Service Worker] در حال فعال‌سازی...');
-    const cacheWhitelist = [CACHE_NAME]; // لیست کش‌های مجاز (فقط کش فعلی)
+    // لیست کش‌های مجاز (کش فعلی منابع استاتیک و کش API)
+    const cacheWhitelist = [CACHE_NAME, API_CACHE_NAME];
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
                     if (cacheWhitelist.indexOf(cacheName) === -1) {
-                        // حذف کش‌های قدیمی
+                        // حذف کش‌های قدیمی که در لیست مجاز نیستند
                         console.log('[Service Worker] در حال حذف کش قدیمی:', cacheName);
                         return caches.delete(cacheName);
                     }
