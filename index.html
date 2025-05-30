@@ -440,6 +440,18 @@
                 padding-left: 0.75rem; /* Adjust padding for items */
                 padding-right: 0.75rem;
             }
+
+            /* Fix for completed tasks section on mobile */
+            #completedTasksSection {
+                width: 100%; /* Ensure it takes full width */
+                box-sizing: border-box; /* Include padding/border in width */
+                padding-left: 0.5rem; /* Match container padding */
+                padding-right: 0.5rem; /* Match container padding */
+            }
+            #completedTasksContainer {
+                padding-left: 0; /* Remove specific padding from task-list-container */
+                padding-right: 0; /* Remove specific padding from task-list-container */
+            }
         }
 
         /* Update the three-dot menu button to match the move buttons */
@@ -852,7 +864,7 @@
 </head>
 <body class="px-0 py-0 sm:p-4 flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
     <div class="container bg-white dark:bg-gray-800 rounded-none sm:rounded-xl p-0 sm:p-6 md:p-8 w-full max-w-4xl relative h-screen sm:h-auto">
-        <header class="relative p-4 flex items-center justify-between bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700">
+        <header class="relative p-4 flex items-center justify-between bg-transparent text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700">
             <button id="menuBtn" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="باز کردن منو">
                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 100-2 1 1 0 000 2zm0 7a1 1 0 100-2 1 1 0 000 2zm0 7a1 1 0 100-2 1 1 0 000 2z"></path>
@@ -894,8 +906,7 @@
             </div>
         </header>
 
-        <div class="relative w-full">
-            <div id="pointsDropdownToggle" class="flex items-center justify-between w-full py-3 px-4 bg-blue-500 dark:bg-blue-700 text-white cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-600 dark:hover:bg-blue-800 rounded-lg">
+        <div class="relative w-full mt-1"> <div id="pointsDropdownToggle" class="flex items-center justify-between w-full py-3 px-4 bg-blue-500 dark:bg-blue-700 text-white cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-600 dark:hover:bg-blue-800 rounded-lg">
                 <div class="flex items-center">
                     <i class="fa-solid fa-coins text-xl ml-2"></i>
                     <span class="text-lg font-semibold">پوینت: <span id="zPoint">0</span></span>
@@ -966,8 +977,7 @@
                 <div id="activeTasksPagination" class="flex items-center space-x-2 space-x-reverse hidden">
                 </div>
             </div>
-            <div id="activeTaskList" class="task-list-container pr-2">
-            </div>
+            <div id="activeTaskList" class="task-list-container"> </div>
         </div>
 
         <div class="mt-8 px-2 md:px-0">
@@ -981,8 +991,7 @@
                     <div id="completedTasksPagination" class="flex items-center space-x-2 space-x-reverse hidden">
                     </div>
                 </div>
-                <div id="completedTasksContainer" class="task-list-container pr-2">
-                </div>
+                <div id="completedTasksContainer" class="task-list-container"> </div>
             </div>
         </div>
     </div>
@@ -1284,51 +1293,51 @@
 
         // Motivation Quotes (45 quotes - psychological, value of tasks, step-by-step, small tasks)
         const motivationQuotes = [
-            "هر گام کوچک، پیشرفت بزرگ است.",
-            "آغاز کن، کمال خود می‌آید.",
-            "پایداری، رمز موفقیت شماست.",
-            "کارهای خرد، نتایج کلان می‌سازند.",
-            "امروز را بهترین سازید.",
-            "کوشش مستمر، رویاها را زنده کند.",
-            "هر وظیفه، گامی به سوی هدف.",
-            "باور کن، می‌توانی، انجام ده.",
-            "قدرت شما در همین لحظه است.",
-            "کوچک آغاز کن، بزرگ بیندیش.",
-            "هر روز، فرصت رشد است.",
-            "تغییر از درون شماست.",
-            "بهترین نسخه خود باش.",
-            "پشتکار، سرنوشت را می‌سازد.",
-            "چالش، فرصت یادگیری است.",
-            "تمرکز، قدرت آفریند.",
-            "هر روز، یک گام پیش رو.",
-            "شادی در عمل است.",
-            "بر تلاش تمرکز کن، نه نتیجه.",
-            "انضباط، آزادی آورد.",
-            "هر کار کوچک، شما را قوی کند.",
-            "به توانایی‌هایت اعتماد کن.",
-            "کمال‌گرایی، مانع عمل است.",
-            "همین اکنون شروع کن، نترس.",
-            "تغییرات خرد، زندگی را دگرگون کند.",
-            "موفقیت، تکرار است.",
-            "هر شکست، درس پیروزی است.",
-            "به جای عالی، آغاز کن.",
-            "کارهای ناتمام را به پایان رسان.",
-            "با برنامه، به همه چیز رسی.",
-            "ذهن آرام، عملکرد بهتر.",
+            "هر گام کوچک، پیشرفت بزرگیه.",
+            "فقط شروع کن، بقیه‌اش میاد.",
+            "پایداری، رمز موفقیت توئه.",
+            "کارهای کوچیک، نتایج بزرگ میسازن.",
+            "امروز رو بهترین روزت کن.",
+            "تلاش کن، رویاهات زنده میشن.",
+            "هر کار، یه قدم به هدفت نزدیکتر.",
+            "باور کن، می‌تونی، انجامش بده.",
+            "قدرتت همین الانه.",
+            "کوچیک شروع کن، بزرگ فکر کن.",
+            "هر روز، فرصت رشد داری.",
+            "تغییر از درون خودته.",
+            "بهترین خودت باش.",
+            "پشتکار، سرنوشت رو میسازه.",
+            "چالش‌ها، درس یادگیری هستن.",
+            "تمرکز، قدرت آفرینشه.",
+            "هر روز، یه قدم جلوتر.",
+            "شادی تو عمل کردنشه.",
+            "روی تلاشت تمرکز کن.",
+            "انضباط، آزادی میاره.",
+            "هر کار کوچیک، قوی‌ترت می‌کنه.",
+            "به توانایی‌هات اعتماد کن.",
+            "کمال‌گرایی، مانع عمله.",
+            "همین الان شروع کن، نترس.",
+            "تغییرات کوچیک، زندگی رو عوض می‌کنه.",
+            "موفقیت، تکرار موفقیته.",
+            "هر شکست، درس پیروزیه.",
+            "به جای عالی، شروع کن.",
+            "کارهای ناتمام رو تموم کن.",
+            "با برنامه، به همه چی می‌رسی.",
+            "ذهن آروم، عملکرد بهتر.",
             "هر روز، بهتر از دیروز باش.",
-            "با اقدام، ترس را زایل کن.",
-            "کوچک اما پیوسته، برنده می‌شوی.",
-            "تلاش امروز، موفقیت فردا.",
-            "بهترین سرمایه‌گذاری، خودت هستی.",
-            "هر کار، فرصت درخشش است.",
-            "با اراده، همه چیز ممکن است.",
-            "قدرت انتخاب با شماست.",
+            "با اقدام، ترست رو از بین ببر.",
+            "کوچیک اما پیوسته، برنده میشی.",
+            "تلاش امروز، موفقیت فرداست.",
+            "بهترین سرمایه‌گذاری، خودتی.",
+            "هر کار، فرصت درخششه.",
+            "با اراده، همه چی ممکنه.",
+            "قدرت انتخاب با خودته.",
             "بهترین زمان، همین حالاست.",
-            "از منطقه امن خود بیرون آی.",
-            "هر روز، یک پیروزی کوچک.",
-            "با انگیزه، کوه‌ها را جابجا کن.",
-            "به مسیر خویش ایمان داشته باش.",
-            "تو قهرمان زندگی خویشی."
+            "از منطقه امنت بیا بیرون.",
+            "هر روز، یه پیروزی کوچیکه.",
+            "با انگیزه، کوه‌ها رو جابجا کن.",
+            "به مسیرت ایمان داشته باش.",
+            "تو قهرمان زندگی خودتی."
         ];
 
 
@@ -2316,7 +2325,7 @@
                 if (taskElement) {
                     // Update existing element (e.e.g., for completion status change, pin status)
                     const newElement = createTaskElement(task, false, inReorderMode, reorderingTaskId); // Create a new element to get updated classes
-                    taskElement.className = newElement.className; (task.importance !== 'note' ? 'ml-3' : '') // Update classes
+                    taskElement.className = newElement.className; // Update classes
                     // Only update checkbox if it exists in the new element (i.e., not a note)
                     const newCheckbox = newElement.querySelector('input[type="checkbox"]');
                     const existingCheckbox = taskElement.querySelector('input[type="checkbox"]');
@@ -2395,24 +2404,23 @@
          */
         function renderPaginationControls(containerElement, totalItems, currentPage, listType) {
             const totalPages = Math.ceil(totalItems / TASKS_PER_PAGE);
+            const maxPageButtons = 5; // Max number of page buttons to show (excluding prev/next and ellipses)
 
-            // Hide pagination if only one page or fewer tasks than TASKS_PER_PAGE
             if (totalPages <= 1) {
                 containerElement.classList.add('hidden');
-                containerElement.innerHTML = ''; // Clear content if hidden
+                containerElement.innerHTML = '';
                 return;
             } else {
-                // Only show pagination if the respective section is visible.
-                // For active tasks, always show if > 1 page. For completed, only if section is visible.
                 if (listType === 'completed' && completedTasksSection.classList.contains('hidden')) {
                     containerElement.classList.add('hidden');
-                    containerElement.innerHTML = ''; // Clear content if hidden
+                    containerElement.innerHTML = '';
                     return;
                 }
                 containerElement.classList.remove('hidden');
             }
 
-            containerElement.innerHTML = ''; // Clear existing controls
+            containerElement.innerHTML = '';
+            containerElement.classList.add('flex', 'flex-wrap', 'justify-center', 'items-center', 'gap-2', 'my-4'); // Added flex-wrap and gap
 
             // Previous button
             const prevBtn = document.createElement('button');
@@ -2426,72 +2434,93 @@
                 } else {
                     completedCurrentPage = Math.max(1, completedCurrentPage - 1);
                 }
-                renderTasks(); // Call renderTasks without focusTaskId for general page navigation
+                renderTasks();
             });
             containerElement.appendChild(prevBtn);
 
-            // Display page number (editable)
-            const pageNumberSpan = document.createElement('span');
-            pageNumberSpan.className = 'px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 font-semibold cursor-pointer min-w-[3rem] text-center';
-            pageNumberSpan.textContent = currentPage;
-            pageNumberSpan.title = `صفحه ${currentPage} از ${totalPages}. برای ویرایش دو بار کلیک کنید.`;
-            pageNumberSpan.dataset.listType = listType; // Store list type for event handling
-
-            // Double-click to edit page number
-            pageNumberSpan.addEventListener('dblclick', () => {
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.inputmode = 'numeric';
-                input.className = 'w-12 text-center bg-blue-50 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400 text-right';
-                input.value = currentPage;
-                input.min = 1;
-                input.max = totalPages;
-                input.dataset.originalValue = currentPage; // Store original value
-
-                pageNumberSpan.replaceWith(input);
-                input.focus();
-                input.select(); // Auto-select text
-
-                const handleInputBlur = () => {
-                    let newPage = parseInt(convertPersianNumbersToEnglish(input.value), 10); // Convert before parsing
-                    if (isNaN(newPage) || newPage < 1 || newPage > totalPages) {
-                        newPage = parseInt(input.dataset.originalValue, 10); // Revert to original value if invalid
-                        showMessageBox(`شماره صفحه نامعتبر است. مقدار باید بین ۱ و ${totalPages} باشد. بازگشت به صفحه ${newPage}.`, 'error');
-                    }
+            // Function to create a page button
+            const createPageButton = (pageNumber, isActive = false) => {
+                const button = document.createElement('button');
+                button.className = `px-3 py-1 rounded-full text-sm font-semibold transition duration-200 ease-in-out
+                                    ${isActive ? 'bg-blue-600 text-white dark:bg-blue-500' : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100'}
+                                    focus:outline-none focus:ring-2 focus:ring-blue-400`;
+                button.textContent = pageNumber;
+                button.title = `صفحه ${pageNumber}`;
+                button.addEventListener('click', () => {
                     if (listType === 'active') {
-                        activeCurrentPage = newPage;
+                        activeCurrentPage = pageNumber;
                     } else {
-                        completedCurrentPage = newPage;
+                        completedCurrentPage = pageNumber;
                     }
-                    renderTasks(); // Call renderTasks without focusTaskId for general page navigation
-                    input.removeEventListener('blur', handleInputBlur);
-                    input.removeEventListener('keydown', handleInputKeydown);
-                };
+                    renderTasks();
+                });
+                return button;
+            };
 
-                const handleInputKeydown = (e) => {
-                    if (e.key === 'Enter') {
-                        input.blur(); // Trigger blur to process input
-                    }
-                };
+            // Function to create an ellipsis
+            const createEllipsis = () => {
+                const span = document.createElement('span');
+                span.className = 'px-2 py-1 text-gray-500 dark:text-gray-400';
+                span.textContent = '...';
+                return span;
+            };
 
-                input.addEventListener('blur', handleInputBlur);
-                input.addEventListener('keydown', handleInputKeydown);
-            });
-            containerElement.appendChild(pageNumberSpan); // Append the span (or input if active)
+            let startPage, endPage;
+
+            if (totalPages <= maxPageButtons) {
+                // Show all pages if total pages are less than or equal to maxPageButtons
+                startPage = 1;
+                endPage = totalPages;
+            } else {
+                // Calculate start and end pages for the dynamic range
+                const half = Math.floor(maxPageButtons / 2);
+                startPage = currentPage - half;
+                endPage = currentPage + half;
+
+                if (startPage < 1) {
+                    startPage = 1;
+                    endPage = maxPageButtons;
+                }
+                if (endPage > totalPages) {
+                    endPage = totalPages;
+                    startPage = totalPages - maxPageButtons + 1;
+                }
+            }
+
+            // Add first page button and ellipsis if needed
+            if (startPage > 1) {
+                containerElement.appendChild(createPageButton(1));
+                if (startPage > 2) {
+                    containerElement.appendChild(createEllipsis());
+                }
+            }
+
+            // Add page buttons within the calculated range
+            for (let i = startPage; i <= endPage; i++) {
+                containerElement.appendChild(createPageButton(i, i === currentPage));
+            }
+
+            // Add ellipsis and last page button if needed
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    containerElement.appendChild(createEllipsis());
+                }
+                containerElement.appendChild(createPageButton(totalPages));
+            }
 
             // Next button
             const nextBtn = document.createElement('button');
             nextBtn.className = `p-2 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400 ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`;
             nextBtn.innerHTML = `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>`;
             nextBtn.disabled = currentPage === totalPages;
-            prevBtn.title = "صفحه بعدی";
+            nextBtn.title = "صفحه بعدی";
             nextBtn.addEventListener('click', () => {
                 if (listType === 'active') {
                     activeCurrentPage = Math.min(totalPages, activeCurrentPage + 1);
                 } else {
                     completedCurrentPage = Math.min(totalPages, completedCurrentPage + 1);
                 }
-                renderTasks(); // Call renderTasks without focusTaskId for general page navigation
+                renderTasks();
             });
             containerElement.appendChild(nextBtn);
         }
@@ -3260,16 +3289,23 @@
 
 
         // --- Theme Toggle Logic ---
+        themeToggleBtn.addEventListener('click', () => {
+            const isDarkMode = document.documentElement.classList.contains('dark');
+            const newTheme = isDarkMode ? 'light' : 'dark';
+            applyTheme(newTheme);
+            localStorage.setItem('theme', newTheme); // Save user's preference
+        });
+
         function applyTheme(theme) {
             const htmlElement = document.documentElement;
             if (theme === 'dark') {
                 htmlElement.classList.add('dark');
                 // Moon icon for dark mode
-                themeIcon.innerHTML = `<path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9 0 0012 21a9.003 9 0 008.354-5.646z"></path>`;
+                themeIcon.className = 'h-6 w-6 fa-solid fa-moon'; // Changed to Font Awesome class
             } else {
                 htmlElement.classList.remove('dark');
                 // Sun icon for light mode
-                themeIcon.innerHTML = `<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.325 6.675l-.707-.707M6.318 6.318l-.707-.707m12.728 0l-.707.707M6.318 17.682l-.707.707M16 12a4 0 11-8 0 4 0 018 0z"></path>`;
+                themeIcon.className = 'h-6 w-6 fa-solid fa-sun'; // Changed to Font Awesome class
             }
             // Re-apply level theme after overall light/dark mode change
             applyLevelTheme(level);
@@ -3642,7 +3678,7 @@
                 </p>
 
                 <h3 class="text-xl sm:text-2xl font-bold mb-2 mt-4 help-heading-blue">حمایت مالی</h3>
-                <p class="semi-formal-text">
+                <p class="semi-formal-text text-center">
                     این بخش در حال حاضر غیرفعال است. از علاقه شما سپاسگزاریم!
                 </p>
 
