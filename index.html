@@ -1216,7 +1216,7 @@
         const MAX_CUSTOM_POINTS = 20; // Max points for custom tasks
         const TASKS_PER_PAGE = 7; // Number of tasks displayed per page
         const DEFAULT_TASK_MAXLENGTH = 30; // Default max length for task input
-        const NOTE_TASK_MAXLENGTH = 150; // Max length for note task input
+        const NOTE_TASK_MAXLENGTH = 55; // Max length for note task input
 
         // Pagination status variables
         let activeCurrentPage = 1;
@@ -2208,7 +2208,7 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-2 space-x-reverse mr-2">
-                    <span class="task-importance-display text-sm px-2 py-1 rounded-full ${importanceClasses}">
+                    <span class="task-importance-display text-sm px-2 py-1 rounded-full mr-2 ${importanceClasses}">
                         ${importanceText}
                     </span>
                     ${actionButtonsHtml}
