@@ -902,15 +902,16 @@
                     <i class="fa-solid fa-sync-alt ml-2"></i> بروزرسانی برنامه
                 </a>
 
-                <a id="shareButton"
-                    class="w-full bg-gray-200 text-gray-800 p-3 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50 mb-2">
-                    <i class="fas fa-share-alt ml-2"></i> اشتراک‌گذاری برنامه
-                </a>
-        
-                <a id="installButton"
-                    class="hidden w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
-                    <i class="fas fa-download ml-2"></i> نصب برنامه
-                </a>
+                <li id="shareMenuItem" class="hidden"> <a href="#" id="shareAppLink" class="flex flex-col items-center text-[#6b7280] hover:text-[#2563eb] p-2">
+                        <i class="fas fa-share-alt text-xl mb-1"></i>
+                        <span class="text-xs">اشتراک‌گذاری</span>
+                    </a>
+                </li>
+                <li id="installMenuItem" class="hidden"> <a href="#" id="installAppLink" class="flex flex-col items-center text-[#6b7280] hover:text-[#2563eb] p-2">
+                        <i class="fas fa-download text-xl mb-1"></i>
+                        <span class="text-xs">نصب برنامه</span>
+                    </a>
+                </li>
                 
                 <a href="#" id="donateMenuItem" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-200 ease-in-out flex items-center">
                     <i class="fa-solid fa-hand-holding-dollar ml-2"></i> حمایت مالی
@@ -4353,71 +4354,68 @@
         }
 
         // new codes
-         const shareButton = document.getElementById('shareButton');
-            const installButton = document.getElementById('installButton');
-            let deferredPrompt; // برای ذخیره رویداد beforeinstallprompt
 
-            // منطق برای دکمه "اشتراک‌گذاری"
+         // --- Start: Minimal Share and Install Logic ---
+
+            // Get references to the new menu items
+            const shareMenuItem = document.getElementById('shareMenuItem');
+            const shareAppLink = document.getElementById('shareAppLink');
+            const installMenuItem = document.getElementById('installMenuItem');
+            const installAppLink = document.getElementById('installAppLink');
+
+            let deferredPrompt; // To store the beforeinstallprompt event
+
+            // Logic for the "Share" menu item
             if (navigator.share) {
-                shareButton.addEventListener('click', async () => {
+                shareMenuItem.classList.remove('hidden'); // Show the menu item if Web Share API is supported
+                shareAppLink.addEventListener('click', async (e) => {
+                    e.preventDefault(); // Prevent default link behavior
                     try {
                         await navigator.share({
                             title: 'زای تسک',
                             text: 'برنامه مدیریت تسک‌ها را امتحان کنید!',
-                            url: window.location.href // آدرس فعلی برنامه شما
+                            url: window.location.href
                         });
                         console.log('محتوا با موفقیت به اشتراک گذاشته شد.');
                     } catch (error) {
                         console.error('خطا در اشتراک‌گذاری:', error);
-                        showMessageBox('قابلیت اشتراک‌گذاری در دسترس نیست یا خطایی رخ داد.', 'error');
+                        // No showMessageBox here as per request for no dialogs
                     }
                 });
-                shareButton.classList.remove('hidden'); // اگر navigator.share پشتیبانی شود، دکمه را نمایش بده
             } else {
-                shareButton.classList.add('hidden'); // اگر پشتیبانی نشود، دکمه را مخفی کن
+                shareMenuItem.classList.add('hidden'); // Hide the menu item if not supported
                 console.warn('Web Share API در این مرورگر پشتیبانی نمی‌شود.');
             }
 
-
-            // منطق برای دکمه "نصب برنامه" (Add to Home Screen)
+            // Logic for the "Install App" menu item
             window.addEventListener('beforeinstallprompt', (e) => {
-                // جلوگیری از نمایش خودکار prompt
-                e.preventDefault();
-                // ذخیره رویداد برای نمایش در زمان مناسب
-                deferredPrompt = e;
-                // نمایش دکمه "نصب" به کاربر
-                installButton.classList.remove('hidden');
+                e.preventDefault(); // Prevent the browser's default prompt
+                deferredPrompt = e; // Store the event
+                installMenuItem.classList.remove('hidden'); // Show the menu item
                 console.log('beforeinstallprompt event fired.');
             });
 
-            installButton.addEventListener('click', async () => {
+            installAppLink.addEventListener('click', async (e) => {
+                e.preventDefault(); // Prevent default link behavior
                 if (deferredPrompt) {
-                    // نمایش prompt نصب
-                    deferredPrompt.prompt();
-                    // منتظر پاسخ کاربر باش
+                    deferredPrompt.prompt(); // Show the install prompt (this is a browser dialog, not one you create)
                     const { outcome } = await deferredPrompt.userChoice;
                     console.log(`User response to the install prompt: ${outcome}`);
-                    // دکمه را مخفی کن چون prompt یک بار استفاده شده است
-                    deferredPrompt = null;
-                    installButton.classList.add('hidden');
-
-                    if (outcome === 'accepted') {
-                        showMessageBox('برنامه با موفقیت نصب شد!', 'success');
-                    } else {
-                        showMessageBox('نصب برنامه لغو شد.', 'info');
-                    }
+                    deferredPrompt = null; // Clear the prompt
+                    installMenuItem.classList.add('hidden'); // Hide the item after use
                 } else {
-                    showMessageBox('امکان نصب در حال حاضر در دسترس نیست.', 'info');
+                    console.warn('امکان نصب در حال حاضر در دسترس نیست.');
+                    // No showMessageBox here as per request for no dialogs
                 }
             });
 
-            // رویداد وقتی برنامه نصب شده و از صفحه اصلی باز می‌شود
+            // Event listener for when the PWA is successfully installed
             window.addEventListener('appinstalled', () => {
-                // دکمه نصب را مخفی کن
-                installButton.classList.add('hidden');
-                showMessageBox('برنامه قبلاً نصب شده است.', 'info');
+                installMenuItem.classList.add('hidden'); // Hide the install item if already installed
                 console.log('PWA was installed.');
             });
+
+            // --- End: Minimal Share and Install Logic ---
         
     </script>
 </body>
