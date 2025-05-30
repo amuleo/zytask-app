@@ -4349,7 +4349,36 @@
 
         // new code
 
-       // --- Start: Share and Manual Install Modal Functionality ---
+       document.addEventListener('DOMContentLoaded', () => {
+    // --- اینجا کدهای موجود برنامه اصلی شما (مثلاً مدیریت وظایف، امتیاز و ...) قرار می‌گیرد ---
+    // مثال:
+    // const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    // function saveTasks() { /* ... */ }
+    // ... (بقیه کدهای موجود شما برای منطق اصلی برنامه) ...
+
+
+    // Register Service Worker for offline capability
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js')
+            .then(registration => {
+                console.log('Service Worker registered with scope:', registration.scope);
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            // A new service worker is installed and ready to take over
+                            // You might prompt the user to refresh here for updates
+                            // showMessageBox('نسخه جدید برنامه موجود است. برای بروزرسانی صفحه را رفرش کنید.', 'info');
+                        }
+                    });
+                });
+            })
+            .catch(error => {
+                console.error('Service Worker registration failed:', error);
+            });
+    }
+
+    // --- Start: Share and Manual Install Modal Functionality ---
 
     const shareAppLink = document.getElementById('shareAppLink');
     const installAppLink = document.getElementById('installAppLink'); // This button is always visible now
