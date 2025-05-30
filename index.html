@@ -2435,7 +2435,7 @@
          */
         function renderPaginationControls(containerElement, totalItems, currentPage, listType) {
             const totalPages = Math.ceil(totalItems / TASKS_PER_PAGE);
-            const maxPageButtons = 5; // Max number of page buttons to show (excluding prev/next and ellipses)
+            const maxPageButtons = 3; // Max number of page buttons to show (excluding prev/next and ellipses)
 
             if (totalPages <= 1) {
                 containerElement.classList.add('hidden');
