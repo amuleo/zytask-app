@@ -1403,13 +1403,9 @@ function toggleTaskCompletion(taskId, taskItemElement) {
 
             // Remove task from its current position
             tasks.splice(taskIndex, 1);
-            // Add task to the beginning of the completed tasks section
-            // Find the first completed task's index to insert before it
-            let insertIndex = tasks.findIndex(t => t.completed);
-            if (insertIndex === -1) { // No completed tasks yet, add to end of active
-                insertIndex = tasks.length;
-            }
-            tasks.splice(insertIndex, 0, task);
+            // Add task to the last of the completed tasks section
+            // Find the last completed task's index to insert before it
+            tasks.push(task);
             focusAfterRender = task.id;
 
         } else {
@@ -1730,12 +1726,8 @@ function restoreNote(taskId) {
             // Remove task from its current position
             tasks.splice(taskIndex, 1);
             // Add task to the beginning of the active tasks section (after any existing pinned tasks)
-            let insertIndex = tasks.findIndex(t => !t.completed && !t.isPinned); // First non-pinned active task
-            if (insertIndex === -1) { // No non-pinned active tasks, add after all pinned or at start if none
-                insertIndex = tasks.filter(t => t.isPinned).length;
-            }
-            tasks.splice(insertIndex, 0, task);
-
+            tasks.push(task);
+            
             saveToLocalStorage();
             activeCurrentPage = 1; // Go to first page of active tasks
             renderTasks(taskId); // Re-render and focus on the task in its new location
