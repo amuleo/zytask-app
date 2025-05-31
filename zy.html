@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>زای تسک</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="زای تسک">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@33.003/misc/Farsi-Digits/Vazirmatn-FD-font-face.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="px-0 py-0 sm:p-4 flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+    <div class="container bg-white dark:bg-gray-800 rounded-none sm:rounded-xl p-0 sm:p-6 md:p-8 w-full max-w-4xl relative sm:h-auto">
+        <header class="relative p-4 flex items-center bg-transparent text-gray-800 dark:text-gray-100">
+            <button id="menuBtn" class="p-1.5 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="باز کردن منو">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 100-2 1 1 0 000 2zm0 7a1 1 0 100-2 1 1 0 000 2zm0 7a1 1 0 100-2 1 1 0 000 2z"></path>
+                </svg>
+            </button>
+
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mr-3">زای تسک</h1>
+
+            <div id="menuDropdown" class="absolute right-4 top-full mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg py-1 hidden z-20">
+                <a href="#" id="profileMenuItem" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-200 ease-in-out flex items-center">
+                    <i class="fa-solid fa-user ml-2"></i> پروفایل
+                </a>
+                <a href="#" id="achievementsMenuItem" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-200 ease-in-out flex items-center">
+                    <i class="fa-solid fa-trophy ml-2"></i> دستاوردها
+                </a>
+                <a href="#" id="helpMenuItem" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-200 ease-in-out flex items-center">
+                    <i class="fa-solid fa-circle-question ml-2"></i> راهنما
+                </a>
+                <a href="#" id="aboutMenuItem" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-200 ease-in-out flex items-center">
+                    <i class="fa-solid fa-circle-info ml-2"></i> درباره ما
+                </a>
+                <a href="#" id="backupMenuItem" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-300 ease-in-out flex items-center">
+                    <i class="fa-solid fa-download ml-2"></i> پشتیبان‌گیری
+                </a>
+                <a href="#" id="updateAppMenuItem" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-200 ease-in-out flex items-center">
+                    <i class="fa-solid fa-sync-alt ml-2"></i> بروزرسانی برنامه
+                </a>
+                <a href="#" id="donateMenuItem" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-200 ease-in-out flex items-center">
+                    <i class="fa-solid fa-hand-holding-dollar ml-2"></i> حمایت مالی
+                </a>
+                <a href="#" id="shareAppLink" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-200 ease-in-out flex items-center">
+                    <i class="fas fa-share-alt ml-2"></i>اشتراک‌گذاری
+                </a>
+                <a href="#" id="installAppLink" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-200 ease-in-out flex items-center">
+                    <i class="fas fa-download ml-2"></i>نصب برنامه
+                </a>
+                <a href="#" id="resetMenuItem" class="block px-4 py-2 text-sm text-red-700 dark:text-red-200 hover:bg-red-100 dark:hover:bg-red-600 transition duration-200 ease-in-out flex items-center">
+                    <i class="fa-solid fa-arrows-rotate ml-2"></i> بازنشانی داده‌ها
+                </a>
+            </div>
+        </header>
+
+        <div class="relative w-full mt-1"> <div id="pointsDropdownToggle" class="flex items-center justify-between w-full py-3 px-4 bg-blue-500 dark:bg-blue-700 text-white cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-600 dark:hover:bg-blue-800 rounded-lg">
+                <div class="flex items-center">
+                    <i class="fa-solid fa-coins text-xl ml-2"></i>
+                    <span class="text-lg font-semibold">پوینت: <span id="zPoint">0</span></span>
+                </div>
+                <i id="dropdownIndicator" class="fa-solid fa-chevron-down transition-transform duration-200"></i>
+            </div>
+
+            <div id="pointsDropdownContent" class="absolute top-full left-0 right-0 w-full bg-white dark:bg-gray-800 shadow-lg py-2 hidden z-10 transition-all duration-200 ease-in-out origin-top opacity-0 scale-y-95 transform dropdown-scrollable">
+                <div class="flex flex-col gap-2 p-2">
+                    <div class="flex items-center gap-2 theme-blue-bg theme-blue-text px-4 py-2 rounded-lg">
+                        <div class="flex items-center">
+                            <i id="levelIcon" class="fa-solid fa-star text-xl ml-2"></i>
+                            <span class="text-base font-semibold">سطح:</span>
+                        </div>
+                        <span id="level" class="text-base font-semibold">1</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mb-6 px-2 md:px-0 mt-5"> <h2 class="text-lg sm:text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">پیشرفت شما به سطح بعدی:</h2>
+            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
+                <div id="progressBar" class="h-4 rounded-full transition-all duration-500 ease-out" style="width: 0%;"></div>
+            </div>
+            <p id="progressText" class="text-sm text-gray-500 dark:text-gray-400 mt-1 text-center">0%</p>
+        </div>
+
+        <div class="mb-8 p-4 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 relative overflow-hidden">
+            <h2 class="text-xl sm:text-2xl font-semibold mb-1 flex items-center justify-center">
+                <i class="fa-solid fa-lightbulb ml-2" style="color: var(--theme-blue-motivation-icon);"></i>
+                تلنگر
+            </h2>
+            <div id="motivationContainer" class="text-center text-lg sm:text-xl font-medium flex items-center justify-center">
+                <span id="motivationText"></span>
+            </div>
+        </div>
+
+        <div class="mb-8 p-4 rounded-lg bg-gray-100 dark:bg-gray-900" id="addTaskSection">
+            <h2 class="text-xl sm:text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-50" id="addTaskTitle">افزودن وظیفه جدید</h2>
+            <div class="flex flex-col md:flex-row gap-4 items-stretch md:items-center">
+                <input type="text" id="taskInput" placeholder="نام وظیفه را وارد کنید..." maxlength="30"
+                       class="flex-grow p-3 border rounded-lg text-base sm:text-lg text-gray-700 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 h-12 text-right">
+                <select id="importanceSelect"
+                        class="p-3 border rounded-lg text-base sm:text-lg text-gray-700 dark:text-gray-100 bg-white dark:bg-gray-700 appearance-none h-12 w-full md:w-40 text-right">
+                    <option value="important">مهم</option>
+                    <option value="normal" selected>عادی</option>
+                    <option value="custom">سفارشی</option>
+                    <option value="note">یادداشت</option>
+                </select>
+                <input type="text" id="customPointsInput" placeholder="پوینت سفارشی (حداکثر ۲۰)" inputmode="numeric"
+                       class="p-3 border rounded-lg text-base sm:text-lg text-gray-700 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 h-12 w-full md:w-32 hidden text-right">
+                <button id="addTaskBtn"
+                        class="text-white font-bold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 text-lg w-full md:w-auto">
+                    افزودن وظیفه
+                </button>
+            </div>
+        </div>
+
+        <div class="mb-6 px-2 md:px-0">
+            <div class="flex flex-col sm:flex-row items-center justify-between mb-2">
+                <h2 class="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-2 sm:mb-0">وظایف فعال</h2>
+                <div id="activeTasksPagination" class="flex items-center space-x-2 space-x-reverse hidden">
+                </div>
+            </div>
+            <div id="activeTaskList" class="task-list-container"> </div>
+        </div>
+
+        <div class="mt-8 px-2 md:px-0">
+            <button id="toggleCompletedTasksBtn" class="w-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 font-bold py-3 px-6 rounded-lg transition duration-300 ease-in-out flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <span>وظایف تکمیل شده</span>
+                <svg id="toggleIcon" class="h-5 w-5 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <div id="completedTasksSection" class="hidden mt-4">
+                <div class="flex flex-col sm:flex-row items-center justify-between mb-1 mt-1">
+                    <h2 class="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-2 sm:mb-0"></h2>
+                    <div id="completedTasksPagination" class="flex items-center space-x-2 space-x-reverse hidden">
+                    </div>
+                </div>
+                <div id="completedTasksContainer" class="task-list-container"> </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="reorderBar" class="fixed top-0 left-0 right-0 bg-blue-600 text-white p-3 flex items-center justify-between z-50 transition-all duration-300 opacity-0 pointer-events-none">
+        <span class="text-lg font-bold">تغییر چیدمان</span>
+        <button id="finishReorderBtn" class="bg-white text-blue-600 px-4 py-1 rounded-full text-sm font-semibold hover:bg-gray-100 transition-colors">
+            پایان
+        </button>
+    </div>
+
+    <div id="welcomeModal" class="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-sm relative text-gray-800 dark:text-gray-100 transition-transform duration-300 transform scale-95 opacity-0" id="welcomeModalContent">
+            <h3 class="text-xl sm:text-2xl font-bold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700 text-center">به زای تسک خوش آمدید!</h3>
+            <p class="mb-4 text-center text-gray-700 dark:text-gray-300">لطفاً نام خود را وارد کنید تا شروع کنیم:</p>
+            <input type="text" id="userNameInput" placeholder="نام شما..." maxlength="15"
+                   class="w-full p-3 border border-blue-300 dark:border-blue-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-300 text-base sm:text-lg text-gray-700 dark:text-gray-100 placeholder-gray-400 dark:placeholder-500 bg-white dark:bg-gray-700 mb-4 text-right">
+            <button id="startBtn"
+                    class="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 text-lg">
+                شروع کنید!
+            </button>
+        </div>
+    </div>
+
+    <div id="profileModal" class="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md relative text-gray-800 dark:text-gray-100 flex flex-col modal-box transition-transform duration-300 transform scale-95 opacity-0" id="profileModalContent">
+            <h3 class="text-xl sm:text-2xl font-bold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">پروفایل کاربری</h3>
+            <div id="profileModalBody" class="modal-scrollable-content text-justify text-sm leading-relaxed">
+            </div>
+            <button id="closeProfileModalBtn" class="absolute top-3 left-3 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <div id="achievementsModal" class="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl relative text-gray-800 dark:text-gray-100 flex flex-col modal-box transition-transform duration-300 transform scale-95 opacity-0" id="achievementsModalContent">
+            <h3 class="text-xl sm:text-2xl font-bold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">دستاوردها</h3>
+            <div id="achievementsModalBody" class="modal-scrollable-content text-justify text-sm leading-relaxed grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            </div>
+            <button id="closeAchievementsModalBtn" class="absolute top-3 left-3 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <div id="achievementNotificationModal" class="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-sm relative text-gray-800 dark:text-gray-100 transition-transform duration-300 transform scale-95 opacity-0" id="achievementNotificationModalContent">
+            <i id="achievementNotificationIcon" class="icon"></i>
+            <h3 id="achievementNotificationTitle" class="title"></h3>
+            <p id="achievementNotificationMessage" class="message"></p>
+            <button id="closeAchievementNotificationModalBtn" class="close-btn">
+                بستن
+            </button>
+        </div>
+    </div>
+
+    <div id="helpModal" class="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md relative text-gray-800 dark:text-gray-100 flex flex-col modal-box transition-transform duration-300 transform scale-95 opacity-0" id="helpModalContent">
+            <h3 class="text-xl sm:text-2xl font-bold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">راهنما</h3>
+            <div id="helpModalBody" class="modal-scrollable-content text-justify text-sm leading-relaxed">
+            </div>
+            <button id="closeHelpModalBtn" class="absolute top-3 left-3 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <div id="aboutModal" class="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md relative text-gray-800 dark:text-gray-100 flex flex-col modal-box transition-transform duration-300 transform scale-95 opacity-0" id="aboutModalContent">
+            <h3 class="text-xl sm:text-2xl font-bold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">درباره ما</h3>
+            <div id="aboutModalBody" class="modal-scrollable-content text-justify text-sm leading-relaxed">
+                <p class="mb-3 text-justify">بسم الله الرحمن الرحیم</p>
+                <div class="semi-formal-text text-justify mt-4 mb-4">
+                    <p>زای تسک، حاصل تلاش و تعهدی فشرده است که در مدت زمان محدودی (حدود دو هفته) و با تمرکز بی‌وقفه بر روی آن شکل گرفت. این پروژه بیش از ۲۰۰ بار برای اطمینان از عملکرد صحیح و سازگاری با نمایشگرهای مختلف، مورد بررسی و رفع اشکال قرار گرفته است. زای تسک به عنوان نسخه‌ی نهایی این ایده، دیگر به‌روزرسانی نخواهد شد و به صورت یک ابزار پایدار ارائه می‌شود.</p>
+                </div>
+                <p class="mb-3 text-justify">این پروژه با توکل به خدا و با هدف خدمت‌رسانی ارائه شده است؛ باشد که مورد پذیرش او قرار گیرد.</p>
+                <p class="mb-3 text-justify">تمامی حقوق متعلق به <strong class="text-gray-600 dark:text-gray-300"><a href="https://amuleo.ir" target="_blank" rel="noopener noreferrer">عمو لئو</a></strong> است.</p>
+                <p class="semi-formal-text">تاریخ: 9 خرداد ۱۴۰۴</p>
+            </div>
+            <button id="closeAboutModalBtn" class="absolute top-3 left-3 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <div id="backupModal" class="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md relative text-gray-800 dark:text-gray-100 flex flex-col modal-box transition-transform duration-300 transform scale-95 opacity-0" id="backupModalContent">
+            <h3 class="text-xl sm:text-2xl font-bold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">پشتیبان‌گیری و بازیابی داده‌ها</h3>
+            <div class="modal-scrollable-content flex flex-col gap-4 text-justify">
+                <p class="text-sm text-gray-700 dark:text-gray-300">برای پشتیبان‌گیری، دکمه "ذخیره داده‌ها" را فشار دهید تا فایل پشتیبان دانلود شود. برای بازیابی، فایل پشتیبان را انتخاب کرده و "بارگذاری از فایل" را فشار دهید.</p>
+
+                <button id="exportDataBtn" class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    ذخیره داده‌ها
+                </button>
+
+                <div class="flex items-center gap-2 mt-2">
+                    <label for="importFileInput" class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        انتخاب فایل
+                    </label>
+                    <span id="selectedFileName" class="text-sm text-gray-600 dark:text-gray-300 truncate max-w-[calc(100%-120px)]">فایلی انتخاب نشده است.</span>
+                    <input type="file" id="importFileInput" accept=".json" class="hidden">
+                </div>
+
+                <button id="importDataBtn" class="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-400">
+                    بارگذاری از فایل
+                </button>
+            </div>
+            <button id="closeBackupModalBtn" class="absolute top-3 left-3 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <div id="resetConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-sm relative text-gray-800 dark:text-gray-100 transition-transform duration-300 transform scale-95 opacity-0" id="resetConfirmModalContent">
+            <h3 class="text-xl sm:text-2xl font-bold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700 text-center">تأیید بازنشانی داده‌ها</h3>
+            <p class="mb-6 text-sm text-justify">آیا مطمئن هستید که می‌خواهید تمامی داده‌های برنامه را حذف کنید؟ این عمل غیرقابل بازگشت است.</p>
+            <div class="flex justify-end space-x-4 space-x-reverse">
+                <button id="confirmResetBtn" class="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-400">
+                    تأیید بازنشانی
+                </button>
+                <button id="cancelResetBtn" class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-100 font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-400">
+                    لغو
+                </button>
+            </div>
+            <button id="closeResetModalBtn" class="absolute top-3 left-3 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <div id="updateConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-sm relative text-gray-800 dark:text-gray-100 transition-transform duration-300 transform scale-95 opacity-0" id="updateConfirmModalContent">
+            <h3 class="text-xl sm:text-2xl font-bold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700 text-center">تأیید بروزرسانی برنامه</h3>
+            <p class="mb-4 text-sm text-gray-700 dark:text-gray-300 text-justify">
+                با تأیید بروزرسانی، برنامه زای تسک آخرین نسخه خود را از سرور دانلود می‌کند. این کار شامل:
+            </p>
+            <ul class="list-disc list-inside mb-6 text-sm text-gray-700 dark:text-gray-300 space-y-2 text-justify">
+                <li><strong class="text-blue-600 dark:text-blue-300">پاکسازی کش برنامه:</strong> تمامی فایل‌های کش شده حذف می‌شوند تا از جدیدترین نسخه‌ها استفاده شود.</li>
+                <li><strong class="text-green-600 dark:text-green-300">حفظ داده‌های شما:</strong> اطلاعات شخصی شما مانند وظایف، پوینت‌ها، سطح و دستاوردها <strong class="font-bold">حفظ خواهند شد</strong> و پاک نمی‌شوند.</li>
+                <li><strong class="text-blue-600 dark:text-blue-300">بارگذاری مجدد صفحه:</strong> پس از اتمام فرآیند، صفحه به طور خودکار بارگذاری مجدد می‌شود تا تغییرات اعمال گردند.</li>
+                <li><strong class="text-blue-600 dark:text-blue-300">توصیه:</strong> با وجود این ویژگی هایی که برای برنامه اتخاذ کرده‌ایم به شما توصیه می‌کنیم که پیش از تایید بروزرسانی از اطلاعات خود پشتیبان گیری کنید.</li>
+            </ul>
+            <p class="mb-6 text-sm text-gray-700 dark:text-gray-300 font-bold text-justify">
+                آیا مایل به ادامه هستید؟
+            </p>
+            <div class="flex justify-end space-x-4 space-x-reverse">
+                <button id="confirmUpdateBtn" class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    تأیید بروزرسانی
+                </button>
+                <button id="cancelUpdateBtn" class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-100 font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-400">
+                    لغو
+                </button>
+            </div>
+            <button id="closeUpdateModalBtn" class="absolute top-3 left-3 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+    </div>
+    <div id="detailModal" class="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md relative text-gray-800 dark:text-gray-100 flex flex-col modal-box transition-transform duration-300 transform scale-95 opacity-0" id="detailModalContent">
+            <h3 class="text-xl sm:text-2xl font-bold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700" id="detailModalTitle"></h3>
+            <div id="detailModalBody" class="modal-scrollable-content text-justify text-sm leading-relaxed">
+            </div>
+            <button id="closeDetailModalBtn" class="absolute top-3 left-3 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <div id="editTaskModal" class="dynamic-modal hidden">
+        <div class="dynamic-modal-content text-gray-800 dark:text-gray-100" id="editTaskModalContent">
+            <h3 class="text-xl font-bold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">ویرایش وظیفه</h3>
+            <input type="text" id="editTaskNameInput" placeholder="نام وظیفه را وارد کنید..." maxlength="30"
+                   class="p-3 border rounded-lg text-base text-gray-700 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-right">
+            <select id="editTaskImportanceSelect"
+                    class="p-3 border rounded-lg text-base text-gray-700 dark:text-gray-100 bg-white dark:bg-gray-700 appearance-none text-right">
+                <option value="important">مهم</option>
+                <option value="normal">عادی</option>
+                <option value="custom">سفارشی</option>
+                <option value="note">یادداشت</option>
+            </select>
+            <input type="text" id="editTaskCustomPointsInput" placeholder="پوینت سفارشی (حداکثر ۲۰)" inputmode="numeric"
+                   class="p-3 border rounded-lg text-base text-gray-700 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 hidden text-right">
+            <div class="flex justify-end space-x-2 space-x-reverse">
+                <button id="saveEditedTaskBtn" class="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white">ذخیره</button>
+                <button id="cancelEditTaskBtn" class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-100">لغو</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="confettiContainer" class="confetti-container"></div>
+
+    <div id="undoMessageBox" class="fixed bottom-4 left-1/2 -translate-x-1/2 p-4 rounded-lg text-white bg-gray-800 dark:bg-gray-700 z-50 transition-all duration-300 transform scale-0 opacity-0 flex items-center justify-between min-w-[200px] max-w-sm cursor-pointer hidden">
+        <span id="undoMessageText" class="flex-grow mr-2"></span>
+        <span id="undoCountdown" class="font-bold text-sm"></span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
