@@ -968,12 +968,13 @@ function renderTasks(focusTaskId = null) {
 }
 
 function updateTaskListDOM(container, newTasks, isEmptyMessageNeeded, emptyMessageText, inReorderMode = false, reorderingTaskId = null, focusTaskId = null) {
-    const existingElements = Array.from(container.children).filter(child => child.classList.contains('task-item'));
-    const existingIds = new Set(existingElements.map(el => el.dataset.id));
-    const newIds = new Set(newTasks.map(task => task.id));
+    const currentElements = Array.from(container.children).filter(child => child.classList.contains('task-item'));
+    const currentElementMap = new Map(currentElements.map(el => [el.dataset.id, el]));
+    const newTasksMap = new Map(newTasks.map(task => [task.id, task]));
 
-    existingElements.forEach(element => {
-        if (!newIds.has(element.dataset.id)) {
+    // 1. Handle removals (elements in DOM but not in newTasks)
+    currentElements.forEach(element => {
+        if (!newTasksMap.has(element.dataset.id)) {
             element.style.transform = `translateX(-100vw)`;
             element.style.opacity = '0';
             element.addEventListener('transitionend', () => {
@@ -982,55 +983,73 @@ function updateTaskListDOM(container, newTasks, isEmptyMessageNeeded, emptyMessa
         }
     });
 
-    const fragment = document.createDocumentFragment();
+    // 2. Create/Update elements and prepare for insertion/reordering
+    const orderedElements = [];
     newTasks.forEach(task => {
-        let taskElement = container.querySelector(`[data-id="${task.id}"]`);
+        let taskElement = currentElementMap.get(task.id);
         if (taskElement) {
+            // Update existing element's properties and classes
             const newElement = createTaskElement(task, false, inReorderMode, reorderingTaskId);
             taskElement.className = newElement.className;
-            const newCheckbox = newElement.querySelector('input[type="checkbox"]');
-            const existingCheckbox = taskElement.querySelector('input[type="checkbox"]');
-            if (newCheckbox && existingCheckbox) {
-                existingCheckbox.checked = task.completed;
-                existingCheckbox.disabled = newCheckbox.disabled;
-            } else if (!newCheckbox && existingCheckbox) {
-                existingCheckbox.remove();
-            } else if (newCheckbox && !existingCheckbox) {
-                taskElement.querySelector('.flex-grow').prepend(newCheckbox);
-            }
-
-            taskElement.querySelector('.task-name').textContent = task.name;
-            taskElement.querySelector('.task-name-wrapper').innerHTML = newElement.querySelector('.task-name-wrapper').innerHTML;
-            taskElement.querySelector('.task-importance-display').className = newElement.querySelector('.task-importance-display').className;
-            taskElement.querySelector('.task-importance-display').textContent = newElement.querySelector('.task-importance-display').textContent;
-            const existingActionButtons = taskElement.querySelector('.flex.items-center.space-x-2.space-x-reverse.mr-2');
-            if (existingActionButtons) {
-                existingActionButtons.innerHTML = newElement.querySelector('.flex.items-center.space-x-2.space-x-reverse.mr-2').innerHTML;
-            }
+            taskElement.innerHTML = newElement.innerHTML; // Update inner content
         } else {
+            // Create new element (with initial animation classes if applicable)
             taskElement = createTaskElement(task, true, inReorderMode, reorderingTaskId);
         }
-        fragment.appendChild(taskElement);
+        orderedElements.push(taskElement);
     });
 
-    container.innerHTML = '';
-    container.appendChild(fragment);
+    // 3. Perform DOM reordering/insertion
+    let currentDOMNode = container.firstElementChild;
+    let orderedElementsIndex = 0;
 
-    const existingNoMessage = container.querySelector('#dynamicNoActiveMessage, #dynamicNoCompletedMessage');
-    if (isEmptyMessageNeeded) {
-        if (!existingNoMessage) {
-            const noItem = document.createElement('div');
-            noItem.id = container.id === 'activeTaskList' ? 'dynamicNoActiveMessage' : 'dynamicNoCompletedMessage';
-            noItem.className = 'text-gray-500 dark:text-gray-400 text-center py-4';
-            noItem.textContent = emptyMessageText;
-            container.appendChild(noItem);
+    while (orderedElementsIndex < orderedElements.length || currentDOMNode) {
+        const desiredNode = orderedElements[orderedElementsIndex];
+
+        // Skip non-task-item children (like empty messages or pagination controls)
+        while (currentDOMNode && !currentDOMNode.classList.contains('task-item')) {
+            currentDOMNode = currentDOMNode.nextElementSibling;
         }
-    } else {
-        if (existingNoMessage) {
-            existingNoMessage.remove();
+
+        if (desiredNode && currentDOMNode === desiredNode) {
+            // Node is already in correct place and is the desired one
+            currentDOMNode = currentDOMNode.nextElementSibling;
+            orderedElementsIndex++;
+        } else if (desiredNode && (!currentDOMNode || currentDOMNode.dataset.id !== desiredNode.dataset.id)) {
+            // Desired node is not in place or is a new node. Insert it.
+            if (currentDOMNode) {
+                container.insertBefore(desiredNode, currentDOMNode);
+            } else {
+                container.appendChild(desiredNode);
+            }
+            orderedElementsIndex++;
+        } else if (currentDOMNode && !newTasksMap.has(currentDOMNode.dataset.id)) {
+            // Current DOM node is an old element that is being removed. Skip it.
+            currentDOMNode = currentDOMNode.nextElementSibling;
+            // The element.remove() will handle its actual removal after transition.
+        } else {
+            // This case should ideally not happen if logic is perfect, but could be a leftover or error.
+            // For safety, just advance.
+            currentDOMNode = currentDOMNode.nextElementSibling;
         }
     }
 
+    // Handle empty message visibility (should be appended/removed independently)
+    const currentNoMessage = container.querySelector('#dynamicNoActiveMessage, #dynamicNoCompletedMessage');
+    if (isEmptyMessageNeeded) {
+        if (!currentNoMessage) {
+            const noItem = document.createElement('div');
+            noItem.id = container.id === 'activeTaskList' ? 'dynamicNoActiveMessage' : 'dynamicNoCompletedMessage';
+            noItem.className = 'text-gray-500 dark:text-gray-400 text-center py-4';
+            container.appendChild(noItem); // Append at the end of task items
+        }
+    } else {
+        if (currentNoMessage) {
+            currentNoMessage.remove();
+        }
+    }
+
+    // Focus and highlight logic (remains the same)
     if (focusTaskId) {
         const taskElement = document.querySelector(`.task-item[data-id="${focusTaskId}"]`);
         if (taskElement) {
@@ -1380,12 +1399,18 @@ function toggleTaskCompletion(taskId, taskItemElement) {
             }
             zPoint += pointsGained;
             showMessageBox('وظیفه تکمیل شد!', 'success');
-            showPointsGainFeedback(pointsGained, taskItemElement);
+            showPointsGainFeedback(pointsGained, taskItemElement); // Show animation
 
-            // Move the completed task to the end of the tasks array
-            const completedTask = tasks.splice(taskIndex, 1)[0];
-            tasks.push(completedTask);
-            focusAfterRender = completedTask.id; // Focus on the task in its new location
+            // Remove task from its current position
+            tasks.splice(taskIndex, 1);
+            // Add task to the beginning of the completed tasks section
+            // Find the first completed task's index to insert before it
+            let insertIndex = tasks.findIndex(t => t.completed);
+            if (insertIndex === -1) { // No completed tasks yet, add to end of active
+                insertIndex = tasks.length;
+            }
+            tasks.splice(insertIndex, 0, task);
+            focusAfterRender = task.id;
 
         } else {
             // Un-completing (restoring) a task
@@ -1401,27 +1426,24 @@ function toggleTaskCompletion(taskId, taskItemElement) {
             zPoint -= pointsDeducted;
             if (zPoint < 0) zPoint = 0;
 
-            // Create a new task to simulate "restoring" to active list
-            // This creates a new ID, ensuring it's treated as a new active task at the end
-            const newActiveTask = {
-                id: Date.now().toString(),
-                name: task.name,
-                completed: false,
-                importance: task.importance,
-                customPoints: task.customPoints,
-                isPinned: false,
-                pinnedAt: null
-            };
+            task.completed = false;
+            task.isPinned = false; // Ensure it's not pinned when restored
+            task.pinnedAt = null;
 
-            // Remove the old completed task
+            // Remove task from its current position
             tasks.splice(taskIndex, 1);
-            // Add the new active task to the end of the list
-            tasks.push(newActiveTask);
-            focusAfterRender = newActiveTask.id;
+            // Add task to the beginning of the active tasks section (after any existing pinned tasks)
+            let insertIndex = tasks.findIndex(t => !t.completed && !t.isPinned); // First non-pinned active task
+            if (insertIndex === -1) { // No non-pinned active tasks, add after all pinned or at start if none
+                insertIndex = tasks.filter(t => t.isPinned).length;
+            }
+            tasks.splice(insertIndex, 0, task);
+            focusAfterRender = task.id;
 
             showMessageBox(`وظیفه بازنشانی شد!`, 'success');
         }
         saveToLocalStorage();
+        activeCurrentPage = 1; // Go to first page of active tasks
         renderTasks(focusAfterRender);
     }
 }
@@ -1678,10 +1700,18 @@ function strikeThroughNote(taskId) {
             task.completed = true;
             task.isPinned = false; // Notes are unpinned when struck through
             task.pinnedAt = null;
-            // Move the struck-through note to the end of the tasks array
-            const struckNote = tasks.splice(taskIndex, 1)[0];
-            tasks.push(struckNote);
+
+            // Remove task from its current position
+            tasks.splice(taskIndex, 1);
+            // Add task to the beginning of the completed tasks section
+            let insertIndex = tasks.findIndex(t => t.completed);
+            if (insertIndex === -1) {
+                insertIndex = tasks.length;
+            }
+            tasks.splice(insertIndex, 0, task);
+
             saveToLocalStorage();
+            activeCurrentPage = 1; // Go to first page of active tasks
             renderTasks(taskId); // Re-render and focus on the task in its new location
             showMessageBox(`یادداشت "${truncateText(task.name, 15)}" خط خورد.`, 'success');
         }
@@ -1696,11 +1726,18 @@ function restoreNote(taskId) {
             task.completed = false;
             task.isPinned = false; // Ensure it's not pinned when restored
             task.pinnedAt = null;
-            // Remove the note from its current position (completed section)
-            const restoredNote = tasks.splice(taskIndex, 1)[0];
-            // Add it to the end of the active tasks (which means end of the overall tasks array)
-            tasks.push(restoredNote);
+
+            // Remove task from its current position
+            tasks.splice(taskIndex, 1);
+            // Add task to the beginning of the active tasks section (after any existing pinned tasks)
+            let insertIndex = tasks.findIndex(t => !t.completed && !t.isPinned); // First non-pinned active task
+            if (insertIndex === -1) { // No non-pinned active tasks, add after all pinned or at start if none
+                insertIndex = tasks.filter(t => t.isPinned).length;
+            }
+            tasks.splice(insertIndex, 0, task);
+
             saveToLocalStorage();
+            activeCurrentPage = 1; // Go to first page of active tasks
             renderTasks(taskId); // Re-render and focus on the task in its new location
             showMessageBox(`یادداشت "${truncateText(task.name, 15)}" بازگردانی شد.`, 'info');
         }
