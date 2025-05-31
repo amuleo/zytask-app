@@ -17,14 +17,13 @@ const TASKS_PER_PAGE = 7;
 const DEFAULT_TASK_MAXLENGTH = 30;
 const NOTE_TASK_MAXLENGTH = 55;
 const CATEGORY_NAME_MAXLENGTH = 15; // New constant for category name max length
+const MAX_CATEGORIES = 7; // New constant for maximum number of categories
 
 let activeCurrentPage = 1;
 let completedCurrentPage = 1;
 
 let isReorderingMode = false;
 let reorderingTaskId = null;
-
-let deferredPrompt = null; // For PWA installation prompt
 
 const levelPointsThresholds = [
     { name: 'نوب', points: 0, icon: 'fa-solid fa-ghost', motivational: 'شروع هر سفر با گام اول است. شما در ابتدای مسیر هستید و آماده برای کشف توانایی‌هایتان!' },
@@ -48,7 +47,7 @@ const achievementsData = [
     { level: 1, name: 'نوب', icon: 'fa-solid fa-ghost', type: 'level', description: 'شروع هر سفر با گام اول است. شما در ابتدای مسیر هستید و آماده برای کشف توانایی‌هایتان!' },
     { level: 2, name: 'مبتدی', icon: 'fa-solid fa-seedling', type: 'level', description: 'شما با تلاش و پشتکار، بذر موفقیت را کاشته‌اید. به رشد خود ادامه دهید!' },
     { level: 3, name: 'جنگجو', icon: 'fa-solid fa-hand-fist', type: 'level', description: 'شما با هر چالش، قوی‌تر و مصمم‌تر می‌شوید. روحیه جنگجویانه شما ستودنی است!' },
-    { level: 4, name: 'شوالیه', icon: 'fa-solid fa-shield-halved', type: 'level', description: 'با هر وظیفه، زره‌ای از تجربه بر تن می‌کنید. شجاعت شما راهگشاست!' },
+    { level: 4, name: 'شوالیه', icon: 'fa-solid fa-shield-halved', type: 'level', description: 'با هر وظیفه, زره‌ای از تجربه بر تن می‌کنید. شجاعت شما راهگشاست!' },
     { level: 5, name: 'هیرو', icon: 'fa-solid fa-mask', type: 'level', description: 'شما الهام‌بخش دیگران هستید. قدم‌هایتان ردپایی از موفقیت بر جای می‌گذارد!' },
     { level: 6, name: 'استاد', icon: 'fa-solid fa-graduation-cap', type: 'level', description: 'دانش و مهارت شما در حال شکوفایی است. از هر تجربه درسی بیاموزید!' },
     { level: 7, name: 'فرمانده', points: 700, icon: 'fa-solid fa-star', type: 'level', description: 'اکنون می‌توانید رهبری کنید و مسیر را برای دیگران هموار سازید. قدرت در دستان شماست!' },
@@ -149,7 +148,7 @@ const reorderBar = document.getElementById('reorderBar');
 const finishReorderBtn = document.getElementById('finishReorderBtn');
 
 const welcomeModal = document.getElementById('welcomeModal');
-const welcomeModalContent = document.getElementById('welcomeModalContent');
+const welcomeModalContent = document.getElementById('welcomeModalContent'); // Corrected ID
 const userNameInput = document.getElementById('userNameInput');
 const startBtn = document.getElementById('startBtn');
 
@@ -1875,7 +1874,7 @@ function copyTask(taskId) {
     const originalTask = tasks.find(t => t.id === taskId);
     if (originalTask) {
         const newTask = {
-            id: Date.now().toString(), // New unique ID
+            id: Date.now().toString() + Math.random().toString().substring(2, 8), // New unique ID
             name: originalTask.name,
             completed: false, // Copied task is always active
             importance: originalTask.importance,
@@ -1983,7 +1982,6 @@ pointsDropdownToggle.addEventListener('click', (e) => {
     if (isHidden) {
         pointsDropdownContent.classList.remove('hidden');
         void pointsDropdownContent.offsetHeight; // Trigger reflow for transition
-        pointsDropdownContent.classList.remove('opacity-0', 'scale-y-95');
         pointsDropdownContent.classList.add('opacity-100', 'scale-y-100', 'is-open');
         dropdownIndicator.classList.add('rotate-180');
         pointsDropdownToggle.classList.add('is-open');
@@ -2206,6 +2204,17 @@ helpMenuItem.addEventListener('click', (e) => {
             <strong class="text-gray-600 dark:text-gray-300">۷. مشاهده وظایف تکمیل شده:</strong>
             برای نمایش یا پنهان کردن لیست وظایف تکمیل شده، روی دکمه "وظایف تکمیل شده" در پایین صفحه کلیک کنید.
         </p>
+        <p class="semi-formal-text">
+            <strong class="text-gray-600 dark:text-gray-300">۸. مدیریت دسته‌های پیش‌فرض:</strong>
+            از طریق منوی اصلی (آیکون سه نقطه در بالا سمت چپ) و انتخاب "دسته‌ها"، می‌توانید دسته‌های وظایف خود را مدیریت کنید.
+            <ul class="list-disc list-inside mt-2 mb-2 text-justify">
+                <li class="semi-formal-text"><strong class="text-blue-600 dark:text-blue-300">افزودن دسته:</strong> می‌توانید دسته‌های جدیدی با نام دلخواه (حداکثر ${CATEGORY_NAME_MAXLENGTH} کاراکتر) ایجاد کنید. حداکثر تعداد دسته‌ها ${MAX_CATEGORIES} عدد است.</li>
+                <li class="semi-formal-text"><strong class="text-yellow-600 dark:text-yellow-300">ویرایش دسته:</strong> برای ویرایش نام دسته یا افزودن/حذف وظایف از آن، روی آیکون سه نقطه کنار دسته کلیک کرده و "ویرایش" را انتخاب کنید. توجه داشته باشید که وظایف داخل دسته‌ها نمی‌توانند از نوع "سفارشی" باشند و نام آن‌ها نباید خالی باشد.</li>
+                <li class="semi-formal-text"><strong class="text-green-600 dark:text-green-300">افزودن وظایف از دسته:</strong> با کلیک بر روی آیکون سه نقطه کنار دسته و انتخاب "افزودن وظایف"، می‌توانید وظایف موجود در آن دسته را به لیست وظایف فعال خود اضافه کنید.</li>
+                <li class="semi-formal-text"><strong class="text-red-600 dark:text-red-300">حذف دسته:</strong> برای حذف یک دسته، روی آیکون سه نقطه کنار آن کلیک کرده و "حذف" را انتخاب کنید.</li>
+            </ul>
+        </p>
+
 
         <h3 class="text-xl sm:text-2xl font-bold mb-2 mt-4 help-heading-blue">سیستم گیمیفیکیشن</h3> <p class="semi-formal-text">
             <strong class="text-gray-600 dark:text-gray-300">پوینت:</strong>
@@ -2319,7 +2328,7 @@ aboutMenuItem.addEventListener('click', (e) => {
         </div>
         <p class="mb-3 text-justify">این پروژه با توکل به خدا و با هدف خدمت‌رسانی ارائه شده است؛ باشد که مورد پذیرش او قرار گیرد.</p>
         <p class="mb-3 text-justify">تمامی حقوق متعلق به <strong class="text-gray-600 dark:text-gray-300"><a href="https://amuleo.ir" target="_blank" rel="noopener noreferrer">عمو لئو</a></strong> است.</p>
-        <p class="semi-formal-text">تاریخ: 9 خرداد ۱۴۰۴</p>
+        <p class="semi-formal-text">تاریخ: 10 خرداد ۱۴۰۴</p>
     `;
 });
 
@@ -2644,7 +2653,7 @@ importDataBtn.addEventListener('click', () => {
                         name: typeof category.name === 'string' ? category.name : 'دسته نامشخص',
                         tasks: Array.isArray(category.tasks) ? category.tasks.map(task => ({
                             name: typeof task.name === 'string' ? task.name : 'وظیفه نامشخص',
-                            importance: typeof task.importance === 'string' && ['important', 'normal', 'custom', 'note'].includes(task.importance) ? task.importance : 'normal',
+                            importance: typeof task.importance === 'string' && ['important', 'normal', 'custom', 'note'].includes(task.importance) ? task.importance : 'normal', // Custom not allowed for category tasks
                             customPoints: typeof task.customPoints === 'number' ? task.customPoints : undefined,
                         })) : []
                     }));
@@ -2822,6 +2831,10 @@ addCategoryBtn.addEventListener('click', () => {
         showMessageBox('دسته‌ای با این نام از قبل وجود دارد.', 'info');
         return;
     }
+    if (defaultCategories.length >= MAX_CATEGORIES) { // Check for max categories
+        showMessageBox(`شما نمی‌توانید بیش از ${MAX_CATEGORIES} دسته اضافه کنید.`, 'info');
+        return;
+    }
 
     const newCategory = {
         id: Date.now().toString(),
@@ -2851,38 +2864,110 @@ function renderDefaultCategories() {
     defaultCategories.forEach(category => {
         const categoryItem = document.createElement('div');
         categoryItem.className = 'flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm mb-2';
+        // Changed to use a menu button for category actions
         categoryItem.innerHTML = `
-            <span class="text-lg font-medium text-gray-800 dark:text-gray-100">${category.name} (${category.tasks.length} وظیفه)</span>
-            <div class="flex space-x-2 space-x-reverse">
-                <button data-id="${category.id}" data-action="add-tasks-from-category" class="p-2 rounded-full bg-blue-200 hover:bg-blue-300 dark:bg-blue-700 dark:hover:bg-blue-600 text-blue-800 dark:text-blue-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400" title="افزودن وظایف">
-                    <i class="fa-solid fa-plus text-sm"></i>
-                </button>
-                <button data-id="${category.id}" data-action="edit-category" class="p-2 rounded-full bg-yellow-200 hover:bg-yellow-300 dark:bg-yellow-700 dark:hover:bg-yellow-600 text-yellow-800 dark:text-yellow-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-yellow-400" title="ویرایش دسته">
-                    <i class="fa-solid fa-pen text-sm"></i>
-                </button>
-                <button data-id="${category.id}" data-action="delete-category" class="p-2 rounded-full bg-red-200 hover:bg-red-300 dark:bg-red-700 dark:hover:bg-red-600 text-red-800 dark:text-red-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-400" title="حذف دسته">
-                    <i class="fa-solid fa-trash-can text-sm"></i>
+            <span class="text-lg font-medium text-gray-800 dark:text-gray-100">${category.name}</span>
+            <div class="flex items-center space-x-2 space-x-reverse mr-2">
+                <button data-id="${category.id}" data-action="category-menu"
+                    class="three-dot-menu-btn bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 100-2 1 1 0 000 2zm0 7a1 1 0 100-2 1 1 0 000 2zm0 7a1 1 0 100-2 1 1 0 000 2z"></path>
+                    </svg>
                 </button>
             </div>
         `;
         defaultCategoriesList.appendChild(categoryItem);
     });
 
-    defaultCategoriesList.querySelectorAll('button').forEach(button => {
+    defaultCategoriesList.querySelectorAll('button[data-action="category-menu"]').forEach(button => {
         button.addEventListener('click', (e) => {
             const categoryId = e.currentTarget.dataset.id;
-            const action = e.currentTarget.dataset.action;
-
-            if (action === 'add-tasks-from-category') {
-                showAddCategoryTasksModal(categoryId);
-            } else if (action === 'edit-category') {
-                showEditCategoryModal(categoryId);
-            } else if (action === 'delete-category') {
-                deleteCategory(categoryId);
-            }
+            showCategoryActionsMenu(categoryId, e.currentTarget);
         });
     });
 }
+
+function showCategoryActionsMenu(categoryId, buttonElement) {
+    document.querySelectorAll('.task-action-menu').forEach(menu => menu.remove()); // Reuse task-action-menu class for styling
+
+    const menu = document.createElement('div');
+    menu.className = 'task-action-menu'; // Using existing style
+    menu.style.position = 'absolute';
+    menu.style.zIndex = '100';
+    menu.style.visibility = 'hidden';
+
+    document.body.appendChild(menu);
+
+    menu.innerHTML = `
+        <button data-action="add-tasks-from-category" data-id="${categoryId}">
+            <i class="fa-solid fa-plus ml-2"></i>
+            افزودن وظایف
+        </button>
+        <button data-action="edit-category" data-id="${categoryId}">
+            <i class="fa-solid fa-pen ml-2"></i>
+            ویرایش دسته
+        </button>
+        <button data-action="delete-category" data-id="${categoryId}">
+            <i class="fa-solid fa-trash-can ml-2"></i>
+            حذف دسته
+        </button>
+    `;
+
+    const rect = buttonElement.getBoundingClientRect();
+    const padding = 5;
+
+    let menuTop = rect.bottom + window.scrollY + 5;
+    let menuLeft = rect.left + window.scrollX;
+
+    // Adjust if menu goes off screen to the right
+    if (menuLeft + menu.offsetWidth > window.innerWidth - padding) {
+        menuLeft = window.innerWidth - menu.offsetWidth - padding;
+    }
+    // Adjust if menu goes off screen to the left
+    if (menuLeft < padding) {
+        menuLeft = padding;
+    }
+
+    // Adjust if menu goes off screen to the bottom
+    if (menuTop + menu.offsetHeight > window.innerHeight + window.scrollY - padding) {
+        menuTop = rect.top + window.scrollY - menu.offsetHeight - 5;
+        // If it still goes off screen to the top, position at top-left of viewport
+        if (menuTop < padding + window.scrollY) {
+            menuTop = padding + window.scrollY;
+        }
+    }
+
+    menu.style.top = `${menuTop}px`;
+    menu.style.left = `${menuLeft}px`;
+    menu.style.visibility = 'visible';
+
+    menu.addEventListener('click', (e) => {
+        const action = e.target.closest('button')?.dataset.action;
+        const id = e.target.closest('button')?.dataset.id;
+        if (action) {
+            menu.remove();
+            document.removeEventListener('click', closeMenu);
+            if (action === 'add-tasks-from-category') {
+                showAddCategoryTasksModal(id);
+            } else if (action === 'edit-category') {
+                showEditCategoryModal(id);
+            } else if (action === 'delete-category') {
+                deleteCategory(id);
+            }
+        }
+    });
+
+    const closeMenu = (e) => {
+        if (!menu.contains(e.target) && !buttonElement.contains(e.target)) {
+            menu.remove();
+            document.removeEventListener('click', closeMenu);
+        }
+    };
+    setTimeout(() => {
+        document.addEventListener('click', closeMenu);
+    }, 50);
+}
+
 
 function showAddCategoryTasksModal(categoryId) {
     const category = defaultCategories.find(cat => cat.id === categoryId);
@@ -3027,7 +3112,7 @@ addNewTaskToCategoryBtn.addEventListener('click', () => {
 
     const newTask = {
         name: '',
-        importance: 'normal',
+        importance: 'normal', // Default to normal, custom is not allowed
         customPoints: undefined
     };
     category.tasks.push(newTask);
@@ -3085,15 +3170,14 @@ saveEditedCategoryBtn.addEventListener('click', () => {
             return;
         }
 
-        if (importance === 'custom') {
-            const convertedPoints = convertPersianNumbersToEnglish(customPointsInput.value);
-            customPoints = parseInt(convertedPoints, 10);
-            if (isNaN(customPoints) || customPoints <= 0 || customPoints > MAX_CUSTOM_POINTS) {
-                showMessageBox(`لطفاً یک مقدار پوینت سفارشی معتبر (حداکثر ${MAX_CUSTOM_POINTS}) برای وظایف دسته وارد کنید.`, 'error');
-                hasError = true;
-                return;
-            }
+        if (importance === 'custom') { // Custom tasks are not allowed in categories
+            showMessageBox('وظایف سفارشی در دسته‌ها مجاز نیستند.', 'error');
+            hasError = true;
+            return;
         }
+        // If importance is not custom, customPoints should be undefined
+        customPoints = undefined;
+
         updatedTasks.push({ name: taskName, importance, customPoints });
     });
 
@@ -3137,11 +3221,10 @@ function renderEditCategoryTasks(tasksInCategories) {
                 <select class="flex-grow p-2 border rounded-lg text-sm text-gray-700 dark:text-gray-100 bg-white dark:bg-gray-700 appearance-none text-right">
                     <option value="important" ${task.importance === 'important' ? 'selected' : ''}>مهم</option>
                     <option value="normal" ${task.importance === 'normal' ? 'selected' : ''}>عادی</option>
-                    <option value="custom" ${task.importance === 'custom' ? 'selected' : ''}>سفارشی</option>
                     <option value="note" ${task.importance === 'note' ? 'selected' : ''}>یادداشت</option>
                 </select>
                 <input type="number" value="${task.customPoints || ''}" placeholder="پوینت" min="1" max="${MAX_CUSTOM_POINTS}"
-                       class="w-20 p-2 border rounded-lg text-sm text-gray-700 dark:text-gray-100 bg-white dark:bg-gray-700 text-right ${task.importance === 'custom' ? '' : 'hidden'}">
+                       class="w-20 p-2 border rounded-lg text-sm text-gray-700 dark:text-gray-100 bg-white dark:bg-gray-700 text-right hidden">
             </div>
         `;
         editCategoryTasksContainer.appendChild(taskDiv);
@@ -3151,21 +3234,20 @@ function renderEditCategoryTasks(tasksInCategories) {
         const taskNameInput = taskDiv.querySelector('input[type="text"]');
 
         importanceSelectElement.addEventListener('change', (e) => {
-            if (e.target.value === 'custom') {
-                customPointsInput.classList.remove('hidden');
-                customPointsInput.focus();
-            } else {
-                customPointsInput.classList.add('hidden');
-                customPointsInput.value = '';
-            }
+            // Custom option removed, so no need to show/hide customPointsInput based on select value
+            // Ensure customPointsInput remains hidden
+            customPointsInput.classList.add('hidden');
+            customPointsInput.value = '';
+
             taskNameInput.setAttribute('maxlength', e.target.value === 'note' ? NOTE_TASK_MAXLENGTH : DEFAULT_TASK_MAXLENGTH);
         });
 
         taskDiv.querySelector('[data-action="delete-task-from-category"]').addEventListener('click', (e) => {
             const category = defaultCategories.find(cat => cat.id === currentCategoryBeingEditedId);
             if (category) {
-                category.tasks.splice(index, 1);
-                renderEditCategoryTasks(category.tasks);
+                const taskIndexToDelete = parseInt(e.currentTarget.dataset.index, 10);
+                category.tasks.splice(taskIndexToDelete, 1);
+                renderEditCategoryTasks(category.tasks); // Re-render to update indices and display
                 showMessageBox('وظیفه از دسته حذف شد.', 'info');
             }
         });
@@ -3212,53 +3294,32 @@ window.onload = function () {
 };
 
 
-// PWA Installation Logic
+// PWA Installation Logic - MODIFIED
 const installAppLink = document.getElementById('installAppLink');
 
-window.addEventListener('beforeinstallprompt', (e) => {
-    // Prevent the mini-infobar from appearing on mobile
-    e.preventDefault();
-    // Stash the event so it can be triggered later.
-    deferredPrompt = e;
-    // Update UI to notify the user they can install the app
-    installAppLink.classList.remove('hidden');
-});
+// Remove deferredPrompt and related event listeners as per new requirement
+// let deferredPrompt = null;
+// window.addEventListener('beforeinstallprompt', (e) => { ... });
+// window.addEventListener('appinstalled', () => { ... });
 
 installAppLink.addEventListener('click', async (e) => {
     e.preventDefault();
-    installAppLink.classList.add('hidden'); // Hide the install button for now
+    menuDropdown.classList.add('hidden'); // Close menu dropdown
 
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        console.log(`User response to the install prompt: ${outcome}`);
-        deferredPrompt = null; // Clear the deferred prompt once used
-        if (outcome === 'accepted') {
-            showMessageBox('برنامه با موفقیت نصب شد!', 'success');
-        } else {
-            // If user dismissed, show fallback message
-            showMessageBox('نصب برنامه لغو شد. برای راهنمایی بیشتر، روی این پیام کلیک کنید.', 'info', {
-                position: 'bottom-center',
-                duration: 7000,
-                link: 'https://zytask.ir/in-app',
-                linkText: 'راهنمای نصب'
-            });
-        }
+    if (navigator.onLine) {
+        // User is online, redirect to zytask.ir/insapp
+        window.location.href = 'https://zytask.ir/insapp';
     } else {
-        // Fallback for browsers that don't support beforeinstallprompt or if already installed
-        showMessageBox('قابلیت نصب برنامه در مرورگر شما در دسترس نیست یا برنامه از قبل نصب شده است. برای راهنمایی بیشتر، روی این پیام کلیک کنید.', 'info', {
+        // User is offline, show message
+        showMessageBox('لطفاً به اینترنت متصل شوید.', 'info', {
             position: 'bottom-center',
             duration: 7000,
-            link: 'https://zytask.ir/in-app',
-            linkText: 'راهنمای نصب'
+            link: null, // No link for offline message
+            linkText: ''
         });
     }
 });
 
-window.addEventListener('appinstalled', () => {
-    console.log('PWA was successfully installed!');
-    installAppLink.classList.add('hidden'); // Hide the install button if app is installed
-});
 
 // Service Worker registration logic (unchanged from previous version)
 if ('serviceWorker' in navigator) {
