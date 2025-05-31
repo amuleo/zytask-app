@@ -1729,7 +1729,7 @@ function restoreNote(taskId) {
             tasks.push(task);
 
             saveToLocalStorage();
-            renderTasks(taskId); // Re-render and focus on the task in its new location
+            renderTasks(); // Re-render and focus on the task in its new location
             showMessageBox(`یادداشت "${truncateText(task.name, 15)}" بازگردانی شد.`, 'info');
         }
     }
