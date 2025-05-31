@@ -344,7 +344,7 @@
     <div id="defaultCategoriesModal" class="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
         <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md relative text-gray-800 dark:text-gray-100 flex flex-col modal-box transition-transform duration-300 transform scale-95 opacity-0" id="defaultCategoriesModalContent">
             <h3 class="text-xl sm:text-2xl font-bold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">دسته های پیش فرض</h3>
-            <div class="fmodal-scrollable-content flex-grow overflow-y-auto space-y-2">
+            <div class="flex flex-col gap-4 mb-4">
                 <input type="text" id="newCategoryInput" placeholder="نام دسته جدید..." maxlength="15"
                        class="p-3 border rounded-lg text-base sm:text-lg text-gray-700 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-right">
                 <button id="addCategoryBtn"
@@ -387,7 +387,7 @@
                        class="p-3 border rounded-lg text-base sm:text-lg text-gray-700 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-right">
                 <div id="editCategoryTasksContainer" class="modal-scrollable-content space-y-2 flex-grow overflow-y-auto">
                     </div>
-                <button id="addNewTaskToCategoryBtn" class="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 text-lg">
+                <button id="addNewTaskToCategoryBtn" class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400">
                     افزودن وظیفه جدید به دسته
                 </button>
             </div>
