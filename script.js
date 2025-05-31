@@ -55,11 +55,6 @@ const achievementsData = [
     { level: 8, name: 'سلطان', points: 950, icon: 'fa-solid fa-crown', type: 'level', description: 'شما بر قلمرو وظایف خود مسلط شده‌اید. با اقتدار به سوی اهداف بزرگتر گام بردارید!' },
     { level: 9, name: 'کار درست', points: 1250, icon: 'fa-solid fa-dragon', type: 'level', description: 'شما به قدرتی بی‌نظیر دست یافته‌اید. هیچ مانعی جلودار شما نخواهد بود!' },
     { level: 10, name: 'خفن', points: 1600, icon: 'fa-solid fa-fire-alt', type: 'level', description: 'شما به یک ستاره درخشان تبدیل شده‌اید. انرژی و خلاقیت شما بی‌حد و مرز است و هر کاری را به بهترین شکل ممکن انجام می‌دهید!' },
-    { level: 11, name: 'جاودان', points: 2000, icon: 'fa-solid fa-infinity', type: 'level', description: 'پشتکار شما بی‌حد و مرز است. این مسیر، راهی برای جاودانگی دستاوردهای شماست!' },
-    { level: 12, name: 'کیهان‌سالار', points: 2500, icon: 'fa-solid fa-bolt', type: 'level', description: 'شما با سرعتی باورنکردنی در حال پیشرفت هستید. انرژی شما جهان را به حرکت درمی‌آورد!' },
-    { level: 13, name: 'کیهان‌نورد', points: 3000, icon: 'fa-solid fa-rocket', type: 'level', description: 'شما مرزها را درنوردیده‌اید و به سوی ناشناخته‌ها پرواز می‌کنید. آسمان حد شما نیست!' },
-    { level: 14, name: 'بتمن', points: 3600, icon: 'fa-solid fa-user-secret', type: 'level', description: 'شما در سایه‌ها نیز قدرتمندید. با هوش و اراده، هر مشکلی را حل می‌کنید!' },
-    { level: 15, name: 'سیگما', points: 4300, icon: 'fa-solid fa-chess-king', type: 'level', description: 'شما به اوج رسیده‌اید. با خرد و استراتژی، هر بازی را به نفع خود به پایان می‌رسانید!' },
     { type: 'totalTasks', value: 1, name: 'اولین قدم', icon: 'fa-solid fa-shoe-prints', description: 'اولین وظیفه خود را با موفقیت تکمیل کنید. هر سفر طولانی با یک قدم آغاز می‌شود!' },
     { type: 'totalTasks', value: 5, name: 'پنج ستاره', icon: 'fa-solid fa-star-half-stroke', description: 'با تکمیل ۵ وظیفه، نشان می‌دهید که در مسیر درستی هستید. به همین ترتیب ادامه دهید!' },
     { type: 'totalTasks', value: 10, name: 'ده وظیفه', icon: 'fa-solid fa-check-double', description: 'با تکمیل ۱۰ وظیفه، گام‌های محکم‌تری برداشته‌اید. این نشان از تعهد شماست و به شما کمک می‌کند تا به اهداف بزرگتر دست یابید.' },
@@ -567,6 +562,10 @@ function applyLevelTheme(currentLevel) {
     // Apply consistent styling to addNewTaskToCategoryBtn
     addNewTaskToCategoryBtn.classList.remove('bg-blue-100', 'hover:bg-blue-200', 'dark:bg-blue-800', 'dark:hover:bg-blue-700', 'text-blue-800', 'dark:text-blue-100');
     addNewTaskToCategoryBtn.classList.add('bg-blue-600', 'hover:bg-blue-700', 'dark:bg-blue-700', 'dark:hover:bg-blue-800', 'text-white');
+
+    // Apply consistent styling to addCategoryBtn
+    addCategoryBtn.classList.remove('bg-blue-100', 'hover:bg-blue-200', 'dark:bg-blue-800', 'dark:hover:bg-blue-700', 'text-blue-800', 'dark:text-blue-100');
+    addCategoryBtn.classList.add('bg-blue-600', 'hover:bg-blue-700', 'dark:bg-blue-700', 'dark:hover:bg-blue-800', 'text-white');
 
 
     progressBar.style.backgroundImage = `linear-gradient(to right, ${currentThemeData.primary}, ${currentThemeData.secondary})`;
@@ -2857,27 +2856,82 @@ function renderDefaultCategories() {
         const categoryItem = document.createElement('div');
         categoryItem.className = 'flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm mb-2';
         categoryItem.innerHTML = `
-            <span class="text-lg font-medium text-gray-800 dark:text-gray-100">${category.name} (${category.tasks.length} وظیفه)</span>
-            <div class="flex space-x-2 space-x-reverse">
-                <button data-id="${category.id}" data-action="add-tasks-from-category" class="p-2 rounded-full bg-blue-200 hover:bg-blue-300 dark:bg-blue-700 dark:hover:bg-blue-600 text-blue-800 dark:text-blue-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400" title="افزودن وظایف">
-                    <i class="fa-solid fa-plus text-sm"></i>
-                </button>
-                <button data-id="${category.id}" data-action="edit-category" class="p-2 rounded-full bg-yellow-200 hover:bg-yellow-300 dark:bg-yellow-700 dark:hover:bg-yellow-600 text-yellow-800 dark:text-yellow-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-yellow-400" title="ویرایش دسته">
-                    <i class="fa-solid fa-pen text-sm"></i>
-                </button>
-                <button data-id="${category.id}" data-action="delete-category" class="p-2 rounded-full bg-red-200 hover:bg-red-300 dark:bg-red-700 dark:hover:bg-red-600 text-red-800 dark:text-red-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-400" title="حذف دسته">
-                    <i class="fa-solid fa-trash-can text-sm"></i>
+            <span class="text-lg font-medium text-gray-800 dark:text-gray-100">${category.name}</span>
+            <div class="flex items-center space-x-2 space-x-reverse mr-2">
+                <button data-id="${category.id}" data-action="menu"
+                    class="three-dot-menu-btn bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 100-2 1 1 0 000 2zm0 7a1 1 0 100-2 1 1 0 000 2zm0 7a1 1 0 100-2 1 1 0 000 2z"></path>
+                    </svg>
                 </button>
             </div>
         `;
         defaultCategoriesList.appendChild(categoryItem);
+
+        categoryItem.querySelector('[data-action="menu"]').addEventListener('click', (e) => {
+            showCategoryActionsMenu(category.id, e.currentTarget);
+        });
     });
+}
 
-    defaultCategoriesList.querySelectorAll('button').forEach(button => {
-        button.addEventListener('click', (e) => {
-            const categoryId = e.currentTarget.dataset.id;
-            const action = e.currentTarget.dataset.action;
+function showCategoryActionsMenu(categoryId, buttonElement) {
+    document.querySelectorAll('.category-action-menu').forEach(menu => menu.remove());
 
+    const menu = document.createElement('div');
+    menu.className = 'category-action-menu task-action-menu'; // Use task-action-menu styles
+    menu.style.position = 'absolute';
+    menu.style.zIndex = '100';
+    menu.style.visibility = 'hidden';
+
+    document.body.appendChild(menu);
+
+    menu.innerHTML = `
+        <button data-action="add-tasks-from-category">
+            <i class="fa-solid fa-plus ml-2"></i>
+            افزودن وظایف از دسته
+        </button>
+        <button data-action="edit-category">
+            <i class="fa-solid fa-pen ml-2"></i>
+            ویرایش دسته
+        </button>
+        <button data-action="delete-category">
+            <i class="fa-solid fa-trash-can ml-2"></i>
+            حذف دسته
+        </button>
+    `;
+
+    const rect = buttonElement.getBoundingClientRect();
+    const padding = 5;
+
+    let menuTop = rect.bottom + window.scrollY + 5;
+    let menuLeft = rect.left + window.scrollX;
+
+    // Adjust if menu goes off screen to the right
+    if (menuLeft + menu.offsetWidth > window.innerWidth - padding) {
+        menuLeft = window.innerWidth - menu.offsetWidth - padding;
+    }
+    // Adjust if menu goes off screen to the left
+    if (menuLeft < padding) {
+        menuLeft = padding;
+    }
+
+    // Adjust if menu goes off screen to the bottom
+    if (menuTop + menu.offsetHeight > window.innerHeight + window.scrollY - padding) {
+        menuTop = rect.top + window.scrollY - menu.offsetHeight - 5;
+        if (menuTop < padding + window.scrollY) {
+            menuTop = padding + window.scrollY;
+        }
+    }
+
+    menu.style.top = `${menuTop}px`;
+    menu.style.left = `${menuLeft}px`;
+    menu.style.visibility = 'visible';
+
+    menu.addEventListener('click', (e) => {
+        const action = e.target.closest('button')?.dataset.action;
+        if (action) {
+            menu.remove();
+            document.removeEventListener('click', closeCategoryMenu);
             if (action === 'add-tasks-from-category') {
                 showAddCategoryTasksModal(categoryId);
             } else if (action === 'edit-category') {
@@ -2885,9 +2939,24 @@ function renderDefaultCategories() {
             } else if (action === 'delete-category') {
                 deleteCategory(categoryId);
             }
-        });
+        }
     });
+
+    const closeCategoryMenu = (e) => {
+        const isInteractiveElement = e.target.closest('input, select, button, [type="checkbox"]');
+        if (!menu.contains(e.target) && !buttonElement.contains(e.target) && !isInteractiveElement) {
+            menu.remove();
+            document.removeEventListener('click', closeCategoryMenu);
+        } else if (isInteractiveElement && !menu.contains(e.target)) {
+            menu.remove();
+            document.removeEventListener('click', closeCategoryMenu);
+        }
+    };
+    setTimeout(() => {
+        document.addEventListener('click', closeCategoryMenu);
+    }, 50);
 }
+
 
 function showAddCategoryTasksModal(categoryId) {
     const category = defaultCategories.find(cat => cat.id === categoryId);
@@ -3113,10 +3182,10 @@ saveEditedCategoryBtn.addEventListener('click', () => {
         }
 
         if (importance === 'custom') {
-            const convertedPoints = convertPersianNumbersToEnglish(customPointsInput.value);
+            const convertedPoints = convertPerspersianNumbersToEnglish(customPointsInput.value);
             customPoints = parseInt(convertedPoints, 10);
             if (isNaN(customPoints) || customPoints <= 0 || customPoints > MAX_CUSTOM_POINTS) {
-                showMessageBox(`لطفاً یک مقدار پوینت سفارشی معتبر (حداکثر ${MAX_CUSTOM_POINTS}) برای وظایف دسته وارد کنید.`, 'error');
+                showMessageBox(`لطفاً یک مقدار پوینت سفارشی معتبر (حداکثر ${MAX_CUSTOM_POINTS}) برای وظایف دسته وارد کنید.`, 'info');
                 hasError = true;
                 return;
             }
@@ -3271,22 +3340,12 @@ installAppLink.addEventListener('click', async (e) => {
 
     if (navigator.onLine) {
         // User is online, redirect to zytask.ir/insapp
-        showMessageBox('در حال انتقال به صفحه راهنمای نصب...', 'info', {
-            position: 'bottom-center',
-            duration: 3000,
-            link: 'https://zytask.ir/insapp',
-            linkText: 'باز کردن صفحه'
-        });
-        setTimeout(() => {
-            window.open('https://zytask.ir/insapp', '_blank');
-        }, 1000); // Small delay to show message before redirecting
+        window.open('https://zytask.ir/insapp', '_blank');
     } else {
         // User is offline, show message
-        showMessageBox('برای نصب برنامه، لطفاً به اینترنت متصل شوید.', 'info', {
+        showMessageBox('برای نصب، آنلاین شوید.', 'info', {
             position: 'bottom-center',
-            duration: 7000,
-            link: null, // No link for offline message
-            linkText: ''
+            duration: 3000 // Shorter duration for simplified message
         });
     }
 });
