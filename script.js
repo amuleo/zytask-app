@@ -1430,8 +1430,6 @@ function toggleTaskCompletion(taskId, taskItemElement) {
             task.isPinned = false; // Ensure it's not pinned when restored
             task.pinnedAt = null;
 
-            // Remove task from its current position
-            tasks.splice(taskIndex, 1);
             // Add task to the beginning of the active tasks section (after any existing pinned tasks)
             tasks.push(task);
             focusAfterRender = task.id;
@@ -1722,8 +1720,7 @@ function restoreNote(taskId) {
             task.isPinned = false; // Ensure it's not pinned when restored
             task.pinnedAt = null;
 
-            // Remove task from its current position
-            tasks.splice(taskIndex, 1);
+            
             // Add task to the beginning of the active tasks section (after any existing pinned tasks)
            tasks.push(task);
 
