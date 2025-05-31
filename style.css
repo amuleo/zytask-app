@@ -3,6 +3,8 @@
     --theme-secondary: #1d4ed8;
     --theme-accent-bg: #eff6ff;
     --theme-accent-text: #1e3a8a;
+    --theme-progress-from: #2563eb;
+    --theme-progress-to: #1d4ed8;
     --theme-input-border: #93c5fd;
     --theme-input-focus-ring: #60a5fa;
     --theme-orange-text: #ea580c;
@@ -19,8 +21,6 @@
     --theme-progress-to: #60a5fa;
     --theme-input-border: #2563eb;
     --theme-input-focus-ring: #3b82f6;
-    --theme-orange-text: #fdba74;
-    --theme-orange-dark-text: #ea580c;
     --theme-blue-motivation-icon: #93c5fd;
 }
 
