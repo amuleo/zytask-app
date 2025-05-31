@@ -1072,20 +1072,16 @@ function renderPaginationControls(containerElement, totalItems, currentPage, lis
     const totalPages = Math.ceil(totalItems / TASKS_PER_PAGE);
     const maxPageButtons = 3;
 
-    if (totalPages <= 1) {
+    // Check if pagination should be hidden based on total items or completed tasks section visibility
+    if (totalPages <= 1 || (listType === 'completed' && completedTasksSection.classList.contains('hidden'))) {
         containerElement.classList.add('hidden');
-        containerElement.innerHTML = '';
+        containerElement.innerHTML = ''; // Clear existing buttons
         return;
     } else {
-        if (listType === 'completed' && completedTasksSection.classList.contains('hidden')) {
-            containerElement.classList.add('hidden');
-            containerElement.innerHTML = '';
-            return;
-        }
         containerElement.classList.remove('hidden');
     }
 
-    containerElement.innerHTML = '';
+    containerElement.innerHTML = ''; // Clear existing buttons before re-rendering
     containerElement.classList.add('flex', 'flex-wrap', 'justify-center', 'items-center', 'gap-2', 'my-4');
 
     const prevBtn = document.createElement('button');
@@ -1314,7 +1310,8 @@ addTaskBtn.addEventListener('click', () => {
 toggleCompletedTasksBtn.addEventListener('click', () => {
     completedTasksSection.classList.toggle('hidden');
     toggleIcon.classList.toggle('rotate-180');
-    renderPaginationControls(completedTasksPagination, tasks.filter(task => task.completed).length, completedCurrentPage, 'completed');
+    // فراخوانی renderTasks برای اطمینان از رندر مجدد کامل لیست‌ها و صفحه‌بندی‌ها
+    renderTasks();
 });
 
 function handleTaskClick(e) {
@@ -1403,9 +1400,13 @@ function toggleTaskCompletion(taskId, taskItemElement) {
 
             // Remove task from its current position
             tasks.splice(taskIndex, 1);
-            // Add task to the last of the completed tasks section
-            // Find the last completed task's index to insert before it
-            tasks.push(task);
+            // Add task to the beginning of the completed tasks section
+            // Find the first completed task's index to insert before it
+            let insertIndex = tasks.findIndex(t => t.completed);
+            if (insertIndex === -1) { // No completed tasks yet, add to end of active
+                insertIndex = tasks.length;
+            }
+            tasks.splice(insertIndex, 0, task);
             focusAfterRender = task.id;
 
         } else {
@@ -1429,12 +1430,17 @@ function toggleTaskCompletion(taskId, taskItemElement) {
             // Remove task from its current position
             tasks.splice(taskIndex, 1);
             // Add task to the beginning of the active tasks section (after any existing pinned tasks)
-            tasks.push(task);
+            let insertIndex = tasks.findIndex(t => !t.completed && !t.isPinned); // First non-pinned active task
+            if (insertIndex === -1) { // No non-pinned active tasks, add after all pinned or at start if none
+                insertIndex = tasks.filter(t => t.isPinned).length;
+            }
+            tasks.splice(insertIndex, 0, task);
             focusAfterRender = task.id;
 
             showMessageBox(`وظیفه بازنشانی شد!`, 'success');
         }
         saveToLocalStorage();
+        activeCurrentPage = 1; // Go to first page of active tasks
         renderTasks(focusAfterRender);
     }
 }
@@ -1721,9 +1727,14 @@ function restoreNote(taskId) {
             // Remove task from its current position
             tasks.splice(taskIndex, 1);
             // Add task to the beginning of the active tasks section (after any existing pinned tasks)
-            tasks.push(task);
-            
+            let insertIndex = tasks.findIndex(t => !t.completed && !t.isPinned); // First non-pinned active task
+            if (insertIndex === -1) { // No non-pinned active tasks, add after all pinned or at start if none
+                insertIndex = tasks.filter(t => t.isPinned).length;
+            }
+            tasks.splice(insertIndex, 0, task);
+
             saveToLocalStorage();
+            activeCurrentPage = 1; // Go to first page of active tasks
             renderTasks(taskId); // Re-render and focus on the task in its new location
             showMessageBox(`یادداشت "${truncateText(task.name, 15)}" بازگردانی شد.`, 'info');
         }
@@ -3267,7 +3278,7 @@ function renderEditCategoryTasks(tasksInCategories) {
 
         const importanceSelectElement = taskDiv.querySelector('select');
         const customPointsInput = taskDiv.querySelector('input[type="number"]');
-        const taskNameInput = taskDiv.querySelector('input[type="text"]');
+        const taskNameInput = taskDiv.querySelector('input[type="text']');
 
         importanceSelectElement.addEventListener('change', (e) => {
             if (e.target.value === 'custom') {
