@@ -1401,15 +1401,15 @@ function toggleTaskCompletion(taskId, taskItemElement) {
             showMessageBox('وظیفه تکمیل شد!', 'success');
             showPointsGainFeedback(pointsGained, taskItemElement); // Show animation
 
-            // Remove from current position
+            // Remove task from its current position
             tasks.splice(taskIndex, 1);
             // Add task to the beginning of the completed tasks section
-            // Filter all active tasks
-            const active = tasks.filter(t => !t.completed);
-            // Filter all completed tasks
-            const completed = tasks.filter(t => t.completed);
-            // Insert 'task' at the beginning of completed section, after all active tasks
-            tasks = [...active, task, ...completed];
+            // Find the first completed task's index to insert before it
+            let insertIndex = tasks.findIndex(t => t.completed);
+            if (insertIndex === -1) { // No completed tasks yet, add to end of active
+                insertIndex = tasks.length;
+            }
+            tasks.splice(insertIndex, 0, task);
             focusAfterRender = task.id;
 
         } else {
@@ -1432,14 +1432,12 @@ function toggleTaskCompletion(taskId, taskItemElement) {
 
             // Remove task from its current position
             tasks.splice(taskIndex, 1);
-
-            // Filter all active tasks (including pinned ones)
-            const active = tasks.filter(t => !t.completed);
-            // Filter all completed tasks
-            const completed = tasks.filter(t => t.completed);
-
-            // Add the restored task to the end of the active tasks, before completed tasks
-            tasks = [...active, task, ...completed];
+            // Add task to the beginning of the active tasks section (after any existing pinned tasks)
+            let insertIndex = tasks.findIndex(t => !t.completed && !t.isPinned); // First non-pinned active task
+            if (insertIndex === -1) { // No non-pinned active tasks, add after all pinned or at start if none
+                insertIndex = tasks.filter(t => t.isPinned).length;
+            }
+            tasks.splice(insertIndex, 0, task);
             focusAfterRender = task.id;
 
             showMessageBox(`وظیفه بازنشانی شد!`, 'success');
@@ -1449,7 +1447,6 @@ function toggleTaskCompletion(taskId, taskItemElement) {
         renderTasks(focusAfterRender);
     }
 }
-
 
 function pinTask(taskId) {
     const taskIndex = tasks.findIndex(t => t.id === taskId);
@@ -1603,7 +1600,7 @@ function showTaskActionsMenu(taskId, buttonElement, isCompletedTask) {
             } else if (action === 'delete-task') {
                 deleteTask(taskId);
             } else if (action === 'copy-task') {
-                ask(taskId);
+                copyTask(taskId);
             } else if (action === 'pin-task' || action === 'unpin-task') {
                 pinTask(taskId);
             } else if (action === 'strike-through-note') {
@@ -1732,12 +1729,7 @@ function restoreNote(taskId) {
 
             // Remove task from its current position
             tasks.splice(taskIndex, 1);
-            // Add task to the beginning of the active tasks section (after any existing pinned tasks)
-            let insertIndex = tasks.findIndex(t => !t.completed && !t.isPinned); // First non-pinned active task
-            if (insertIndex === -1) { // No non-pinned active tasks, add after all pinned or at start if none
-                insertIndex = tasks.filter(t => t.isPinned).length;
-            }
-            tasks.splice(insertIndex, 0, task);
+            tasks.push(task);
 
             saveToLocalStorage();
             activeCurrentPage = 1; // Go to first page of active tasks
