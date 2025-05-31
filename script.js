@@ -1380,12 +1380,15 @@ function toggleTaskCompletion(taskId, taskItemElement) {
             }
             zPoint += pointsGained;
             showMessageBox('وظیفه تکمیل شد!', 'success');
-            showPointsGainFeedback(pointsGained, taskItemElement);
+            showPointsGainFeedback(pointsGained, taskItemElement); // Show animation
 
-            // Move the completed task to the end of the tasks array
-            const completedTask = tasks.splice(taskIndex, 1)[0];
-            tasks.push(completedTask);
-            focusAfterRender = completedTask.id; // Focus on the task in its new location
+            // Remove from current position
+            tasks.splice(taskIndex, 1);
+            // Insert at the beginning of the completed tasks section
+            const active = tasks.filter(t => !t.completed);
+            const completed = tasks.filter(t => t.completed);
+            tasks = [...active, task, ...completed]; // Insert 'task' at the beginning of completed section
+            focusAfterRender = task.id;
 
         } else {
             // Un-completing (restoring) a task
@@ -1401,27 +1404,23 @@ function toggleTaskCompletion(taskId, taskItemElement) {
             zPoint -= pointsDeducted;
             if (zPoint < 0) zPoint = 0;
 
-            // Create a new task to simulate "restoring" to active list
-            // This creates a new ID, ensuring it's treated as a new active task at the end
-            const newActiveTask = {
-                id: Date.now().toString(),
-                name: task.name,
-                completed: false,
-                importance: task.importance,
-                customPoints: task.customPoints,
-                isPinned: false,
-                pinnedAt: null
-            };
+            task.completed = false;
+            task.isPinned = false; // Ensure it's not pinned when restored
+            task.pinnedAt = null;
 
-            // Remove the old completed task
+            // Remove from current position
             tasks.splice(taskIndex, 1);
-            // Add the new active task to the end of the list
-            tasks.push(newActiveTask);
-            focusAfterRender = newActiveTask.id;
+            // Insert at the beginning of the active tasks section (after any existing pinned tasks)
+            const active = tasks.filter(t => !t.completed && !t.isPinned);
+            const pinned = tasks.filter(t => !t.completed && t.isPinned);
+            const completed = tasks.filter(t => t.completed);
+            tasks = [...pinned, task, ...active, ...completed]; // Insert 'task' after pinned, before other active
+            focusAfterRender = task.id;
 
             showMessageBox(`وظیفه بازنشانی شد!`, 'success');
         }
         saveToLocalStorage();
+        activeCurrentPage = 1; // Go to first page of active tasks
         renderTasks(focusAfterRender);
     }
 }
@@ -1678,10 +1677,16 @@ function strikeThroughNote(taskId) {
             task.completed = true;
             task.isPinned = false; // Notes are unpinned when struck through
             task.pinnedAt = null;
-            // Move the struck-through note to the end of the tasks array
-            const struckNote = tasks.splice(taskIndex, 1)[0];
-            tasks.push(struckNote);
+
+            // Remove from current position
+            tasks.splice(taskIndex, 1);
+            // Insert at the beginning of the completed tasks section
+            const active = tasks.filter(t => !t.completed);
+            const completed = tasks.filter(t => t.completed);
+            tasks = [...active, task, ...completed]; // Insert 'task' at the beginning of completed section
+
             saveToLocalStorage();
+            activeCurrentPage = 1; // Go to first page of active tasks
             renderTasks(taskId); // Re-render and focus on the task in its new location
             showMessageBox(`یادداشت "${truncateText(task.name, 15)}" خط خورد.`, 'success');
         }
@@ -1696,11 +1701,17 @@ function restoreNote(taskId) {
             task.completed = false;
             task.isPinned = false; // Ensure it's not pinned when restored
             task.pinnedAt = null;
-            // Remove the note from its current position (completed section)
-            const restoredNote = tasks.splice(taskIndex, 1)[0];
-            // Add it to the end of the active tasks (which means end of the overall tasks array)
-            tasks.push(restoredNote);
+
+            // Remove from current position
+            tasks.splice(taskIndex, 1);
+            // Insert at the beginning of the active tasks section (after any existing pinned tasks)
+            const active = tasks.filter(t => !t.completed && !t.isPinned);
+            const pinned = tasks.filter(t => !t.completed && t.isPinned);
+            const completed = tasks.filter(t => t.completed);
+            tasks = [...pinned, task, ...active, ...completed]; // Insert 'task' after pinned, before other active
+
             saveToLocalStorage();
+            activeCurrentPage = 1; // Go to first page of active tasks
             renderTasks(taskId); // Re-render and focus on the task in its new location
             showMessageBox(`یادداشت "${truncateText(task.name, 15)}" بازگردانی شد.`, 'info');
         }
@@ -3182,7 +3193,7 @@ saveEditedCategoryBtn.addEventListener('click', () => {
         }
 
         if (importance === 'custom') {
-            const convertedPoints = convertPerspersianNumbersToEnglish(customPointsInput.value);
+            const convertedPoints = convertPersianNumbersToEnglish(customPointsInput.value); // Corrected typo here
             customPoints = parseInt(convertedPoints, 10);
             if (isNaN(customPoints) || customPoints <= 0 || customPoints > MAX_CUSTOM_POINTS) {
                 showMessageBox(`لطفاً یک مقدار پوینت سفارشی معتبر (حداکثر ${MAX_CUSTOM_POINTS}) برای وظایف دسته وارد کنید.`, 'info');
@@ -3244,7 +3255,7 @@ function renderEditCategoryTasks(tasksInCategories) {
 
         const importanceSelectElement = taskDiv.querySelector('select');
         const customPointsInput = taskDiv.querySelector('input[type="number"]');
-        const taskNameInput = taskDiv.querySelector('input[type="text"]');
+        const taskNameInput = taskDiv.querySelector('input[type="text']');
 
         importanceSelectElement.addEventListener('change', (e) => {
             if (e.target.value === 'custom') {
