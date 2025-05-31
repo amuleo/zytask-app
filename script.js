@@ -8,7 +8,7 @@ let unlockedAchievements = [];
 let achievementUnlockDates = {};
 let hasPinnedTaskEver = false;
 let currentMotivationIndex = 0;
-let defaultCategories = []; // New: Array to store default categories
+let defaultCategories = []; // New array to store default categories
 
 const pointsPerNormalTask = 10;
 const pointsPerImportantTask = 25;
@@ -16,9 +16,7 @@ const MAX_CUSTOM_POINTS = 20;
 const TASKS_PER_PAGE = 7;
 const DEFAULT_TASK_MAXLENGTH = 30;
 const NOTE_TASK_MAXLENGTH = 55;
-const MAX_CATEGORIES = 7; // New: Maximum number of default categories
-const MAX_CATEGORY_NAME_LENGTH = 20; // New: Max length for category names
-const MAX_TASKS_IN_CATEGORY = 10; // New: Max tasks per category
+const CATEGORY_NAME_MAXLENGTH = 15; // New constant for category name max length
 
 let activeCurrentPage = 1;
 let completedCurrentPage = 1;
@@ -26,8 +24,7 @@ let completedCurrentPage = 1;
 let isReorderingMode = false;
 let reorderingTaskId = null;
 
-let currentCategoryBeingEditedId = null; // New: To keep track of the category being edited
-let currentCategoryBeingAddedFromId = null; // New: To keep track of the category tasks are being added from
+let deferredPrompt = null; // For PWA installation prompt
 
 const levelPointsThresholds = [
     { name: 'نوب', points: 0, icon: 'fa-solid fa-ghost', motivational: 'شروع هر سفر با گام اول است. شما در ابتدای مسیر هستید و آماده برای کشف توانایی‌هایتان!' },
@@ -54,10 +51,10 @@ const achievementsData = [
     { level: 4, name: 'شوالیه', icon: 'fa-solid fa-shield-halved', type: 'level', description: 'با هر وظیفه، زره‌ای از تجربه بر تن می‌کنید. شجاعت شما راهگشاست!' },
     { level: 5, name: 'هیرو', icon: 'fa-solid fa-mask', type: 'level', description: 'شما الهام‌بخش دیگران هستید. قدم‌هایتان ردپایی از موفقیت بر جای می‌گذارد!' },
     { level: 6, name: 'استاد', icon: 'fa-solid fa-graduation-cap', type: 'level', description: 'دانش و مهارت شما در حال شکوفایی است. از هر تجربه درسی بیاموزید!' },
-    { level: 7, name: 'فرمانده', icon: 'fa-solid fa-star', type: 'level', description: 'اکنون می‌توانید رهبری کنید و مسیر را برای دیگران هموار سازید. قدرت در دستان شماست!' },
-    { level: 8, name: 'سلطان', icon: 'fa-solid fa-crown', type: 'level', description: 'شما بر قلمرو وظایف خود مسلط شده‌اید. با اقتدار به سوی اهداف بزرگتر گام بردارید!' },
-    { level: 9, name: 'کار درست', icon: 'fa-solid fa-dragon', type: 'level', description: 'شما به قدرتی بی‌نظیر دست یافته‌اید. هیچ مانعی جلودار شما نخواهد بود!' },
-    { level: 10, name: 'خفن', icon: 'fa-solid fa-fire-alt', type: 'level', description: 'شما به یک ستاره درخشان تبدیل شده‌اید. انرژی و خلاقیت شما بی‌حد و مرز است و هر کاری را به بهترین شکل ممکن انجام می‌دهید!' },
+    { level: 7, name: 'فرمانده', points: 700, icon: 'fa-solid fa-star', type: 'level', description: 'اکنون می‌توانید رهبری کنید و مسیر را برای دیگران هموار سازید. قدرت در دستان شماست!' },
+    { level: 8, name: 'سلطان', points: 950, icon: 'fa-solid fa-crown', type: 'level', description: 'شما بر قلمرو وظایف خود مسلط شده‌اید. با اقتدار به سوی اهداف بزرگتر گام بردارید!' },
+    { level: 9, name: 'کار درست', points: 1250, icon: 'fa-solid fa-dragon', type: 'level', description: 'شما به قدرتی بی‌نظیر دست یافته‌اید. هیچ مانعی جلودار شما نخواهد بود!' },
+    { level: 10, name: 'خفن', points: 1600, icon: 'fa-solid fa-fire-alt', type: 'level', description: 'شما به یک ستاره درخشان تبدیل شده‌اید. انرژی و خلاقیت شما بی‌حد و مرز است و هر کاری را به بهترین شکل ممکن انجام می‌دهید!' },
     { level: 11, name: 'جاودان', points: 2000, icon: 'fa-solid fa-infinity', type: 'level', description: 'پشتکار شما بی‌حد و مرز است. این مسیر، راهی برای جاودانگی دستاوردهای شماست!' },
     { level: 12, name: 'کیهان‌سالار', points: 2500, icon: 'fa-solid fa-bolt', type: 'level', description: 'شما با سرعتی باورنکردنی در حال پیشرفت هستید. انرژی شما جهان را به حرکت درمی‌آورد!' },
     { level: 13, name: 'کیهان‌نورد', points: 3000, icon: 'fa-solid fa-rocket', type: 'level', description: 'شما مرزها را درنوردیده‌اید و به سوی ناشناخته‌ها پرواز می‌کنید. آسمان حد شما نیست!' },
@@ -136,7 +133,7 @@ const menuBtn = document.getElementById('menuBtn');
 const menuDropdown = document.getElementById('menuDropdown');
 const profileMenuItem = document.getElementById('profileMenuItem');
 const achievementsMenuItem = document.getElementById('achievementsMenuItem');
-const defaultCategoriesMenuItem = document.getElementById('defaultCategoriesMenuItem'); // New: Default Categories menu item
+const defaultCategoriesMenuItem = document.getElementById('defaultCategoriesMenuItem'); // New element
 const helpMenuItem = document.getElementById('helpMenuItem');
 const aboutMenuItem = document.getElementById('aboutMenuItem');
 const backupMenuItem = document.getElementById('backupMenuItem');
@@ -277,14 +274,15 @@ const closeAddCategoryTasksModalBtn = document.getElementById('closeAddCategoryT
 
 const editCategoryModal = document.getElementById('editCategoryModal');
 const editCategoryModalContent = document.getElementById('editCategoryModalContent');
-const editCategoryNameInput = document.getElementById('editCategoryNameInput');
 const editCategoryTitle = document.getElementById('editCategoryTitle');
+const editCategoryNameInput = document.getElementById('editCategoryNameInput');
 const editCategoryTasksContainer = document.getElementById('editCategoryTasksContainer');
 const addNewTaskToCategoryBtn = document.getElementById('addNewTaskToCategoryBtn');
 const saveEditedCategoryBtn = document.getElementById('saveEditedCategoryBtn');
 const cancelEditCategoryBtn = document.getElementById('cancelEditCategoryBtn');
 const closeEditCategoryModalBtn = document.getElementById('closeEditCategoryModalBtn');
 
+let currentCategoryBeingEditedId = null;
 
 function convertPersianNumbersToEnglish(inputString) {
     if (typeof inputString !== 'string') {
@@ -336,7 +334,7 @@ function formatPersianDate(isoDateString) {
 
 
 function showMessageBox(message, type = 'info', options = {}) {
-    const { position = 'top-right', duration = 3000, isUndo = false, taskData = null } = options;
+    const { position = 'top-right', duration = 3000, isUndo = false, taskData = null, link = null, linkText = '' } = options;
 
     if (options.type === 'achievement') {
         achievementNotificationQueue.push({ iconClass: options.iconClass, title: message, message: options.description });
@@ -345,7 +343,7 @@ function showMessageBox(message, type = 'info', options = {}) {
         notificationQueue.push({ type: 'message', data: { message, msgType: type, duration } });
         processNotificationQueue();
     } else if (position === 'bottom-center') {
-        bottomCenterMessageQueue.push({ message, type, position, duration, isUndo, taskData });
+        bottomCenterMessageQueue.push({ message, type, position, duration, isUndo, taskData, link, linkText });
         processBottomCenterQueue();
     }
 }
@@ -426,45 +424,56 @@ function processBottomCenterQueue() {
     }
 
     isBottomCenterDisplaying = true;
-    const { message, duration, isUndo, taskData } = bottomCenterMessageQueue.shift();
+    const { message, duration, isUndo, taskData, link, linkText } = bottomCenterMessageQueue.shift();
 
-    if (isUndo) {
-        undoMessageText.textContent = message;
-        undoMessageBox.classList.remove('hidden');
-        undoMessageBox._currentUndoTaskData = taskData;
+    undoMessageText.innerHTML = message; // Use innerHTML to allow for links
 
-        let timeLeft = duration / 1000;
-        undoCountdown.textContent = `(${timeLeft}s)`;
-        clearInterval(currentCountdownInterval);
-        currentCountdownInterval = setInterval(() => {
-            timeLeft--;
-            undoCountdown.textContent = `(${timeLeft}s)`;
-            if (timeLeft <= 0) {
-                clearInterval(currentCountdownInterval);
-                hideBottomCenterMessage();
-            }
-        }, 1000);
-
-        undoMessageBox.onclick = () => {
-            if (undoMessageBox._currentUndoTaskData) {
-                if (undoMessageBox._currentUndoTaskData.importance === 'note') {
-                    restoreNote(undoMessageBox._currentUndoTaskData.id);
-                } else {
-                    undoLastDeletion(undoMessageBox._currentUndoTaskData);
-                }
-            }
-            hideBottomCenterMessage();
-        };
-
-        setTimeout(() => {
-            undoMessageBox.classList.remove('scale-0', 'opacity-0');
-            undoMessageBox.classList.add('scale-100', 'opacity-100');
-        }, 100);
-
-        currentBottomCenterTimeout = setTimeout(() => {
-            hideBottomCenterMessage();
-        }, duration);
+    if (link) {
+        const linkElement = document.createElement('a');
+        linkElement.href = link;
+        linkElement.textContent = linkText;
+        linkElement.className = 'underline font-semibold mr-1';
+        linkElement.target = '_blank'; // Open in new tab
+        undoMessageText.appendChild(linkElement);
     }
+
+    undoMessageBox.classList.remove('hidden');
+    undoMessageBox._currentUndoTaskData = taskData;
+
+    let timeLeft = duration / 1000;
+    undoCountdown.textContent = `(${timeLeft}s)`;
+    clearInterval(currentCountdownInterval);
+    currentCountdownInterval = setInterval(() => {
+        timeLeft--;
+        undoCountdown.textContent = `(${timeLeft}s)`;
+        if (timeLeft <= 0) {
+            clearInterval(currentCountdownInterval);
+            hideBottomCenterMessage();
+        }
+    }, 1000);
+
+    undoMessageBox.onclick = () => {
+        if (isUndo && undoMessageBox._currentUndoTaskData) {
+            if (undoMessageBox._currentUndoTaskData.importance === 'note') {
+                restoreNote(undoMessageBox._currentUndoTaskData.id);
+            } else {
+                undoLastDeletion(undoMessageBox._currentUndoTaskData);
+            }
+        } else if (link) {
+            window.open(link, '_blank');
+        }
+        hideBottomCenterMessage();
+    };
+
+    setTimeout(() => {
+        undoMessageBox.classList.remove('scale-0', 'opacity-0');
+        undoMessageBox.classList.add('scale-100', 'opacity-100');
+    }, 100);
+
+    currentBottomCenterTimeout = setTimeout(() => {
+        hideBottomCenterMessage();
+    }, duration);
+
 
     function hideBottomCenterMessage() {
         clearTimeout(currentBottomCenterTimeout);
@@ -689,7 +698,7 @@ function saveToLocalStorage() {
     localStorage.setItem('achievementUnlockDates', JSON.stringify(achievementUnlockDates));
     localStorage.setItem('hasPinnedTaskEver', hasPinnedTaskEver);
     localStorage.setItem('currentMotivationIndex', currentMotivationIndex);
-    localStorage.setItem('defaultCategories', JSON.stringify(defaultCategories)); // New: Save default categories
+    localStorage.setItem('defaultCategories', JSON.stringify(defaultCategories)); // Save default categories
 }
 
 function loadFromLocalStorage() {
@@ -703,7 +712,7 @@ function loadFromLocalStorage() {
     const storedAchievementUnlockDates = localStorage.getItem('achievementUnlockDates');
     const storedHasPinnedTaskEver = localStorage.getItem('hasPinnedTaskEver');
     const storedCurrentMotivationIndex = localStorage.getItem('currentMotivationIndex');
-    const storedDefaultCategories = localStorage.getItem('defaultCategories'); // New: Load default categories
+    const storedDefaultCategories = localStorage.getItem('defaultCategories'); // Load default categories
 
     if (storedTasks) {
         try {
@@ -772,7 +781,7 @@ function loadFromLocalStorage() {
         currentMotivationIndex = 0;
     }
 
-    if (storedDefaultCategories) { // New: Load default categories
+    if (storedDefaultCategories) { // Load default categories
         try {
             defaultCategories = JSON.parse(storedDefaultCategories);
         } catch (e) {
@@ -1843,7 +1852,7 @@ function deleteTask(taskId) {
                 showMessageBox(`وظیفه "${truncateText(deletedTaskCopy.name, 15)}" حذف شد. برای بازگردانی ضربه بزنید.`, 'info', {
                     position: 'bottom-center',
                     isUndo: true,
-                    duration: 5000,
+                    duration: 7000, // Changed to 7 seconds
                     taskData: deletedTaskCopy
                 });
             }, { once: true });
@@ -1853,7 +1862,7 @@ function deleteTask(taskId) {
             showMessageBox(`وظیفه "${truncateText(deletedTaskCopy.name, 15)}" حذف شد. برای بازگردانی ضربه بزنید.`, 'info', {
                 position: 'bottom-center',
                 isUndo: true,
-                duration: 5000,
+                duration: 7000, // Changed to 7 seconds
                 taskData: deletedTaskCopy
                 });
         }
@@ -2516,7 +2525,7 @@ exportDataBtn.addEventListener('click', () => {
         achievementUnlockDates: achievementUnlockDates,
         hasPinnedTaskEver: hasPinnedTaskEver,
         currentMotivationIndex: currentMotivationIndex,
-        defaultCategories: defaultCategories, // New: Include default categories in backup
+        defaultCategories: defaultCategories, // Include default categories
         theme: localStorage.getItem('theme') // Include current theme
     };
     const jsonString = JSON.stringify(dataToSave, null, 2); // Pretty print JSON
@@ -2567,7 +2576,7 @@ importDataBtn.addEventListener('click', () => {
             achievementUnlockDates = {};
             hasPinnedTaskEver = false;
             currentMotivationIndex = 0;
-            defaultCategories = []; // New: Reset default categories
+            defaultCategories = []; // Reset default categories
             let importedTheme = null;
 
             // Populate data from imported file, with type checking and fallbacks
@@ -2629,15 +2638,18 @@ importDataBtn.addEventListener('click', () => {
                 } else {
                     currentMotivationIndex = 0;
                 }
-                if (Array.isArray(importedData.defaultCategories)) { // New: Import default categories
-                    defaultCategories = importedData.defaultCategories.map(cat => ({
-                        id: typeof cat.id === 'string' ? cat.id : Date.now().toString() + Math.random().toString().substring(2, 8),
-                        name: typeof cat.name === 'string' ? cat.name : 'دسته نامشخص',
-                        tasks: Array.isArray(cat.tasks) ? cat.tasks.map(task => ({
+                if (Array.isArray(importedData.defaultCategories)) { // Import default categories
+                    defaultCategories = importedData.defaultCategories.map(category => ({
+                        id: typeof category.id === 'string' ? category.id : Date.now().toString() + Math.random().toString().substring(2, 8),
+                        name: typeof category.name === 'string' ? category.name : 'دسته نامشخص',
+                        tasks: Array.isArray(category.tasks) ? category.tasks.map(task => ({
                             name: typeof task.name === 'string' ? task.name : 'وظیفه نامشخص',
-                            importance: typeof task.importance === 'string' && ['normal', 'note'].includes(task.importance) ? task.importance : 'normal'
+                            importance: typeof task.importance === 'string' && ['important', 'normal', 'custom', 'note'].includes(task.importance) ? task.importance : 'normal',
+                            customPoints: typeof task.customPoints === 'number' ? task.customPoints : undefined,
                         })) : []
                     }));
+                } else {
+                    defaultCategories = [];
                 }
                 if (typeof importedData.theme === 'string') {
                     importedTheme = importedData.theme;
@@ -2772,7 +2784,7 @@ function startMotivationRotation() {
     motivationInterval = setInterval(updateMotivationQuote, 7000); // Rotate every 7 seconds
 }
 
-// New: Default Categories Functions
+// Default Categories functionality
 defaultCategoriesMenuItem.addEventListener('click', (e) => {
     e.preventDefault();
     menuDropdown.classList.add('hidden');
@@ -2802,29 +2814,28 @@ addCategoryBtn.addEventListener('click', () => {
         showMessageBox('لطفاً نام دسته را وارد کنید.', 'info');
         return;
     }
-    if (categoryName.length > MAX_CATEGORY_NAME_LENGTH) {
-        showMessageBox(`نام دسته نباید بیش از ${MAX_CATEGORY_NAME_LENGTH} کاراکتر باشد.`, 'error');
-        return;
-    }
-    if (defaultCategories.length >= MAX_CATEGORIES) {
-        showMessageBox(`حداکثر ${MAX_CATEGORIES} دسته پیش فرض می‌توانید داشته باشید.`, 'info');
+    if (categoryName.length > CATEGORY_NAME_MAXLENGTH) {
+        showMessageBox(`نام دسته نباید بیش از ${CATEGORY_NAME_MAXLENGTH} کاراکتر باشد.`, 'error');
         return;
     }
     if (defaultCategories.some(cat => cat.name === categoryName)) {
-        showMessageBox('این دسته از قبل وجود دارد.', 'info');
+        showMessageBox('دسته‌ای با این نام از قبل وجود دارد.', 'info');
         return;
     }
 
     const newCategory = {
         id: Date.now().toString(),
         name: categoryName,
-        tasks: [] // Tasks within a category are just name and importance (normal/note)
+        tasks: []
     };
     defaultCategories.push(newCategory);
     newCategoryInput.value = '';
     saveToLocalStorage();
     renderDefaultCategories();
     showMessageBox('دسته جدید با موفقیت اضافه شد!', 'success');
+
+    // Automatically open the edit modal for the newly created category
+    showEditCategoryModal(newCategory.id);
 });
 
 function renderDefaultCategories() {
@@ -2832,113 +2843,48 @@ function renderDefaultCategories() {
     if (defaultCategories.length === 0) {
         const noCategoriesMessage = document.createElement('p');
         noCategoriesMessage.className = 'text-gray-500 dark:text-gray-400 text-center py-4';
-        noCategoriesMessage.textContent = 'هنوز دسته‌ای اضافه نشده است.';
+        noCategoriesMessage.textContent = 'هنوز دسته‌ای ایجاد نشده است.';
         defaultCategoriesList.appendChild(noCategoriesMessage);
         return;
     }
 
     defaultCategories.forEach(category => {
         const categoryItem = document.createElement('div');
-        categoryItem.className = `flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-700 mb-2`;
+        categoryItem.className = 'flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm mb-2';
         categoryItem.innerHTML = `
-            <span class="text-lg font-medium text-gray-800 dark:text-gray-100 flex-grow">${category.name} (${category.tasks.length} وظیفه)</span>
-            <button data-id="${category.id}" data-action="category-menu"
-                class="three-dot-menu-btn bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-100 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 100-2 1 1 0 000 2zm0 7a1 1 0 100-2 1 1 0 000 2zm0 7a1 1 0 100-2 1 1 0 000 2z"></path>
-                </svg>
-            </button>
+            <span class="text-lg font-medium text-gray-800 dark:text-gray-100">${category.name} (${category.tasks.length} وظیفه)</span>
+            <div class="flex space-x-2 space-x-reverse">
+                <button data-id="${category.id}" data-action="add-tasks-from-category" class="p-2 rounded-full bg-blue-200 hover:bg-blue-300 dark:bg-blue-700 dark:hover:bg-blue-600 text-blue-800 dark:text-blue-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400" title="افزودن وظایف">
+                    <i class="fa-solid fa-plus text-sm"></i>
+                </button>
+                <button data-id="${category.id}" data-action="edit-category" class="p-2 rounded-full bg-yellow-200 hover:bg-yellow-300 dark:bg-yellow-700 dark:hover:bg-yellow-600 text-yellow-800 dark:text-yellow-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-yellow-400" title="ویرایش دسته">
+                    <i class="fa-solid fa-pen text-sm"></i>
+                </button>
+                <button data-id="${category.id}" data-action="delete-category" class="p-2 rounded-full bg-red-200 hover:bg-red-300 dark:bg-red-700 dark:hover:bg-red-600 text-red-800 dark:text-red-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-400" title="حذف دسته">
+                    <i class="fa-solid fa-trash-can text-sm"></i>
+                </button>
+            </div>
         `;
         defaultCategoriesList.appendChild(categoryItem);
     });
-}
 
-defaultCategoriesList.addEventListener('click', (e) => {
-    const button = e.target.closest('button[data-action="category-menu"]');
-    if (button) {
-        const categoryId = button.dataset.id;
-        showCategoryActionsMenu(categoryId, button);
-    }
-});
+    defaultCategoriesList.querySelectorAll('button').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const categoryId = e.currentTarget.dataset.id;
+            const action = e.currentTarget.dataset.action;
 
-function showCategoryActionsMenu(categoryId, buttonElement) {
-    document.querySelectorAll('.task-action-menu').forEach(menu => menu.remove()); // Reuse task-action-menu class for styling
-
-    const menu = document.createElement('div');
-    menu.className = 'task-action-menu'; // Use existing styling
-    menu.style.position = 'absolute';
-    menu.style.zIndex = '100';
-    menu.style.visibility = 'hidden';
-
-    document.body.appendChild(menu);
-
-    menu.innerHTML = `
-        <button data-action="add-category-tasks" data-id="${categoryId}">
-            <i class="fa-solid fa-plus ml-2"></i>
-            افزودن به وظایف
-        </button>
-        <button data-action="edit-category" data-id="${categoryId}">
-            <i class="fa-solid fa-pen ml-2"></i>
-            ویرایش دسته
-        </button>
-        <button data-action="delete-category" data-id="${categoryId}">
-            <i class="fa-solid fa-trash-can ml-2"></i>
-            حذف دسته
-        </button>
-    `;
-
-    const rect = buttonElement.getBoundingClientRect();
-    const padding = 5;
-
-    let menuTop = rect.bottom + window.scrollY + 5;
-    let menuLeft = rect.left + window.scrollX;
-
-    if (menuLeft + menu.offsetWidth > window.innerWidth - padding) {
-        menuLeft = window.innerWidth - menu.offsetWidth - padding;
-    }
-    if (menuLeft < padding) {
-        menuLeft = padding;
-    }
-    if (menuTop + menu.offsetHeight > window.innerHeight + window.scrollY - padding) {
-        menuTop = rect.top + window.scrollY - menu.offsetHeight - 5;
-        if (menuTop < padding + window.scrollY) {
-            menuTop = padding + window.scrollY;
-        }
-    }
-
-    menu.style.top = `${menuTop}px`;
-    menu.style.left = `${menuLeft}px`;
-    menu.style.visibility = 'visible';
-
-    menu.addEventListener('click', (e) => {
-        const action = e.target.closest('button')?.dataset.action;
-        const id = e.target.closest('button')?.dataset.id;
-        if (action && id) {
-            menu.remove();
-            document.removeEventListener('click', closeCategoryMenu);
-            if (action === 'add-category-tasks') {
-                showAddCategoryTasksModal(id);
+            if (action === 'add-tasks-from-category') {
+                showAddCategoryTasksModal(categoryId);
             } else if (action === 'edit-category') {
-                showEditCategoryModal(id);
+                showEditCategoryModal(categoryId);
             } else if (action === 'delete-category') {
-                deleteCategory(id);
+                deleteCategory(categoryId);
             }
-        }
+        });
     });
-
-    const closeCategoryMenu = (e) => {
-        if (!menu.contains(e.target) && !buttonElement.contains(e.target)) {
-            menu.remove();
-            document.removeEventListener('click', closeCategoryMenu);
-        }
-    };
-    setTimeout(() => {
-        document.addEventListener('click', closeCategoryMenu);
-    }, 50);
 }
 
 function showAddCategoryTasksModal(categoryId) {
-    currentCategoryBeingAddedFromId = categoryId;
     const category = defaultCategories.find(cat => cat.id === categoryId);
     if (!category) {
         showMessageBox('خطا: دسته یافت نشد.', 'error');
@@ -2949,79 +2895,89 @@ function showAddCategoryTasksModal(categoryId) {
     categoryTasksInputContainer.innerHTML = '';
 
     if (category.tasks.length === 0) {
-        const noTasksMessage = document.createElement('p');
-        noTasksMessage.className = 'text-gray-500 dark:text-gray-400 text-center py-4';
-        noTasksMessage.textContent = 'این دسته وظیفه‌ای ندارد. ابتدا وظایف را به دسته اضافه کنید.';
-        categoryTasksInputContainer.appendChild(noTasksMessage);
-        addCategoryTaskBtn.disabled = true; // Disable add button if no tasks
+        categoryTasksInputContainer.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-4">این دسته وظیفه‌ای ندارد.</p>';
+        addCategoryTaskBtn.disabled = true;
     } else {
-        addCategoryTaskBtn.disabled = false; // Enable add button
+        addCategoryTaskBtn.disabled = false;
         category.tasks.forEach((task, index) => {
             const taskDiv = document.createElement('div');
-            taskDiv.className = 'flex items-center bg-gray-100 dark:bg-gray-700 p-2 rounded-lg';
+            taskDiv.className = 'flex items-center justify-between p-2 bg-gray-100 dark:bg-gray-700 rounded-lg';
             taskDiv.innerHTML = `
-                <input type="checkbox" id="categoryTask-${index}" data-index="${index}" checked
-                       class="form-checkbox h-5 w-5 text-blue-600 dark:text-blue-400 rounded focus:ring-blue-500 dark:focus:ring-blue-300 ml-2">
-                <label for="categoryTask-${index}" class="text-gray-800 dark:text-gray-100 text-base flex-grow cursor-pointer">
-                    ${task.name} <span class="text-sm text-gray-500 dark:text-gray-400">(${task.importance === 'normal' ? 'عادی' : 'یادداشت'})</span>
-                </label>
+                <span class="text-gray-800 dark:text-gray-100">${task.name}</span>
+                <input type="checkbox" data-index="${index}" checked class="form-checkbox h-5 w-5 text-blue-600 dark:text-blue-400 rounded focus:ring-blue-500 dark:focus:ring-blue-300">
             `;
             categoryTasksInputContainer.appendChild(taskDiv);
         });
     }
 
+    defaultCategoriesModal.classList.add('hidden'); // Hide default categories modal
     addCategoryTasksModal.classList.remove('hidden');
     void addCategoryTasksModalContent.offsetWidth;
     addCategoryTasksModalContent.classList.remove('opacity-0', 'scale-95');
     addCategoryTasksModalContent.classList.add('opacity-100', 'scale-100');
+
+    addCategoryTaskBtn.onclick = () => addTasksFromCategory(categoryId);
 }
 
-addCategoryTaskBtn.addEventListener('click', () => {
-    const category = defaultCategories.find(cat => cat.id === currentCategoryBeingAddedFromId);
-    if (!category) return;
-
-    const selectedTasks = [];
-    categoryTasksInputContainer.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
-        const index = parseInt(checkbox.dataset.index, 10);
-        if (category.tasks[index]) {
-            selectedTasks.push(category.tasks[index]);
-        }
-    });
-
-    if (selectedTasks.length === 0) {
-        showMessageBox('هیچ وظیفه‌ای برای افزودن انتخاب نشده است.', 'info');
-        return;
-    }
-
-    selectedTasks.forEach(taskTemplate => {
-        const newTask = {
-            id: Date.now().toString() + Math.random().toString().substring(2, 8), // Unique ID for each new task
-            name: taskTemplate.name,
-            completed: false,
-            importance: taskTemplate.importance,
-            customPoints: undefined, // Categories only have normal/note, no custom points
-            isPinned: false,
-            pinnedAt: null
-        };
-        tasks.push(newTask);
-    });
-
-    saveToLocalStorage();
-    renderTasks();
-    showMessageBox(`${selectedTasks.length} وظیفه از دسته "${category.name}" اضافه شد!`, 'success');
-    closeAddCategoryTasksModal();
-});
-
-cancelAddCategoryTasksBtn.addEventListener('click', closeAddCategoryTasksModal);
-closeAddCategoryTasksModalBtn.addEventListener('click', closeAddCategoryTasksModal);
-
-function closeAddCategoryTasksModal() {
+closeAddCategoryTasksModalBtn.addEventListener('click', () => {
     addCategoryTasksModalContent.classList.remove('opacity-100', 'scale-100');
     addCategoryTasksModalContent.classList.add('opacity-0', 'scale-95');
     setTimeout(() => {
         addCategoryTasksModal.classList.add('hidden');
-        currentCategoryBeingAddedFromId = null;
     }, 50);
+    showDefaultCategoriesModal(); // Return to default categories modal
+});
+
+cancelAddCategoryTasksBtn.addEventListener('click', () => {
+    addCategoryTasksModalContent.classList.remove('opacity-100', 'scale-100');
+    addCategoryTasksModalContent.classList.add('opacity-0', 'scale-95');
+    setTimeout(() => {
+        addCategoryTasksModal.classList.add('hidden');
+    }, 50);
+    showDefaultCategoriesModal(); // Return to default categories modal
+    showMessageBox('افزودن وظایف از دسته لغو شد.', 'info');
+});
+
+function addTasksFromCategory(categoryId) {
+    const category = defaultCategories.find(cat => cat.id === categoryId);
+    if (!category) return;
+
+    const checkboxes = categoryTasksInputContainer.querySelectorAll('input[type="checkbox"]:checked');
+    let addedCount = 0;
+
+    checkboxes.forEach(checkbox => {
+        const taskIndex = parseInt(checkbox.dataset.index, 10);
+        const taskToAdd = category.tasks[taskIndex];
+
+        if (taskToAdd) {
+            const newTask = {
+                id: Date.now().toString() + Math.random().toString().substring(2, 8),
+                name: taskToAdd.name,
+                completed: false,
+                importance: taskToAdd.importance,
+                customPoints: taskToAdd.customPoints,
+                isPinned: false,
+                pinnedAt: null
+            };
+            tasks.push(newTask);
+            addedCount++;
+        }
+    });
+
+    if (addedCount > 0) {
+        saveToLocalStorage();
+        renderTasks();
+        showMessageBox(`${addedCount} وظیفه از دسته "${category.name}" اضافه شد!`, 'success');
+    } else {
+        showMessageBox('هیچ وظیفه‌ای برای اضافه کردن انتخاب نشده بود.', 'info');
+    }
+
+    addCategoryTasksModalContent.classList.remove('opacity-100', 'scale-100');
+    addCategoryTasksModalContent.classList.add('opacity-0', 'scale-95');
+    setTimeout(() => {
+        addCategoryTasksModal.classList.add('hidden');
+    }, 50);
+    showDefaultCategoriesModal(); // Return to default categories modal
 }
 
 function showEditCategoryModal(categoryId) {
@@ -3034,8 +2990,11 @@ function showEditCategoryModal(categoryId) {
 
     editCategoryTitle.textContent = category.name;
     editCategoryNameInput.value = category.name;
-    renderTasksInEditCategoryModal(category.tasks);
+    editCategoryNameInput.setAttribute('maxlength', CATEGORY_NAME_MAXLENGTH); // Set max length for category name
 
+    renderEditCategoryTasks(category.tasks);
+
+    defaultCategoriesModal.classList.add('hidden'); // Hide default categories modal
     editCategoryModal.classList.remove('hidden');
     void editCategoryModalContent.offsetWidth;
     editCategoryModalContent.classList.remove('opacity-0', 'scale-95');
@@ -3043,87 +3002,40 @@ function showEditCategoryModal(categoryId) {
     editCategoryNameInput.focus();
 }
 
-function renderTasksInEditCategoryModal(categoryTasks) {
-    editCategoryTasksContainer.innerHTML = '';
-    if (categoryTasks.length === 0) {
-        const noTasksMessage = document.createElement('p');
-        noTasksMessage.className = 'text-gray-500 dark:text-gray-400 text-center py-2';
-        noTasksMessage.textContent = 'این دسته وظیفه‌ای ندارد.';
-        editCategoryTasksContainer.appendChild(noTasksMessage);
-    } else {
-        categoryTasks.forEach((task, index) => {
-            const taskDiv = document.createElement('div');
-            taskDiv.className = 'flex items-center gap-2 p-2 bg-gray-100 dark:bg-gray-700 rounded-lg';
-            taskDiv.innerHTML = `
-                <input type="text" value="${task.name}" data-index="${index}" data-type="name"
-                       class="flex-grow p-2 border rounded-lg text-sm text-gray-700 dark:text-gray-100 bg-white dark:bg-gray-600 text-right" maxlength="${task.importance === 'note' ? NOTE_TASK_MAXLENGTH : DEFAULT_TASK_MAXLENGTH}">
-                <select data-index="${index}" data-type="importance"
-                        class="p-2 border rounded-lg text-sm text-gray-700 dark:text-gray-100 bg-white dark:bg-gray-600 appearance-none w-24 text-right">
-                    <option value="normal" ${task.importance === 'normal' ? 'selected' : ''}>عادی</option>
-                    <option value="note" ${task.importance === 'note' ? 'selected' : ''}>یادداشت</option>
-                </select>
-                <button data-index="${index}" data-action="remove-task-from-category"
-                        class="p-2 rounded-full bg-red-100 hover:bg-red-200 dark:bg-red-800 dark:hover:bg-red-700 text-red-600 dark:text-red-100 transition duration-200">
-                    <i class="fa-solid fa-times text-sm"></i>
-                </button>
-            `;
-            editCategoryTasksContainer.appendChild(taskDiv);
-        });
-    }
-}
+closeEditCategoryModalBtn.addEventListener('click', () => {
+    editCategoryModalContent.classList.remove('opacity-100', 'scale-100');
+    editCategoryModalContent.classList.add('opacity-0', 'scale-95');
+    setTimeout(() => {
+        editCategoryModal.classList.add('hidden');
+    }, 50);
+    showDefaultCategoriesModal(); // Return to default categories modal
+});
+
+cancelEditCategoryBtn.addEventListener('click', () => {
+    editCategoryModalContent.classList.remove('opacity-100', 'scale-100');
+    editCategoryModalContent.classList.add('opacity-0', 'scale-95');
+    setTimeout(() => {
+        editCategoryModal.classList.add('hidden');
+    }, 50);
+    showDefaultCategoriesModal(); // Return to default categories modal
+    showMessageBox('ویرایش دسته لغو شد.', 'info');
+});
 
 addNewTaskToCategoryBtn.addEventListener('click', () => {
     const category = defaultCategories.find(cat => cat.id === currentCategoryBeingEditedId);
     if (!category) return;
 
-    if (category.tasks.length >= MAX_TASKS_IN_CATEGORY) {
-        showMessageBox(`هر دسته می‌تواند حداکثر ${MAX_TASKS_IN_CATEGORY} وظیفه داشته باشد.`, 'info');
-        return;
-    }
-
-    category.tasks.push({ name: '', importance: 'normal' });
-    renderTasksInEditCategoryModal(category.tasks);
-    // Focus on the newly added input
-    const newInputs = editCategoryTasksContainer.querySelectorAll('input[type="text"]');
-    if (newInputs.length > 0) {
-        newInputs[newInputs.length - 1].focus();
-    }
-});
-
-editCategoryTasksContainer.addEventListener('click', (e) => {
-    const removeBtn = e.target.closest('button[data-action="remove-task-from-category"]');
-    if (removeBtn) {
-        const indexToRemove = parseInt(removeBtn.dataset.index, 10);
-        const category = defaultCategories.find(cat => cat.id === currentCategoryBeingEditedId);
-        if (category && category.tasks[indexToRemove]) {
-            category.tasks.splice(indexToRemove, 1);
-            renderTasksInEditCategoryModal(category.tasks);
-        }
-    }
-});
-
-editCategoryTasksContainer.addEventListener('change', (e) => {
-    const input = e.target.closest('input[data-type="name"]');
-    const select = e.target.closest('select[data-type="importance"]');
-    const category = defaultCategories.find(cat => cat.id === currentCategoryBeingEditedId);
-
-    if (!category) return;
-
-    if (input) {
-        const index = parseInt(input.dataset.index, 10);
-        if (category.tasks[index]) {
-            category.tasks[index].name = input.value.trim();
-        }
-    } else if (select) {
-        const index = parseInt(select.dataset.index, 10);
-        if (category.tasks[index]) {
-            category.tasks[index].importance = select.value;
-            // Update maxlength of corresponding input field
-            const correspondingInput = editCategoryTasksContainer.querySelector(`input[data-index="${index}"][data-type="name"]`);
-            if (correspondingInput) {
-                correspondingInput.setAttribute('maxlength', select.value === 'note' ? NOTE_TASK_MAXLENGTH : DEFAULT_TASK_MAXLENGTH);
-            }
-        }
+    const newTask = {
+        name: '',
+        importance: 'normal',
+        customPoints: undefined
+    };
+    category.tasks.push(newTask);
+    renderEditCategoryTasks(category.tasks);
+    // Focus on the newly added input field
+    const lastInput = editCategoryTasksContainer.querySelector('.category-task-item:last-child input[type="text"]');
+    if (lastInput) {
+        lastInput.focus();
     }
 });
 
@@ -3136,62 +3048,128 @@ saveEditedCategoryBtn.addEventListener('click', () => {
         showMessageBox('نام دسته نمی‌تواند خالی باشد.', 'info');
         return;
     }
-    if (newCategoryName.length > MAX_CATEGORY_NAME_LENGTH) {
-        showMessageBox(`نام دسته نباید بیش از ${MAX_CATEGORY_NAME_LENGTH} کاراکتر باشد.`, 'error');
+    if (newCategoryName.length > CATEGORY_NAME_MAXLENGTH) {
+        showMessageBox(`نام دسته نباید بیش از ${CATEGORY_NAME_MAXLENGTH} کاراکتر باشد.`, 'error');
         return;
     }
     if (defaultCategories.some(cat => cat.name === newCategoryName && cat.id !== category.id)) {
-        showMessageBox('دسته با این نام از قبل وجود دارد.', 'info');
+        showMessageBox('دسته‌ای با این نام از قبل وجود دارد.', 'info');
         return;
     }
 
     category.name = newCategoryName;
 
-    // Validate tasks within the category
-    let allTasksValid = true;
     const updatedTasks = [];
-    editCategoryTasksContainer.querySelectorAll('div.flex.items-center.gap-2').forEach(taskDiv => {
-        const nameInput = taskDiv.querySelector('input[data-type="name"]');
-        const importanceSelect = taskDiv.querySelector('select[data-type="importance"]');
+    const taskItems = editCategoryTasksContainer.querySelectorAll('.category-task-item');
+    let hasError = false;
+
+    taskItems.forEach(item => {
+        const nameInput = item.querySelector('input[type="text"]');
+        const importanceSelect = item.querySelector('select');
+        const customPointsInput = item.querySelector('input[type="number"]');
 
         const taskName = nameInput.value.trim();
-        const taskImportance = importanceSelect.value;
-        const currentMaxLength = taskImportance === 'note' ? NOTE_TASK_MAXLENGTH : DEFAULT_TASK_MAXLENGTH;
+        const importance = importanceSelect.value;
+        let customPoints = undefined;
 
         if (taskName.length === 0) {
-            showMessageBox('نام وظیفه در دسته نمی‌تواند خالی باشد.', 'info');
-            allTasksValid = false;
+            showMessageBox('نام وظیفه در دسته نمی‌تواند خالی باشد.', 'error');
+            hasError = true;
             return;
         }
+
+        const currentMaxLength = importance === 'note' ? NOTE_TASK_MAXLENGTH : DEFAULT_TASK_MAXLENGTH;
         if (taskName.length > currentMaxLength) {
-            showMessageBox(`طول نام وظیفه "${truncateText(taskName, 15)}" در دسته نباید بیش از ${currentMaxLength} کاراکتر باشد.`, 'error');
-            allTasksValid = false;
+            showMessageBox(`مقدار ورودی وظیفه نباید بیش از ${currentMaxLength} کاراکتر باشد.`, 'error');
+            hasError = true;
             return;
         }
-        updatedTasks.push({ name: taskName, importance: taskImportance });
+
+        if (importance === 'custom') {
+            const convertedPoints = convertPersianNumbersToEnglish(customPointsInput.value);
+            customPoints = parseInt(convertedPoints, 10);
+            if (isNaN(customPoints) || customPoints <= 0 || customPoints > MAX_CUSTOM_POINTS) {
+                showMessageBox(`لطفاً یک مقدار پوینت سفارشی معتبر (حداکثر ${MAX_CUSTOM_POINTS}) برای وظایف دسته وارد کنید.`, 'error');
+                hasError = true;
+                return;
+            }
+        }
+        updatedTasks.push({ name: taskName, importance, customPoints });
     });
 
-    if (!allTasksValid) {
-        return;
-    }
+    if (hasError) return;
 
     category.tasks = updatedTasks;
     saveToLocalStorage();
-    renderDefaultCategories(); // Re-render the categories list
+    renderDefaultCategories();
     showMessageBox('دسته با موفقیت ویرایش شد!', 'success');
-    closeEditCategoryModal();
-});
 
-cancelEditCategoryBtn.addEventListener('click', closeEditCategoryModal);
-closeEditCategoryModalBtn.addEventListener('click', closeEditCategoryModal);
-
-function closeEditCategoryModal() {
     editCategoryModalContent.classList.remove('opacity-100', 'scale-100');
     editCategoryModalContent.classList.add('opacity-0', 'scale-95');
     setTimeout(() => {
         editCategoryModal.classList.add('hidden');
-        currentCategoryBeingEditedId = null;
     }, 50);
+    showDefaultCategoriesModal(); // Return to default categories modal
+});
+
+function renderEditCategoryTasks(tasksInCategories) {
+    editCategoryTasksContainer.innerHTML = '';
+    if (tasksInCategories.length === 0) {
+        const noTasksMessage = document.createElement('p');
+        noTasksMessage.className = 'text-gray-500 dark:text-gray-400 text-center py-4';
+        noTasksMessage.textContent = 'این دسته وظیفه‌ای ندارد. می‌توانید وظیفه جدید اضافه کنید.';
+        editCategoryTasksContainer.appendChild(noTasksMessage);
+        return;
+    }
+
+    tasksInCategories.forEach((task, index) => {
+        const taskDiv = document.createElement('div');
+        taskDiv.className = 'category-task-item flex flex-col gap-2 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-sm mb-2';
+        taskDiv.innerHTML = `
+            <div class="flex items-center gap-2">
+                <input type="text" value="${task.name}" placeholder="نام وظیفه..." maxlength="${task.importance === 'note' ? NOTE_TASK_MAXLENGTH : DEFAULT_TASK_MAXLENGTH}"
+                       class="flex-grow p-2 border rounded-lg text-sm text-gray-700 dark:text-gray-100 bg-white dark:bg-gray-700 text-right">
+                <button data-index="${index}" data-action="delete-task-from-category" class="p-2 rounded-full bg-red-200 hover:bg-red-300 dark:bg-red-700 dark:hover:bg-red-600 text-red-800 dark:text-red-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-400" title="حذف وظیفه">
+                    <i class="fa-solid fa-trash-can text-xs"></i>
+                </button>
+            </div>
+            <div class="flex items-center gap-2">
+                <select class="flex-grow p-2 border rounded-lg text-sm text-gray-700 dark:text-gray-100 bg-white dark:bg-gray-700 appearance-none text-right">
+                    <option value="important" ${task.importance === 'important' ? 'selected' : ''}>مهم</option>
+                    <option value="normal" ${task.importance === 'normal' ? 'selected' : ''}>عادی</option>
+                    <option value="custom" ${task.importance === 'custom' ? 'selected' : ''}>سفارشی</option>
+                    <option value="note" ${task.importance === 'note' ? 'selected' : ''}>یادداشت</option>
+                </select>
+                <input type="number" value="${task.customPoints || ''}" placeholder="پوینت" min="1" max="${MAX_CUSTOM_POINTS}"
+                       class="w-20 p-2 border rounded-lg text-sm text-gray-700 dark:text-gray-100 bg-white dark:bg-gray-700 text-right ${task.importance === 'custom' ? '' : 'hidden'}">
+            </div>
+        `;
+        editCategoryTasksContainer.appendChild(taskDiv);
+
+        const importanceSelectElement = taskDiv.querySelector('select');
+        const customPointsInput = taskDiv.querySelector('input[type="number"]');
+        const taskNameInput = taskDiv.querySelector('input[type="text"]');
+
+        importanceSelectElement.addEventListener('change', (e) => {
+            if (e.target.value === 'custom') {
+                customPointsInput.classList.remove('hidden');
+                customPointsInput.focus();
+            } else {
+                customPointsInput.classList.add('hidden');
+                customPointsInput.value = '';
+            }
+            taskNameInput.setAttribute('maxlength', e.target.value === 'note' ? NOTE_TASK_MAXLENGTH : DEFAULT_TASK_MAXLENGTH);
+        });
+
+        taskDiv.querySelector('[data-action="delete-task-from-category"]').addEventListener('click', (e) => {
+            const category = defaultCategories.find(cat => cat.id === currentCategoryBeingEditedId);
+            if (category) {
+                category.tasks.splice(index, 1);
+                renderEditCategoryTasks(category.tasks);
+                showMessageBox('وظیفه از دسته حذف شد.', 'info');
+            }
+        });
+    });
 }
 
 function deleteCategory(categoryId) {
@@ -3201,9 +3179,7 @@ function deleteCategory(categoryId) {
         defaultCategories.splice(categoryIndex, 1);
         saveToLocalStorage();
         renderDefaultCategories();
-        showMessageBox(`دسته "${categoryName}" با موفقیت حذف شد.`, 'success');
-    } else {
-        showMessageBox('خطا: دسته برای حذف یافت نشد.', 'error');
+        showMessageBox(`دسته "${categoryName}" حذف شد!`, 'success');
     }
 }
 
@@ -3236,7 +3212,55 @@ window.onload = function () {
 };
 
 
-// Service Worker registration logic (unchanged)
+// PWA Installation Logic
+const installAppLink = document.getElementById('installAppLink');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent the mini-infobar from appearing on mobile
+    e.preventDefault();
+    // Stash the event so it can be triggered later.
+    deferredPrompt = e;
+    // Update UI to notify the user they can install the app
+    installAppLink.classList.remove('hidden');
+});
+
+installAppLink.addEventListener('click', async (e) => {
+    e.preventDefault();
+    installAppLink.classList.add('hidden'); // Hide the install button for now
+
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`User response to the install prompt: ${outcome}`);
+        deferredPrompt = null; // Clear the deferred prompt once used
+        if (outcome === 'accepted') {
+            showMessageBox('برنامه با موفقیت نصب شد!', 'success');
+        } else {
+            // If user dismissed, show fallback message
+            showMessageBox('نصب برنامه لغو شد. برای راهنمایی بیشتر، روی این پیام کلیک کنید.', 'info', {
+                position: 'bottom-center',
+                duration: 7000,
+                link: 'https://zytask.ir/in-app',
+                linkText: 'راهنمای نصب'
+            });
+        }
+    } else {
+        // Fallback for browsers that don't support beforeinstallprompt or if already installed
+        showMessageBox('قابلیت نصب برنامه در مرورگر شما در دسترس نیست یا برنامه از قبل نصب شده است. برای راهنمایی بیشتر، روی این پیام کلیک کنید.', 'info', {
+            position: 'bottom-center',
+            duration: 7000,
+            link: 'https://zytask.ir/in-app',
+            linkText: 'راهنمای نصب'
+        });
+    }
+});
+
+window.addEventListener('appinstalled', () => {
+    console.log('PWA was successfully installed!');
+    installAppLink.classList.add('hidden'); // Hide the install button if app is installed
+});
+
+// Service Worker registration logic (unchanged from previous version)
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/service-worker.js')
@@ -3258,260 +3282,24 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/service-worker.js')
-            .then(registration => {
-                console.log('Service Worker registered with scope:', registration.scope);
-                registration.addEventListener('updatefound', () => {
-                    const newWorker = registration.installing;
-                    newWorker.addEventListener('statechange', () => {
-                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                        }
-                    });
-                });
-            })
-            .catch(error => {
-                console.error('Service Worker registration failed:', error);
-            });
-    }
-
-    const shareAppLink = document.getElementById('shareAppLink');
-    const installAppLink = document.getElementById('installAppLink');
-
-    const modalHtml = `
-        <div id="installModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-[9999] hidden">
-            <div class="bg-white dark:bg-[#1f2937] rounded-lg shadow-xl p-6 w-full max-w-md text-right relative" style="direction: rtl;">
-                <button id="closeModalBtn" class="absolute top-3 left-3 text-gray-400 hover:text-gray-600 dark:text-[#9ca3af] dark:hover:text-[#e5e7eb] focus:outline-none">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-                <h2 class="text-xl font-bold mb-4 text-center text-[#1d4ed8] dark:text-[#2563eb]">نصب برنامه زای تسک</h2>
-                <p class="text-sm text-gray-600 dark:text-[#9ca3af] mb-4 text-center">برای تجربه بهتر، برنامه را روی دستگاه خود نصب کنید:</p>
-                <div id="installInstructions" class="space-y-4 text-gray-700 dark:text-[#e5e7eb]">
-                    </div>
-                <div class="mt-6 text-center">
-                    <button id="understoodBtn" class="bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-bold py-2 px-6 rounded-lg focus:outline-none focus:shadow-outline transition duration-200">
-                        متوجه شدم
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-    const installModal = document.getElementById('installModal');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    const understoodBtn = document.getElementById('understoodBtn');
-    const installInstructions = document.getElementById('installInstructions');
-
-    function getBrowserAndPlatform() {
-        const userAgent = navigator.userAgent;
-        let browser = 'Other';
-        let platform = 'Desktop';
-        let os = 'Unknown OS';
-
-        if (/windows/i.test(userAgent)) {
-            os = 'Windows';
-            platform = 'Desktop';
-        } else if (/macintosh|mac os x/i.test(userAgent)) {
-            os = 'macOS';
-            platform = 'Desktop';
-        } else if (/linux/i.test(userAgent)) {
-            os = 'Linux';
-            platform = 'Desktop';
-        } else if (/android/i.test(userAgent)) {
-            os = 'Android';
-            platform = 'Mobile';
-        } else if (/iphone|ipod/i.test(userAgent)) {
-            os = 'iOS';
-            platform = 'Mobile';
-        } else if (/ipad/i.test(userAgent)) {
-            os = 'iPadOS';
-            platform = 'Tablet';
-        }
-
-        if (userAgent.includes('CriOS')) browser = 'Chrome';
-        else if (userAgent.includes('Chrome') && !userAgent.includes('Edge')) browser = 'Chrome';
-        else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) browser = 'Safari';
-        else if (userAgent.includes('Firefox')) browser = 'Firefox';
-        else if (userAgent.includes('Edg') || userAgent.includes('Edge')) browser = 'Edge';
-        else if (userAgent.includes('SamsungBrowser')) browser = 'Samsung Browser';
-        else if (userAgent.includes('Brave')) browser = 'Brave';
-        else if (userAgent.includes('Opera') || userAgent.includes('OPR')) browser = 'Opera';
-        else if (userAgent.includes('MSIE') || userAgent.includes('Trident')) browser = 'Internet Explorer';
-        else if (userAgent.includes('Bing')) browser = 'Bing';
-
-        return { browser, platform, os };
-    }
-
-    function getInstallInstructionsContent() {
-        const { browser, platform, os } = getBrowserAndPlatform();
-        let instructions = '';
-        const blueIcon = 'text-[#2563eb] dark:text-[#1d4ed8]';
-        const grayIcon = 'text-gray-600 dark:text-[#9ca3af]';
-
-        const commonSafariiOS = `
-            <p><strong class="text-[#1d4ed8] dark:text-[#2563eb]">در مرورگر سافاری (iOS/iPadOS):</strong></p>
-            <ol class="list-decimal list-inside text-sm leading-relaxed">
-                <li>روی دکمه <i class="fas fa-share-alt ${blueIcon}"></i> (Share) در نوار پایین مرورگر ضربه بزنید.</li>
-                <li>به پایین اسکرول کنید و گزینه "<strong>Add to Home Screen</strong>" را انتخاب کنید.</li>
-                <li>در پنجره باز شده، روی "Add" در بالا سمت راست ضربه بزنید.</li>
-            </ol>
-        `;
-
-        switch (browser) {
-            case 'Chrome':
-            case 'Samsung Browser':
-            case 'Brave':
-                if (platform === 'Mobile' || platform === 'Tablet') {
-                    instructions = `
-                        <p><strong class="text-[#1d4ed8] dark:text-[#2563eb]">در مرورگر ${browser} (${os}):</strong></p>
-                        <ol class="list-decimal list-inside text-sm leading-relaxed">
-                            <li>روی آیکون سه نقطه <i class="fas fa-ellipsis-v ${blueIcon}"></i> یا سه خط <i class="fas fa-bars ${blueIcon}"></i> در بالای صفحه سمت چپ (منوی مرورگر) ضربه بزنید.</li>
-                            <li>گزینه "<strong>Add to Home screen</strong>" یا "<strong>Install app</strong>" را پیدا کرده و انتخاب کنید.</li>
-                            <li>دستورالعمل‌ها را دنبال کنید تا برنامه به صفحه اصلی شما اضافه شود.</li>
-                        </ol>
-                    `;
-                } else {
-                    instructions = `
-                        <p><strong class="text-[#1d4ed8] dark:text-[#2563eb]">در مرورگر ${browser} (دسکتاپ ${os}):</strong></p>
-                        <ol class="list-decimal list-inside text-sm leading-relaxed">
-                            <li>به دنبال آیکون "نصب برنامه" <i class="fas fa-download ${blueIcon}"></i> یا <i class="fas fa-plus ${blueIcon}"></i> در نوار آدرس مرورگر (معمولاً سمت راست) بگردید و روی آن کلیک کنید.</li>
-                            <li>در پنجره باز شده، روی "<strong>Install</strong>" کلیک کنید.</li>
-                        </ol>
-                        <p class="text-sm mt-2 text-gray-600 dark:text-[#9ca3af]">یا از منوی مرورگر (سه نقطه <i class="fas fa-ellipsis-v ${grayIcon}"></i>) گزینه "Install ${document.title}..." را پیدا کنید.</p>
-                    `;
-                }
-                break;
-            case 'Safari':
-                if (os === 'iOS' || os === 'iPadOS') {
-                    instructions = commonSafariiOS;
-                } else {
-                    instructions = `
-                        <p><strong class="text-[#1d4ed8] dark:text-[#2563eb]">در مرورگر سافاری (دسکتاپ macOS):</strong></p>
-                        <p class="text-sm">سافاری در دسکتاپ امکان نصب مستقیم برنامه (PWA) را ندارد. می‌توانید آدرس این صفحه را برای دسترسی سریع ذخیره کنید (Bookmark).</p>
-                        <p class="text-sm mt-2 text-gray-600 dark:text-[#9ca3af]">اگر از آیفون یا آیپد استفاده می‌کنید، مراحل نصب متفاوت است:</p>
-                        ${commonSafariiOS}
-                    `;
-                }
-                break;
-            case 'Firefox':
-                if (platform === 'Mobile' || platform === 'Tablet') {
-                    instructions = `
-                        <p><strong class="text-[#1d4ed8] dark:text-[#2563eb]">در مرورگر فایرفاکس (موبایل ${os}):</strong></p>
-                        <ol class="list-decimal list-inside text-sm leading-relaxed">
-                            <li>روی آیکون سه نقطه <i class="fas fa-ellipsis-v ${blueIcon}"></i> (منو) در پایین صفحه ضربه بزید.</li>
-                            <li>گزینه "<strong>Install</strong>" را پیدا کرده و انتخاب کنید.</li>
-                        </ol>
-                    `;
-                } else {
-                    instructions = `
-                        <p><strong class="text-[#1d4ed8] dark:text-[#2563eb]">در مرورگر فایرفاکس (دسکتاپ ${os}):</strong></p>
-                        <ol class="list-decimal list-inside text-sm leading-relaxed">
-                            <li>به دنبال آیکون خانه با علامت مثبت <i class="fas fa-plus-circle ${blueIcon}"></i> یا نماد صفحه با فلش رو به پایین <i class="fas fa-arrow-alt-circle-down ${blueIcon}"></i> در نوار آدرس بگردید.</li>
-                            <li>روی آن کلیک کنید و دستورالعمل‌ها را دنبال کنید.</li>
-                        </ol>
-                        <p class="text-sm mt-2 text-gray-600 dark:text-[#9ca3af]">یا از منوی مرورگر (سه خط <i class="fas fa-bars ${grayIcon}"></i>) گزینه "Install" را پیدا کنید.</p>
-                    `;
-                }
-                break;
-            case 'Edge':
-            case 'Bing':
-                if (platform === 'Mobile' || platform === 'Tablet') {
-                    instructions = `
-                        <p><strong class="text-[#1d4ed8] dark:text-[#2563eb]">در مرورگر اج/بینگ (موبایل ${os}):</strong></p>
-                        <ol class="list-decimal list-inside text-sm leading-relaxed">
-                            <li>روی آیکون سه نقطه <i class="fas fa-ellipsis-h ${blueIcon}"></i> (منو) در پایین صفحه ضربه بزنید.</li>
-                            <li>گزینه "<strong>Add to phone</strong>" یا "<strong>Install app</strong>" را پیدا کرده و انتخاب کنید.</li>
-                        </ol>
-                    `;
-                } else {
-                    instructions = `
-                        <p><strong class="text-[#1d4ed8] dark:text-[#2563eb]">در مرورگر اج (دسکتاپ ${os}):</strong></p>
-                        <ol class="list-decimal list-inside text-sm leading-relaxed">
-                            <li>به دنبال آیکون "App available" <i class="fas fa-download ${blueIcon}"></i> یا دکمه "Install" در نوار آدرس مرورگر بگردید و روی آن کلیک کنید.</li>
-                            <li>در پنجره باز شده، روی "<strong>Install</strong>" کلیک کنید.</li>
-                        </ol>
-                        <p class="text-sm mt-2 text-gray-600 dark:text-[#9ca3af]">یا از منوی مرورگر (سه نقطه <i class="fas fa-ellipsis-h ${grayIcon}"></i>) گزینه "Apps" سپس "Install this site as an app" را پیدا کنید.</p>
-                    `;
-                }
-                break;
-            case 'Opera':
-                if (platform === 'Mobile' || platform === 'Tablet') {
-                    instructions = `
-                        <p><strong class="text-[#1d4ed8] dark:text-[#2563eb]">در مرورگر اپرا (موبایل ${os}):</strong></p>
-                        <p class="text-sm">معمولاً می‌توانید برنامه را از طریق منوی مرورگر (آیکون اپرا <i class="fab fa-opera ${blueIcon}"></i> یا سه خط <i class="fas fa-bars ${blueIcon}"></i>) و جستجوی گزینه‌هایی مانند "<strong>Add to Home Screen</strong>" یا "<strong>Install app</strong>" نصب کنید.</p>
-                    `;
-                } else {
-                    instructions = `
-                        <p><strong class="text-[#1d4ed8] dark:text-[#2563eb]">در مرورگر اپرا (دسکتاپ ${os}):</strong></p>
-                        <p class="text-sm">معمولاً می‌توانید برنامه را از طریق منوی مرورگر (آیکون اپرا <i class="fab fa-opera ${blueIcon}"></i>) و جستجوی گزینه‌هایی مانند "<strong>Install app</strong>" یا "<strong>Add to Home Screen</strong>" نصب کنید.</p>
-                    `;
-                }
-                break;
-            case 'Internet Explorer':
-                instructions = `
-                    <p><strong class="text-[#ef4444] dark:text-[#ef4444]">مرورگر شما، Internet Explorer، به طور کامل از نصب برنامه‌های PWA پشتیبانی نمی‌کند.</strong></p>
-                    <p class="text-sm mt-2 text-gray-700 dark:text-[#e5e7eb]">برای بهترین تجربه، لطفاً از یک مرورگر مدرن مانند کروم، فایرفاکس یا اج استفاده کنید.</p>
-                `;
-                break;
-            case 'Other':
-            default:
-                instructions = `
-                    <p><strong class="text-[#1d4ed8] dark:text-[#2563eb]">راهنمای نصب برای مرورگر شما (${browser} ${platform} ${os}):</strong></p>
-                    <p class="text-sm">معمولاً می‌توانید برنامه را از طریق منوی مرورگر (به دنبال آیکون سه نقطه <i class="fas fa-ellipsis-v ${blueIcon}"></i>، سه خط <i class="fas fa-bars ${blueIcon}"></i> یا آیکون اشتراک‌گذاری <i class="fas fa-share-alt ${blueIcon}"></i> بگردید) و جستجوی گزینه‌هایی مانند "<strong>Add to Home screen</strong>"، "<strong>Install app</strong>" یا "<strong>Install site</strong>" نصب کنید.</p>
-                    <p class="text-sm mt-2 text-gray-600 dark:text-[#9ca3af]">اگر از آیفون یا آیپد استفاده می‌کنید و مرورگر شما سافاری است، از دستورالعمل زیر پیروی کنید:</p>
-                    ${commonSafariiOS}
-                `;
-                break;
-        }
-
-        installInstructions.innerHTML = instructions;
-        installModal.classList.remove('hidden');
-    }
-
-    installAppLink.addEventListener('click', (e) => {
+// Share App Link (unchanged)
+const shareAppLink = document.getElementById('shareAppLink');
+if ('share' in navigator) {
+    shareAppLink.classList.remove('hidden');
+    shareAppLink.addEventListener('click', async (e) => {
         e.preventDefault();
-        getInstallInstructionsContent();
-    });
-
-    closeModalBtn.addEventListener('click', () => {
-        installModal.classList.add('hidden');
-    });
-    understoodBtn.addEventListener('click', () => {
-        installModal.classList.add('hidden');
-    });
-
-    installModal.addEventListener('click', (e) => {
-        if (e.target === installModal) {
-            installModal.classList.add('hidden');
+        try {
+            await navigator.share({
+                title: 'زای تسک',
+                text: 'برنامه مدیریت تسک‌ها را امتحان کنید!',
+                url: window.location.href
+            });
+            console.log('Action: Content shared successfully.');
+        } catch (error) {
+            console.error('Error sharing:', error);
         }
     });
-
-    if ('share' in navigator) {
-        shareAppLink.classList.remove('hidden');
-        shareAppLink.addEventListener('click', async (e) => {
-            e.preventDefault();
-            try {
-                await navigator.share({
-                    title: 'زای تسک',
-                    text: 'برنامه مدیریت تسک‌ها را امتحان کنید!',
-                    url: window.location.href
-                });
-                console.log('Action: Content shared successfully.');
-            } catch (error) {
-                console.error('Error sharing:', error);
-            }
-        });
-    } else {
-        shareAppLink.classList.add('hidden');
-        console.warn('Warning: Web Share API is not supported in this browser.');
-    }
-
-    window.addEventListener('appinstalled', () => {
-        console.log('Event: PWA was successfully installed (via native prompt).');
-        installAppLink.classList.add('hidden');
-    });
-
-});
+} else {
+    shareAppLink.classList.add('hidden');
+    console.warn('Warning: Web Share API is not supported in this browser.');
+}
