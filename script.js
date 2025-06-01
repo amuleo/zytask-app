@@ -11,12 +11,13 @@ let currentMotivationIndex = 0;
 let defaultCategories = []; // New array to store default categories
 
 const pointsPerNormalTask = 10;
-const pointsPerImportantTask = 25;
+const pointsPerImportantTask = 15;
 const MAX_CUSTOM_POINTS = 20;
 const TASKS_PER_PAGE = 7;
 const DEFAULT_TASK_MAXLENGTH = 30;
 const NOTE_TASK_MAXLENGTH = 55;
 const CATEGORY_NAME_MAXLENGTH = 15; // New constant for category name max length
+const MAX_CATEGORIES = 7; // New constant for maximum number of categories
 
 let activeCurrentPage = 1;
 let completedCurrentPage = 1;
@@ -24,14 +25,12 @@ let completedCurrentPage = 1;
 let isReorderingMode = false;
 let reorderingTaskId = null;
 
-// Removed deferredPrompt as it's no longer used for PWA installation prompt
-
 const levelPointsThresholds = [
     { name: 'نوب', points: 0, icon: 'fa-solid fa-ghost', motivational: 'شروع هر سفر با گام اول است. شما در ابتدای مسیر هستید و آماده برای کشف توانایی‌هایتان!' },
     { name: 'مبتدی', points: 50, icon: 'fa-solid fa-seedling', motivational: 'شما با تلاش و پشتکار، بذر موفقیت را کاشته‌اید. به رشد خود ادامه دهید!' },
     { name: 'جنگجو', points: 120, icon: 'fa-solid fa-hand-fist', motivational: 'شما با هر چallenge، قوی‌تر و مصمم‌تر می‌شوید. روحیه جنگجویانه شما ستودنی است!' },
-    { name: 'شوالیه', points: 220, icon: 'fa-solid fa-shield-halved', motivational: 'با هر وظیفه, زره‌ای از تجربه بر تن می‌کنید. شجاعت شما راهگشاست!' },
-    { level: 5, name: 'هیرو', points: 350, icon: 'fa-solid fa-mask', motivational: 'شما الهام‌بخش دیگران هستید. قدم‌هایتان ردپایی از موفقیت بر جای می‌گذارد!' },
+    { name: 'شوالیه', points: 220, icon: 'fa-solid fa-shield-halved', motivational: 'با هر وظیفه، زره‌ای از تجربه بر تن می‌کنید. شجاعت شما راهگشاست!' },
+    { name: 'هیرو', points: 350, icon: 'fa-solid fa-mask', motivational: 'شما الهام‌بخش دیگران هستید. قدم‌هایتان ردپایی از موفقیت بر جای می‌گذارد!' },
     { level: 6, name: 'استاد', points: 500, icon: 'fa-solid fa-graduation-cap', motivational: 'دانش و مهارت شما در حال شکوفایی است. از هر تجربه درسی بیاموزید!' },
     { level: 7, name: 'فرمانده', points: 700, icon: 'fa-solid fa-star', motivational: 'اکنون می‌توانید رهبری کنید و مسیر را برای دیگران هموار سازید. قدرت در دستان شماست!' },
     { level: 8, name: 'سلطان', points: 950, icon: 'fa-solid fa-crown', motivational: 'شما بر قلمرو وظایف خود مسلط شده‌اید. با اقتدار به سوی اهداف بزرگتر گام بردارید!' },
@@ -55,6 +54,11 @@ const achievementsData = [
     { level: 8, name: 'سلطان', points: 950, icon: 'fa-solid fa-crown', type: 'level', description: 'شما بر قلمرو وظایف خود مسلط شده‌اید. با اقتدار به سوی اهداف بزرگتر گام بردارید!' },
     { level: 9, name: 'کار درست', points: 1250, icon: 'fa-solid fa-dragon', type: 'level', description: 'شما به قدرتی بی‌نظیر دست یافته‌اید. هیچ مانعی جلودار شما نخواهد بود!' },
     { level: 10, name: 'خفن', points: 1600, icon: 'fa-solid fa-fire-alt', type: 'level', description: 'شما به یک ستاره درخشان تبدیل شده‌اید. انرژی و خلاقیت شما بی‌حد و مرز است و هر کاری را به بهترین شکل ممکن انجام می‌دهید!' },
+    { level: 11, name: 'جاودان', points: 2000, icon: 'fa-solid fa-infinity', type: 'level', description: 'پشتکار شما بی‌حد و مرز است. این مسیر، راهی برای جاودانگی دستاوردهای شماست!' },
+    { level: 12, name: 'کیهان‌سالار', points: 2500, icon: 'fa-solid fa-bolt', type: 'level', description: 'شما با سرعتی باورنکردنی در حال پیشرفت هستید. انرژی شما جهان را به حرکت درمی‌آورد!' },
+    { level: 13, name: 'کیهان‌نورد', points: 3000, icon: 'fa-solid fa-rocket', type: 'level', description: 'شما مرزها را درنوردیده‌اید و به سوی ناشناخته‌ها پرواز می‌کنید. آسمان حد شما نیست!' },
+    { level: 14, name: 'بتمن', points: 3600, icon: 'fa-solid fa-user-secret', type: 'level', description: 'شما در سایه‌ها نیز قدرتمندید. با هوش و اراده، هر مشکلی را حل می‌کنید!' },
+    { level: 15, name: 'سیگما', points: 4300, icon: 'fa-solid fa-chess-king', type: 'level', description: 'شما به اوج رسیده‌اید. با خرد و استراتژی، هر بازی را به نفع خود به پایان می‌رسانید!' },
     { type: 'totalTasks', value: 1, name: 'اولین قدم', icon: 'fa-solid fa-shoe-prints', description: 'اولین وظیفه خود را با موفقیت تکمیل کنید. هر سفر طولانی با یک قدم آغاز می‌شود!' },
     { type: 'totalTasks', value: 5, name: 'پنج ستاره', icon: 'fa-solid fa-star-half-stroke', description: 'با تکمیل ۵ وظیفه، نشان می‌دهید که در مسیر درستی هستید. به همین ترتیب ادامه دهید!' },
     { type: 'totalTasks', value: 10, name: 'ده وظیفه', icon: 'fa-solid fa-check-double', description: 'با تکمیل ۱۰ وظیفه، گام‌های محکم‌تری برداشته‌اید. این نشان از تعهد شماست و به شما کمک می‌کند تا به اهداف بزرگتر دست یابید.' },
@@ -559,15 +563,6 @@ function applyLevelTheme(currentLevel) {
     addTaskBtn.onmouseover = () => addTaskBtn.style.backgroundColor = currentThemeData.secondary;
     addTaskBtn.onmouseout = () => addTaskBtn.style.backgroundColor = currentThemeData.primary;
 
-    // Apply consistent styling to addNewTaskToCategoryBtn
-    addNewTaskToCategoryBtn.classList.remove('bg-blue-100', 'hover:bg-blue-200', 'dark:bg-blue-800', 'dark:hover:bg-blue-700', 'text-blue-800', 'dark:text-blue-100');
-    addNewTaskToCategoryBtn.classList.add('bg-blue-600', 'hover:bg-blue-700', 'dark:bg-blue-700', 'dark:hover:bg-blue-800', 'text-white');
-
-    // Apply consistent styling to addCategoryBtn
-    addCategoryBtn.classList.remove('bg-blue-100', 'hover:bg-blue-200', 'dark:bg-blue-800', 'dark:hover:bg-blue-700', 'text-blue-800', 'dark:text-blue-100');
-    addCategoryBtn.classList.add('bg-blue-600', 'hover:bg-blue-700', 'dark:bg-blue-700', 'dark:hover:bg-blue-800', 'text-white');
-
-
     progressBar.style.backgroundImage = `linear-gradient(to right, ${currentThemeData.primary}, ${currentThemeData.secondary})`;
 }
 
@@ -912,7 +907,7 @@ function renderTasks(focusTaskId = null) {
             } else {
                 const indexInCompletedList = completedTasks.findIndex(t => t.id === focusTaskId);
                 if (indexInCompletedList !== -1) {
-                    completedCurrentPage = Math.ceil((indexInCompletedList + 1) / TASKS_PER_PAGE);
+                    completedCurrentPage = 1;
                     if (completedTasksSection.classList.contains('hidden')) {
                         completedTasksSection.classList.remove('hidden');
                         toggleIcon.classList.add('rotate-180');
@@ -935,6 +930,36 @@ function renderTasks(focusTaskId = null) {
     const activeTasksToRender = activeTasks.slice(activeStartIndex, activeEndIndex);
 
     updateTaskListDOM(activeTaskList, activeTasksToRender, activeTasks.length === 0, 'اولین وظیفه فعال خود را ایجاد کنید!', isReorderingMode, reorderingTaskId, focusTaskId);
+
+            // --- شروع: کدهای جدید برای کنترل اسکرول دو وجهی (فعال/تکمیل شده) ---
+    // این کد باید بلافاصله بعد از فراخوانی updateTaskListDOM برای activeTaskList قرار گیرد.
+    if (!focusTaskId) { // اگر هیچ focusTaskId مشخصی وجود ندارد (یعنی از طریق صفحه‌بندی کلیک شده)
+        setTimeout(() => {
+            if (triggeredByListType === 'active') {
+                // اگر صفحه‌بندی برای وظایف فعال کلیک شده است
+                if (!completedTasksSection.classList.contains('hidden')) {
+                    completedTasksSection.classList.add('hidden'); // آکا دئسون را ببند
+                    toggleIcon.classList.remove('rotate-180'); // آیکون را بچرخان
+                }
+                // همیشه کل صفحه را به بالا اسکرول کن (با اسکرول نرم)
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else if (triggeredByListType === 'completed') {
+                // اگر صفحه‌بندی برای وظایف تکمیل شده کلیک شده است
+                // آکا دئسون باید باز بماند (نیازی به تغییر visibility نیست)
+                if (completedTasksContainer) {
+                    completedTasksContainer.scrollTo({ top: 0, behavior: 'smooth' }); // کانتینر آن را به بالا اسکرول کن (با اسکرول نرم)
+                }
+            }
+        }, 0); // 0ms delay, just to push it to the end of the event queue
+    } else {
+        // اگر focusTaskId وجود دارد (مثلاً وظیفه جدید اضافه شده یا بازگردانده شده)
+        // به سمت آن وظیفه خاص به صورت نرم اسکرول کن
+        const focusedTaskElement = document.getElementById(`task-${focusTaskId}`);
+        if (focusedTaskElement) {
+            focusedTaskElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+    // --- پایان: کدهای جدید برای کنترل اسکرول دو وجهی ---
 
     const completedTotalPages = Math.ceil(completedTasks.length / TASKS_PER_PAGE);
     if (completedCurrentPage > completedTotalPages && completedTotalPages > 0) {
@@ -968,13 +993,12 @@ function renderTasks(focusTaskId = null) {
 }
 
 function updateTaskListDOM(container, newTasks, isEmptyMessageNeeded, emptyMessageText, inReorderMode = false, reorderingTaskId = null, focusTaskId = null) {
-    const currentElements = Array.from(container.children).filter(child => child.classList.contains('task-item'));
-    const currentElementMap = new Map(currentElements.map(el => [el.dataset.id, el]));
-    const newTasksMap = new Map(newTasks.map(task => [task.id, task]));
+    const existingElements = Array.from(container.children).filter(child => child.classList.contains('task-item'));
+    const existingIds = new Set(existingElements.map(el => el.dataset.id));
+    const newIds = new Set(newTasks.map(task => task.id));
 
-    // 1. Handle removals (elements in DOM but not in newTasks)
-    currentElements.forEach(element => {
-        if (!newTasksMap.has(element.dataset.id)) {
+    existingElements.forEach(element => {
+        if (!newIds.has(element.dataset.id)) {
             element.style.transform = `translateX(-100vw)`;
             element.style.opacity = '0';
             element.addEventListener('transitionend', () => {
@@ -983,73 +1007,55 @@ function updateTaskListDOM(container, newTasks, isEmptyMessageNeeded, emptyMessa
         }
     });
 
-    // 2. Create/Update elements and prepare for insertion/reordering
-    const orderedElements = [];
+    const fragment = document.createDocumentFragment();
     newTasks.forEach(task => {
-        let taskElement = currentElementMap.get(task.id);
+        let taskElement = container.querySelector(`[data-id="${task.id}"]`);
         if (taskElement) {
-            // Update existing element's properties and classes
             const newElement = createTaskElement(task, false, inReorderMode, reorderingTaskId);
             taskElement.className = newElement.className;
-            taskElement.innerHTML = newElement.innerHTML; // Update inner content
+            const newCheckbox = newElement.querySelector('input[type="checkbox"]');
+            const existingCheckbox = taskElement.querySelector('input[type="checkbox"]');
+            if (newCheckbox && existingCheckbox) {
+                existingCheckbox.checked = task.completed;
+                existingCheckbox.disabled = newCheckbox.disabled;
+            } else if (!newCheckbox && existingCheckbox) {
+                existingCheckbox.remove();
+            } else if (newCheckbox && !existingCheckbox) {
+                taskElement.querySelector('.flex-grow').prepend(newCheckbox);
+            }
+
+            taskElement.querySelector('.task-name').textContent = task.name;
+            taskElement.querySelector('.task-name-wrapper').innerHTML = newElement.querySelector('.task-name-wrapper').innerHTML;
+            taskElement.querySelector('.task-importance-display').className = newElement.querySelector('.task-importance-display').className;
+            taskElement.querySelector('.task-importance-display').textContent = newElement.querySelector('.task-importance-display').textContent;
+            const existingActionButtons = taskElement.querySelector('.flex.items-center.space-x-2.space-x-reverse.mr-2');
+            if (existingActionButtons) {
+                existingActionButtons.innerHTML = newElement.querySelector('.flex.items-center.space-x-2.space-x-reverse.mr-2').innerHTML;
+            }
         } else {
-            // Create new element (with initial animation classes if applicable)
             taskElement = createTaskElement(task, true, inReorderMode, reorderingTaskId);
         }
-        orderedElements.push(taskElement);
+        fragment.appendChild(taskElement);
     });
 
-    // 3. Perform DOM reordering/insertion
-    let currentDOMNode = container.firstElementChild;
-    let orderedElementsIndex = 0;
+    container.innerHTML = '';
+    container.appendChild(fragment);
 
-    while (orderedElementsIndex < orderedElements.length || currentDOMNode) {
-        const desiredNode = orderedElements[orderedElementsIndex];
-
-        // Skip non-task-item children (like empty messages or pagination controls)
-        while (currentDOMNode && !currentDOMNode.classList.contains('task-item')) {
-            currentDOMNode = currentDOMNode.nextElementSibling;
-        }
-
-        if (desiredNode && currentDOMNode === desiredNode) {
-            // Node is already in correct place and is the desired one
-            currentDOMNode = currentDOMNode.nextElementSibling;
-            orderedElementsIndex++;
-        } else if (desiredNode && (!currentDOMNode || currentDOMNode.dataset.id !== desiredNode.dataset.id)) {
-            // Desired node is not in place or is a new node. Insert it.
-            if (currentDOMNode) {
-                container.insertBefore(desiredNode, currentDOMNode);
-            } else {
-                container.appendChild(desiredNode);
-            }
-            orderedElementsIndex++;
-        } else if (currentDOMNode && !newTasksMap.has(currentDOMNode.dataset.id)) {
-            // Current DOM node is an old element that is being removed. Skip it.
-            currentDOMNode = currentDOMNode.nextElementSibling;
-            // The element.remove() will handle its actual removal after transition.
-        } else {
-            // This case should ideally not happen if logic is perfect, but could be a leftover or error.
-            // For safety, just advance.
-            currentDOMNode = currentDOMNode.nextElementSibling;
-        }
-    }
-
-    // Handle empty message visibility (should be appended/removed independently)
-    const currentNoMessage = container.querySelector('#dynamicNoActiveMessage, #dynamicNoCompletedMessage');
+    const existingNoMessage = container.querySelector('#dynamicNoActiveMessage, #dynamicNoCompletedMessage');
     if (isEmptyMessageNeeded) {
-        if (!currentNoMessage) {
+        if (!existingNoMessage) {
             const noItem = document.createElement('div');
             noItem.id = container.id === 'activeTaskList' ? 'dynamicNoActiveMessage' : 'dynamicNoCompletedMessage';
             noItem.className = 'text-gray-500 dark:text-gray-400 text-center py-4';
-            container.appendChild(noItem); // Append at the end of task items
+            noItem.textContent = emptyMessageText;
+            container.appendChild(noItem);
         }
     } else {
-        if (currentNoMessage) {
-            currentNoMessage.remove();
+        if (existingNoMessage) {
+            existingNoMessage.remove();
         }
     }
 
-    // Focus and highlight logic (remains the same)
     if (focusTaskId) {
         const taskElement = document.querySelector(`.task-item[data-id="${focusTaskId}"]`);
         if (taskElement) {
@@ -1077,6 +1083,7 @@ function renderPaginationControls(containerElement, totalItems, currentPage, lis
         containerElement.innerHTML = '';
         return;
     } else {
+        // اطمینان از اینکه بخش تکمیل شده پنهان نیست اگر لیست از نوع تکمیل شده باشد
         if (listType === 'completed' && completedTasksSection.classList.contains('hidden')) {
             containerElement.classList.add('hidden');
             containerElement.innerHTML = '';
@@ -1088,6 +1095,7 @@ function renderPaginationControls(containerElement, totalItems, currentPage, lis
     containerElement.innerHTML = '';
     containerElement.classList.add('flex', 'flex-wrap', 'justify-center', 'items-center', 'gap-2', 'my-4');
 
+    // دکمه قبلی
     const prevBtn = document.createElement('button');
     prevBtn.className = `p-1 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`;
     prevBtn.innerHTML = `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>`;
@@ -1096,13 +1104,19 @@ function renderPaginationControls(containerElement, totalItems, currentPage, lis
     prevBtn.addEventListener('click', () => {
         if (listType === 'active') {
             activeCurrentPage = Math.max(1, activeCurrentPage - 1);
+            // NEW: Close completed tasks section immediately for active task pagination
+            if (!completedTasksSection.classList.contains('hidden')) {
+                completedTasksSection.classList.add('hidden');
+                toggleIcon.classList.remove('rotate-180');
+            }
         } else {
             completedCurrentPage = Math.max(1, completedCurrentPage - 1);
         }
-        renderTasks();
+        renderTasks(null, listType); // فراخوانی renderTasks با listType
     });
     containerElement.appendChild(prevBtn);
 
+    // تابع کمکی برای ایجاد دکمه‌های صفحه
     const createPageButton = (pageNumber, isActive = false) => {
         const button = document.createElement('button');
         button.className = `px-3 py-1 rounded-full text-sm font-semibold transition duration-200 ease-in-out
@@ -1113,10 +1127,15 @@ function renderPaginationControls(containerElement, totalItems, currentPage, lis
         button.addEventListener('click', () => {
             if (listType === 'active') {
                 activeCurrentPage = pageNumber;
+                // NEW: Close completed tasks section immediately for active task pagination
+                if (!completedTasksSection.classList.contains('hidden')) {
+                    completedTasksSection.classList.add('hidden');
+                    toggleIcon.classList.remove('rotate-180');
+                }
             } else {
                 completedCurrentPage = pageNumber;
             }
-            renderTasks();
+            renderTasks(null, listType); // فراخوانی renderTasks با listType
         });
         return button;
     };
@@ -1130,6 +1149,7 @@ function renderPaginationControls(containerElement, totalItems, currentPage, lis
 
     let startPage, endPage;
 
+    // منطق نمایش دکمه‌های صفحه (برای نمایش حداکثر maxPageButtons دکمه)
     if (totalPages <= maxPageButtons) {
         startPage = 1;
         endPage = totalPages;
@@ -1148,6 +1168,7 @@ function renderPaginationControls(containerElement, totalItems, currentPage, lis
         }
     }
 
+    // اضافه کردن دکمه صفحه اول و سه نقطه (در صورت نیاز)
     if (startPage > 1) {
         containerElement.appendChild(createPageButton(1));
         if (startPage > 2) {
@@ -1155,10 +1176,12 @@ function renderPaginationControls(containerElement, totalItems, currentPage, lis
         }
     }
 
+    // اضافه کردن دکمه‌های صفحه میانی
     for (let i = startPage; i <= endPage; i++) {
         containerElement.appendChild(createPageButton(i, i === currentPage));
     }
 
+    // اضافه کردن سه نقطه و دکمه صفحه آخر (در صورت نیاز)
     if (endPage < totalPages) {
         if (endPage < totalPages - 1) {
             containerElement.appendChild(createEllipsis());
@@ -1166,6 +1189,7 @@ function renderPaginationControls(containerElement, totalItems, currentPage, lis
         containerElement.appendChild(createPageButton(totalPages));
     }
 
+    // دکمه بعدی
     const nextBtn = document.createElement('button');
     nextBtn.className = `p-1 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400 ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`;
     nextBtn.innerHTML = `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>`;
@@ -1174,13 +1198,19 @@ function renderPaginationControls(containerElement, totalItems, currentPage, lis
     nextBtn.addEventListener('click', () => {
         if (listType === 'active') {
             activeCurrentPage = Math.min(totalPages, activeCurrentPage + 1);
+            // NEW: Close completed tasks section immediately for active task pagination
+            if (!completedTasksSection.classList.contains('hidden')) {
+                completedTasksSection.classList.add('hidden');
+                toggleIcon.classList.remove('rotate-180');
+            }
         } else {
             completedCurrentPage = Math.min(totalPages, completedCurrentPage + 1);
         }
-        renderTasks();
+        renderTasks(null, listType); // فراخوانی renderTasks با listType
     });
     containerElement.appendChild(nextBtn);
 }
+
 
 function renderAchievementsIntoModal() {
     achievementsModalBody.innerHTML = '';
@@ -1238,32 +1268,31 @@ function renderAchievementsIntoModal() {
         noAchievementsMessage.className = 'text-gray-500 dark:text-gray-400 text-center col-span-full py-4';
         noAchievementsMessage.textContent = 'هنوز دستاوردی کسب نشده است.';
         achievementsModalBody.appendChild(noAchievementsMessage);
-        return; // Exit early if no achievements
+    } else {
+        sortedAchievements.forEach(achievement => {
+            const achievementItem = document.createElement('div');
+            const isAchieved = unlockedAchievements.includes(achievement.name);
+
+            achievementItem.className = `achievement-item-card ${isAchieved ? '' : 'unachieved'}`;
+
+            achievementItem.innerHTML = `
+                <i class="${isAchieved ? achievement.icon : 'fa-solid fa-lock'} icon"></i>
+                <span class="name">${achievement.name}</span>
+                `;
+
+             if (isAchieved) {
+                achievementItem.addEventListener('click', () => {
+                    if (achievement.type === 'level') {
+                        showDetailModal(achievement.type, achievement.name);
+                    } else {
+                        showDetailModal('achievement', achievement.name);
+                    }
+                });
+            }
+
+            achievementsModalBody.appendChild(achievementItem);
+        });
     }
-
-    sortedAchievements.forEach(achievement => {
-        const achievementItem = document.createElement('div');
-        const isAchieved = unlockedAchievements.includes(achievement.name);
-
-        achievementItem.className = `achievement-item-card ${isAchieved ? '' : 'unachieved'}`;
-
-        achievementItem.innerHTML = `
-            <i class="${isAchieved ? achievement.icon : 'fa-solid fa-lock'} icon"></i>
-            <span class="name">${achievement.name}</span>
-            `;
-
-         if (isAchieved) {
-            achievementItem.addEventListener('click', () => {
-                if (achievement.type === 'level') {
-                    showDetailModal(achievement.type, achievement.name);
-                } else {
-                    showDetailModal('achievement', achievement.name);
-                }
-            });
-        }
-
-        achievementsModalBody.appendChild(achievementItem);
-    });
 }
 
 addTaskBtn.addEventListener('click', () => {
@@ -1399,17 +1428,12 @@ function toggleTaskCompletion(taskId, taskItemElement) {
             }
             zPoint += pointsGained;
             showMessageBox('وظیفه تکمیل شد!', 'success');
-            showPointsGainFeedback(pointsGained, taskItemElement); // Show animation
+            showPointsGainFeedback(pointsGained, taskItemElement);
 
-            // Remove task from its current position
-            tasks.splice(taskIndex, 1);
-            // Add task to the beginning of the completed tasks section
-            // Find the first completed task's index to insert before it
-            let insertIndex = tasks.findIndex(t => t.completed);
-            if (insertIndex === -1) { // No completed tasks yet, add to end of active
-                insertIndex = tasks.length;
-            }
-            tasks.splice(insertIndex, 0, task);
+            // Insert at the beginning of the completed tasks section
+            const active = tasks.filter(t => !t.completed);
+            const completed = tasks.filter(t => t.completed);
+            tasks = [...active, task, ...completed]; // Insert 'task' at the beginning of completed section
             focusAfterRender = task.id;
 
         } else {
@@ -1426,14 +1450,23 @@ function toggleTaskCompletion(taskId, taskItemElement) {
             zPoint -= pointsDeducted;
             if (zPoint < 0) zPoint = 0;
 
-            task.completed = false;
-            task.isPinned = false; // Ensure it's not pinned when restored
-            task.pinnedAt = null;
+            // Create a new task to simulate "restoring" to active list
+            // This creates a new ID, ensuring it's treated as a new active task at the end
+            const newActiveTask = {
+                id: Date.now().toString(),
+                name: task.name,
+                completed: false,
+                importance: task.importance,
+                customPoints: task.customPoints,
+                isPinned: false,
+                pinnedAt: null
+            };
 
-            // Remove task from its current position
+            // Remove the old completed task
             tasks.splice(taskIndex, 1);
-            tasks.push(task);
-            focusAfterRender = task.id;
+            // Add the new active task to the end of the list
+            tasks.push(newActiveTask);
+            focusAfterRender = newActiveTask.id;
 
             showMessageBox(`وظیفه بازنشانی شد!`, 'success');
         }
@@ -1490,10 +1523,6 @@ function showTaskActionsMenu(taskId, buttonElement, isCompletedTask) {
                     <i class="fa-solid fa-undo ml-2"></i>
                     برگرداندن یادداشت
                 </button>
-                <button data-action="delete-task">
-                    <i class="fa-solid fa-trash-can ml-2"></i>
-                    حذف
-                </button>
             `;
         } else {
             // Menu for active notes
@@ -1501,6 +1530,10 @@ function showTaskActionsMenu(taskId, buttonElement, isCompletedTask) {
                 <button data-action="edit-task">
                     <i class="fa-solid fa-pen ml-2"></i>
                     ویرایش
+                </button>
+				<button data-action="${task.isPinned ? 'unpin-task' : 'pin-task'}">
+                    <i class="fa-solid fa-thumbtack ml-2 ${task.isPinned ? 'fa-rotate-90' : ''}"></i>
+                    ${task.isPinned ? 'برداشتن پین' : 'پین کردن'}
                 </button>
                 <button data-action="strike-through-note">
                     <i class="fa-solid fa-strikethrough ml-2"></i>
@@ -1523,10 +1556,6 @@ function showTaskActionsMenu(taskId, buttonElement, isCompletedTask) {
                 <button data-action="copy-task">
                     <i class="fa-solid fa-copy ml-2"></i>
                     کپی
-                </button>
-                <button data-action="delete-task">
-                    <i class="fa-solid fa-trash-can ml-2"></i>
-                    حذف
                 </button>
             `;
         } else {
@@ -1694,18 +1723,14 @@ function strikeThroughNote(taskId) {
             task.completed = true;
             task.isPinned = false; // Notes are unpinned when struck through
             task.pinnedAt = null;
-
-            // Remove task from its current position
+            // Remove from current position
             tasks.splice(taskIndex, 1);
-            // Add task to the beginning of the completed tasks section
-            let insertIndex = tasks.findIndex(t => t.completed);
-            if (insertIndex === -1) {
-                insertIndex = tasks.length;
-            }
-            tasks.splice(insertIndex, 0, task);
-
+            // Insert at the beginning of the completed tasks section
+            const active = tasks.filter(t => !t.completed);
+            const completed = tasks.filter(t => t.completed);
+            tasks = [...active, task, ...completed]; // Insert 'task' at the beginning of completed section
+			
             saveToLocalStorage();
-            activeCurrentPage = 1; // Go to first page of active tasks
             renderTasks(taskId); // Re-render and focus on the task in its new location
             showMessageBox(`یادداشت "${truncateText(task.name, 15)}" خط خورد.`, 'success');
         }
@@ -1720,11 +1745,10 @@ function restoreNote(taskId) {
             task.completed = false;
             task.isPinned = false; // Ensure it's not pinned when restored
             task.pinnedAt = null;
-
-            // Remove task from its current position
-            tasks.splice(taskIndex, 1);
-            tasks.push(task);
-
+            // Remove the note from its current position (completed section)
+            const restoredNote = tasks.splice(taskIndex, 1)[0];
+            // Add it to the end of the active tasks (which means end of the overall tasks array)
+            tasks.push(restoredNote);
             saveToLocalStorage();
             renderTasks(taskId); // Re-render and focus on the task in its new location
             showMessageBox(`یادداشت "${truncateText(task.name, 15)}" بازگردانی شد.`, 'info');
@@ -2235,6 +2259,17 @@ helpMenuItem.addEventListener('click', (e) => {
             <strong class="text-gray-600 dark:text-gray-300">۷. مشاهده وظایف تکمیل شده:</strong>
             برای نمایش یا پنهان کردن لیست وظایف تکمیل شده، روی دکمه "وظایف تکمیل شده" در پایین صفحه کلیک کنید.
         </p>
+        <p class="semi-formal-text">
+            <strong class="text-gray-600 dark:text-gray-300">۸. مدیریت دسته‌های پیش‌فرض:</strong>
+            از طریق منوی اصلی (آیکون سه نقطه در بالا سمت چپ) و انتخاب "دسته‌ها"، می‌توانید دسته‌های وظایف خود را مدیریت کنید.
+            <ul class="list-disc list-inside mt-2 mb-2 text-justify">
+                <li class="semi-formal-text"><strong class="text-blue-600 dark:text-blue-300">افزودن دسته:</strong> می‌توانید دسته‌های جدیدی با نام دلخواه (حداکثر ${CATEGORY_NAME_MAXLENGTH} کاراکتر) ایجاد کنید. حداکثر تعداد دسته‌ها ${MAX_CATEGORIES} عدد است.</li>
+                <li class="semi-formal-text"><strong class="text-yellow-600 dark:text-yellow-300">ویرایش دسته:</strong> برای ویرایش نام دسته یا افزودن/حذف وظایف از آن، روی آیکون سه نقطه کنار دسته کلیک کرده و "ویرایش" را انتخاب کنید. توجه داشته باشید که وظایف داخل دسته‌ها نمی‌توانند از نوع "سفارشی" باشند و نام آن‌ها نباید خالی باشد.</li>
+                <li class="semi-formal-text"><strong class="text-green-600 dark:text-green-300">افزودن وظایف از دسته:</strong> با کلیک بر روی آیکون سه نقطه کنار دسته و انتخاب "افزودن وظایف"، می‌توانید وظایف موجود در آن دسته را به لیست وظایف فعال خود اضافه کنید.</li>
+                <li class="semi-formal-text"><strong class="text-red-600 dark:text-red-300">حذف دسته:</strong> برای حذف یک دسته، روی آیکون سه نقطه کنار آن کلیک کرده و "حذف" را انتخاب کنید.</li>
+            </ul>
+        </p>
+
 
         <h3 class="text-xl sm:text-2xl font-bold mb-2 mt-4 help-heading-blue">سیستم گیمیفیکیشن</h3> <p class="semi-formal-text">
             <strong class="text-gray-600 dark:text-gray-300">پوینت:</strong>
@@ -2348,7 +2383,7 @@ aboutMenuItem.addEventListener('click', (e) => {
         </div>
         <p class="mb-3 text-justify">این پروژه با توکل به خدا و با هدف خدمت‌رسانی ارائه شده است؛ باشد که مورد پذیرش او قرار گیرد.</p>
         <p class="mb-3 text-justify">تمامی حقوق متعلق به <strong class="text-gray-600 dark:text-gray-300"><a href="https://amuleo.ir" target="_blank" rel="noopener noreferrer">عمو لئو</a></strong> است.</p>
-        <p class="semi-formal-text">تاریخ: 10 خرداد ۱۴۰۴</p>
+        <p class="semi-formal-text">تاریخ: 11 خرداد ۱۴۰۴</p>
     `;
 });
 
@@ -2673,7 +2708,7 @@ importDataBtn.addEventListener('click', () => {
                         name: typeof category.name === 'string' ? category.name : 'دسته نامشخص',
                         tasks: Array.isArray(category.tasks) ? category.tasks.map(task => ({
                             name: typeof task.name === 'string' ? task.name : 'وظیفه نامشخص',
-                            importance: typeof task.importance === 'string' && ['important', 'normal', 'custom', 'note'].includes(task.importance) ? task.importance : 'normal',
+                            importance: typeof task.importance === 'string' && ['important', 'normal', 'custom', 'note'].includes(task.importance) ? task.importance : 'normal', // Custom not allowed for category tasks
                             customPoints: typeof task.customPoints === 'number' ? task.customPoints : undefined,
                         })) : []
                     }));
@@ -2851,6 +2886,10 @@ addCategoryBtn.addEventListener('click', () => {
         showMessageBox('دسته‌ای با این نام از قبل وجود دارد.', 'info');
         return;
     }
+    if (defaultCategories.length >= MAX_CATEGORIES) { // Check for max categories
+        showMessageBox(`شما نمی‌توانید بیش از ${MAX_CATEGORIES} دسته اضافه کنید.`, 'info');
+        return;
+    }
 
     const newCategory = {
         id: Date.now().toString(),
@@ -2880,10 +2919,11 @@ function renderDefaultCategories() {
     defaultCategories.forEach(category => {
         const categoryItem = document.createElement('div');
         categoryItem.className = 'flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm mb-2';
+        // Changed to use a menu button for category actions
         categoryItem.innerHTML = `
             <span class="text-lg font-medium text-gray-800 dark:text-gray-100">${category.name}</span>
             <div class="flex items-center space-x-2 space-x-reverse mr-2">
-                <button data-id="${category.id}" data-action="menu"
+                <button data-id="${category.id}" data-action="category-menu"
                     class="three-dot-menu-btn bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 100-2 1 1 0 000 2zm0 7a1 1 0 100-2 1 1 0 000 2zm0 7a1 1 0 100-2 1 1 0 000 2z"></path>
@@ -2892,18 +2932,21 @@ function renderDefaultCategories() {
             </div>
         `;
         defaultCategoriesList.appendChild(categoryItem);
+    });
 
-        categoryItem.querySelector('[data-action="menu"]').addEventListener('click', (e) => {
-            showCategoryActionsMenu(category.id, e.currentTarget);
+    defaultCategoriesList.querySelectorAll('button[data-action="category-menu"]').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const categoryId = e.currentTarget.dataset.id;
+            showCategoryActionsMenu(categoryId, e.currentTarget);
         });
     });
 }
 
 function showCategoryActionsMenu(categoryId, buttonElement) {
-    document.querySelectorAll('.category-action-menu').forEach(menu => menu.remove());
+    document.querySelectorAll('.task-action-menu').forEach(menu => menu.remove()); // Reuse task-action-menu class for styling
 
     const menu = document.createElement('div');
-    menu.className = 'category-action-menu task-action-menu'; // Use task-action-menu styles
+    menu.className = 'task-action-menu'; // Using existing style
     menu.style.position = 'absolute';
     menu.style.zIndex = '100';
     menu.style.visibility = 'hidden';
@@ -2911,15 +2954,15 @@ function showCategoryActionsMenu(categoryId, buttonElement) {
     document.body.appendChild(menu);
 
     menu.innerHTML = `
-        <button data-action="add-tasks-from-category">
+        <button data-action="add-tasks-from-category" data-id="${categoryId}">
             <i class="fa-solid fa-plus ml-2"></i>
-            افزودن وظایف از دسته
+            افزودن وظایف
         </button>
-        <button data-action="edit-category">
+        <button data-action="edit-category" data-id="${categoryId}">
             <i class="fa-solid fa-pen ml-2"></i>
             ویرایش دسته
         </button>
-        <button data-action="delete-category">
+        <button data-action="delete-category" data-id="${categoryId}">
             <i class="fa-solid fa-trash-can ml-2"></i>
             حذف دسته
         </button>
@@ -2943,6 +2986,7 @@ function showCategoryActionsMenu(categoryId, buttonElement) {
     // Adjust if menu goes off screen to the bottom
     if (menuTop + menu.offsetHeight > window.innerHeight + window.scrollY - padding) {
         menuTop = rect.top + window.scrollY - menu.offsetHeight - 5;
+        // If it still goes off screen to the top, position at top-left of viewport
         if (menuTop < padding + window.scrollY) {
             menuTop = padding + window.scrollY;
         }
@@ -2954,31 +2998,28 @@ function showCategoryActionsMenu(categoryId, buttonElement) {
 
     menu.addEventListener('click', (e) => {
         const action = e.target.closest('button')?.dataset.action;
+        const id = e.target.closest('button')?.dataset.id;
         if (action) {
             menu.remove();
-            document.removeEventListener('click', closeCategoryMenu);
+            document.removeEventListener('click', closeMenu);
             if (action === 'add-tasks-from-category') {
-                showAddCategoryTasksModal(categoryId);
+                showAddCategoryTasksModal(id);
             } else if (action === 'edit-category') {
-                showEditCategoryModal(categoryId);
+                showEditCategoryModal(id);
             } else if (action === 'delete-category') {
-                deleteCategory(categoryId);
+                deleteCategory(id);
             }
         }
     });
 
-    const closeCategoryMenu = (e) => {
-        const isInteractiveElement = e.target.closest('input, select, button, [type="checkbox"]');
-        if (!menu.contains(e.target) && !buttonElement.contains(e.target) && !isInteractiveElement) {
+    const closeMenu = (e) => {
+        if (!menu.contains(e.target) && !buttonElement.contains(e.target)) {
             menu.remove();
-            document.removeEventListener('click', closeCategoryMenu);
-        } else if (isInteractiveElement && !menu.contains(e.target)) {
-            menu.remove();
-            document.removeEventListener('click', closeCategoryMenu);
+            document.removeEventListener('click', closeMenu);
         }
     };
     setTimeout(() => {
-        document.addEventListener('click', closeCategoryMenu);
+        document.addEventListener('click', closeMenu);
     }, 50);
 }
 
@@ -3043,6 +3084,7 @@ function addTasksFromCategory(categoryId) {
 
     const checkboxes = categoryTasksInputContainer.querySelectorAll('input[type="checkbox"]:checked');
     let addedCount = 0;
+    let firstAddedTaskId = null; // متغیری برای ذخیره ID اولین وظیفه اضافه شده
 
     checkboxes.forEach(checkbox => {
         const taskIndex = parseInt(checkbox.dataset.index, 10);
@@ -3059,13 +3101,17 @@ function addTasksFromCategory(categoryId) {
                 pinnedAt: null
             };
             tasks.push(newTask);
+            if (firstAddedTaskId === null) { // ID اولین وظیفه اضافه شده را ذخیره کن
+                firstAddedTaskId = newTask.id;
+            }
             addedCount++;
         }
     });
 
     if (addedCount > 0) {
         saveToLocalStorage();
-        renderTasks();
+        // ID اولین وظیفه اضافه شده را به renderTasks ارسال کن
+        renderTasks(firstAddedTaskId);
         showMessageBox(`${addedCount} وظیفه از دسته "${category.name}" اضافه شد!`, 'success');
     } else {
         showMessageBox('هیچ وظیفه‌ای برای اضافه کردن انتخاب نشده بود.', 'info');
@@ -3076,7 +3122,6 @@ function addTasksFromCategory(categoryId) {
     setTimeout(() => {
         addCategoryTasksModal.classList.add('hidden');
     }, 50);
-    showDefaultCategoriesModal(); // Return to default categories modal
 }
 
 function showEditCategoryModal(categoryId) {
@@ -3141,16 +3186,16 @@ addNewTaskToCategoryBtn.addEventListener('click', () => {
             customPoints = parseInt(convertedPoints, 10);
         }
         currentTasksInInputs.push({ name: taskName, importance, customPoints });
-    });
+});
 
-    // Add the new empty task to this captured array
+// Add the new empty task to this captured array
     currentTasksInInputs.push({
         name: '',
         importance: 'normal',
         customPoints: undefined
     });
-
-    // Update the category's tasks and re-render
+	
+	// Update the category's tasks and re-render
     category.tasks = currentTasksInInputs;
     renderEditCategoryTasks(category.tasks);
     // Focus on the newly added input field
@@ -3206,15 +3251,14 @@ saveEditedCategoryBtn.addEventListener('click', () => {
             return;
         }
 
-        if (importance === 'custom') {
-            const convertedPoints = convertPersianNumbersToEnglish(customPointsInput.value); // Corrected typo here
-            customPoints = parseInt(convertedPoints, 10);
-            if (isNaN(customPoints) || customPoints <= 0 || customPoints > MAX_CUSTOM_POINTS) {
-                showMessageBox(`لطفاً یک مقدار پوینت سفارشی معتبر (حداکثر ${MAX_CUSTOM_POINTS}) برای وظایف دسته وارد کنید.`, 'info');
-                hasError = true;
-                return;
-            }
+        if (importance === 'custom') { // Custom tasks are not allowed in categories
+            showMessageBox('وظایف سفارشی در دسته‌ها مجاز نیستند.', 'error');
+            hasError = true;
+            return;
         }
+        // If importance is not custom, customPoints should be undefined
+        customPoints = undefined;
+
         updatedTasks.push({ name: taskName, importance, customPoints });
     });
 
@@ -3258,11 +3302,10 @@ function renderEditCategoryTasks(tasksInCategories) {
                 <select class="flex-grow p-2 border rounded-lg text-sm text-gray-700 dark:text-gray-100 bg-white dark:bg-gray-700 appearance-none text-right">
                     <option value="important" ${task.importance === 'important' ? 'selected' : ''}>مهم</option>
                     <option value="normal" ${task.importance === 'normal' ? 'selected' : ''}>عادی</option>
-                    <option value="custom" ${task.importance === 'custom' ? 'selected' : ''}>سفارشی</option>
                     <option value="note" ${task.importance === 'note' ? 'selected' : ''}>یادداشت</option>
                 </select>
                 <input type="number" value="${task.customPoints || ''}" placeholder="پوینت" min="1" max="${MAX_CUSTOM_POINTS}"
-                       class="w-20 p-2 border rounded-lg text-sm text-gray-700 dark:text-gray-100 bg-white dark:bg-gray-700 text-right ${task.importance === 'custom' ? '' : 'hidden'}">
+                       class="w-20 p-2 border rounded-lg text-sm text-gray-700 dark:text-gray-100 bg-white dark:bg-gray-700 text-right hidden">
             </div>
         `;
         editCategoryTasksContainer.appendChild(taskDiv);
@@ -3272,41 +3315,20 @@ function renderEditCategoryTasks(tasksInCategories) {
         const taskNameInput = taskDiv.querySelector('input[type="text"]');
 
         importanceSelectElement.addEventListener('change', (e) => {
-            if (e.target.value === 'custom') {
-                customPointsInput.classList.remove('hidden');
-                customPointsInput.focus();
-            } else {
-                customPointsInput.classList.add('hidden');
-                customPointsInput.value = '';
-            }
+            // Custom option removed, so no need to show/hide customPointsInput based on select value
+            // Ensure customPointsInput remains hidden
+            customPointsInput.classList.add('hidden');
+            customPointsInput.value = '';
+
             taskNameInput.setAttribute('maxlength', e.target.value === 'note' ? NOTE_TASK_MAXLENGTH : DEFAULT_TASK_MAXLENGTH);
         });
 
         taskDiv.querySelector('[data-action="delete-task-from-category"]').addEventListener('click', (e) => {
             const category = defaultCategories.find(cat => cat.id === currentCategoryBeingEditedId);
             if (category) {
-                // Capture current values before splicing
-                const currentTasksInInputs = [];
-                const taskItems = editCategoryTasksContainer.querySelectorAll('.category-task-item');
-                taskItems.forEach((item, itemIndex) => {
-                    if (itemIndex !== index) { // Skip the one being deleted
-                        const nameInput = item.querySelector('input[type="text"]');
-                        const importanceSelectElement = item.querySelector('select');
-                        const customPointsInput = item.querySelector('input[type="number"]');
-
-                        const taskName = nameInput.value.trim();
-                        const importance = importanceSelectElement.value;
-                        let customPoints = undefined;
-
-                        if (importance === 'custom') {
-                            const convertedPoints = convertPersianNumbersToEnglish(customPointsInput.value);
-                            customPoints = parseInt(convertedPoints, 10);
-                        }
-                        currentTasksInInputs.push({ name: taskName, importance, customPoints });
-                    }
-                });
-                category.tasks = currentTasksInInputs; // Update the category's tasks
-                renderEditCategoryTasks(category.tasks); // Re-render with updated tasks
+                const taskIndexToDelete = parseInt(e.currentTarget.dataset.index, 10);
+                category.tasks.splice(taskIndexToDelete, 1);
+                renderEditCategoryTasks(category.tasks); // Re-render to update indices and display
                 showMessageBox('وظیفه از دسته حذف شد.', 'info');
             }
         });
@@ -3356,8 +3378,10 @@ window.onload = function () {
 // PWA Installation Logic - MODIFIED
 const installAppLink = document.getElementById('installAppLink');
 
-// Removed window.addEventListener('beforeinstallprompt', ...)
-// Removed deferredPrompt variable and related logic
+// Remove deferredPrompt and related event listeners as per new requirement
+// let deferredPrompt = null;
+// window.addEventListener('beforeinstallprompt', (e) => { ... });
+// window.addEventListener('appinstalled', () => { ... });
 
 installAppLink.addEventListener('click', async (e) => {
     e.preventDefault();
@@ -3365,17 +3389,18 @@ installAppLink.addEventListener('click', async (e) => {
 
     if (navigator.onLine) {
         // User is online, redirect to zytask.ir/insapp
-        window.open('https://zytask.ir/insapp', '_blank');
+        window.location.href = 'https://zytask.ir/insapp';
     } else {
         // User is offline, show message
-        showMessageBox('برای نصب، آنلاین شوید.', 'info', {
+        showMessageBox('لطفاً به اینترنت متصل شوید.', 'info', {
             position: 'bottom-center',
-            duration: 3000 // Shorter duration for simplified message
+            duration: 7000,
+            link: null, // No link for offline message
+            linkText: ''
         });
     }
 });
 
-// Removed window.addEventListener('appinstalled', ...) as it's for PWA native prompt
 
 // Service Worker registration logic (unchanged from previous version)
 if ('serviceWorker' in navigator) {
