@@ -2439,8 +2439,7 @@ confirmUpdateBtn.addEventListener('click', async () => {
     if ('serviceWorker' in navigator) {
         try {
             const registration = await navigator.serviceWorker.getRegistration();
-            if (registration) {
-				 registration = await navigator.serviceWorker.ready;
+            if (registration && registration.active) {
                 showMessageBox('بروزرسانی برنامه آغاز شد. لطفاً صبر کنید...', 'info');
                 // Send message to service worker to start deep update
                 registration.active.postMessage({ type: 'START_DEEP_UPDATE' });
@@ -2456,7 +2455,7 @@ confirmUpdateBtn.addEventListener('click', async () => {
                 // Fallback if no active service worker found
                 const registrations = await navigator.serviceWorker.getRegistrations();
                 await Promise.all(registrations.map(reg => reg.unregister())); // Unregister all existing service workers
-                showMessageBox('Service Worker یافت نشد یا غیرفعال بود. کش مرورگر پاک شده و صفحه مجدداً بارگذاری می‌شود.', 'info');
+                showMessageBox('سرویس وورکر یافت نشد یا غیرفعال بود. کش مرورگر پاک شده و صفحه مجدداً بارگذاری می‌شود.', 'info');
                 const cacheNames = await caches.keys();
                 await Promise.all(cacheNames.map(cacheName => caches.delete(cacheName))); // Clear all caches
                 setTimeout(() => {
@@ -2464,11 +2463,11 @@ confirmUpdateBtn.addEventListener('click', async () => {
                 }, 500);
             }
         } catch (error) {
-            console.error('بروزرسانی Service Worker با خطا مواجه شد:', error);
+            console.error('بروزرسانی سرویس وورکر  با خطا مواجه شد:', error);
             showMessageBox('خطا در بروزرسانی برنامه. لطفاً دوباره امتحان کنید.', 'error');
         }
     } else {
-        showMessageBox('مرورگر شما از سرویس پس‌زمینه (Service Worker) پشتیبانی نمی‌کند.', 'info');
+        showMessageBox('مرورگر شما از سرویس پس‌زمینه (سرویس وورکر) پشتیبانی نمی‌کند.', 'info');
     }
 });
 
