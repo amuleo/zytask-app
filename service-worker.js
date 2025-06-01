@@ -8,7 +8,7 @@
 // -----------------------------------------------------------------------------
 // تعریف متغیرهای اصلی
 // -----------------------------------------------------------------------------
-const CACHE_NAME = 'my-app-v1.0.7'; // نسخه جدید کش منابع استاتیک
+const CACHE_NAME = 'my-app-v1.1.0'; // نسخه جدید کش منابع استاتیک
 const API_CACHE_NAME = 'api-cache-v1'; // کش جداگانه برای پاسخ‌های API
 
 // حداکثر زمان نگهداری کش برای منابع غیر index (مثلاً API یا تصاویر): ۳۶۵ روز
@@ -18,6 +18,8 @@ const MAX_CACHE_AGE = 365 * 24 * 60 * 60 * 1000;
 const urlsToCache = [
   '/',               // فرض شده index.html از این مسیر ارائه می‌شود
   '/index.html',     // کش کردن صریح فایل HTML اصلی
+  '/script.js',      // کش کردن فایل اصلی جاوااسکریپت - اصلاح شده
+  '/style.css',      // کش کردن فایل اصلی CSS
   'https://cdn.tailwindcss.com',
   'https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@33.003/misc/Farsi-Digits/Vazirmatn-FD-font-face.css',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css',
@@ -178,7 +180,6 @@ self.addEventListener('fetch', (event) => {
         });
     })
   );
-});
 
 
 // فعال‌سازی Service Worker و پاکسازی کش‌های قدیمی
@@ -220,16 +221,15 @@ self.addEventListener('message', (event) => {
           'tasks',
           'zPoint',
           'level',
-          'dailyStreak',
-          'highestDailyStreak',
-          'lastCompletionDate',
           'totalCustomTasksCompleted',
           'userName',
           'userCreationDate',
           'unlockedAchievements',
           'achievementUnlockDates',
           'hasPinnedTaskEver',
-          'theme'
+          'currentMotivationIndex', // اضافه شده
+          'defaultCategories',      // اضافه شده
+          'theme'                   // اضافه شده
         ];
         console.log('[Service Worker] تمامی کش‌ها پاک شدند. لغو ثبت Service Worker و ارسال پیام به کلاینت...');
         return self.registration.unregister().then(() => {
