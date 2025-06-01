@@ -118,7 +118,7 @@ const motivationQuotes = [
     "تلاش امروز، موفقیت فرداست.",
     "بهترین سرمایه‌گذاری، خودتی.",
     "هر کار کوچیک، فرصت درخششه.",
-    "با تلاش، همه چی ممکنه.",
+    "با ت، همه چی ممکنه.",
     "قدرت انتخاب با خودته.",
     "بهترین زمان، همین حالاست.",
     "از منطقه امنت بیا بیرون.",
@@ -2438,7 +2438,7 @@ confirmUpdateBtn.addEventListener('click', async () => {
 
     if ('serviceWorker' in navigator) {
         try {
-            const registration = await navigator.serviceWorker.getRegistration();
+            const registration = await navigator.serviceWorker.ready;
             if (registration && registration.active) {
                 showMessageBox('بروزرسانی برنامه آغاز شد. لطفاً صبر کنید...', 'info');
                 // Send message to service worker to start deep update
