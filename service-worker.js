@@ -8,7 +8,7 @@
 // -----------------------------------------------------------------------------
 // تعریف متغیرهای اصلی
 // -----------------------------------------------------------------------------
-const CACHE_NAME = 'my-app-v1.4.0'; // نسخه جدید کش منابع استاتیک (افزایش نسخه برای اطمینان از بروزرسانی)
+const CACHE_NAME = 'my-app-v1.5.0'; // نسخه جدید کش منابع استاتیک (افزایش نسخه برای اطمینان از بروزرسانی)
 const API_CACHE_NAME = 'api-cache-v1'; // کش جداگانه برای پاسخ‌های API
 
 // حداکثر زمان نگهداری کش برای منابع غیر index (مثلاً API یا تصاویر): ۳۶۵ روز
@@ -78,7 +78,12 @@ self.addEventListener('install', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
-  const requestUrl = event.request.url;
+  const requestUrl = new URL(event.request.url); // Use URL object for easier path checking
+  // بررسی می‌کنیم که آیا درخواست مربوط به یکی از فایل‌های App Shell است یا خیر
+  const isAppShellAsset = urlsToCache.some(url => {
+    const appShellUrl = new URL(url, self.location.origin);
+    return requestUrl.pathname === appShellUrl.pathname || requestUrl.href === appShellUrl.href;
+  });
 
   // 1. استراتژی برای ناوبری (App Shell - index.html)
   // این بخش برای بارگذاری اولیه صفحه و اطمینان از سرعت و قابلیت آفلاین است.
@@ -119,7 +124,7 @@ self.addEventListener('fetch', (event) => {
 
   // 2. استراتژی برای API (Network First with Cache Fallback)
   // برای درخواست‌هایی که شامل '/api/' هستند.
-  if (requestUrl.includes('/api/')) {
+  if (requestUrl.pathname.includes('/api/')) { // Using pathname for /api/ check
     event.respondWith(
       caches.open(API_CACHE_NAME).then((cache) => {
         return fetch(event.request)
@@ -130,7 +135,7 @@ self.addEventListener('fetch', (event) => {
             return networkResponse;
           })
           .catch(() => {
-            console.warn('[Service Worker] درخواست API با شکست مواجه شد، بازگشت به کش:', requestUrl);
+            console.warn('[Service Worker] درخواست API با شکست مواجه شد، بازگشت به کش:', requestUrl.href);
             return cache.match(event.request); // Fallback به کش
           });
       })
@@ -138,22 +143,50 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 3. استراتژی برای سایر منابع (App Shell Assets & Dynamic Assets)
-  // این بخش شامل script.js, style.css و سایر منابع استاتیک و پویا می‌شود.
+  // 3. استراتژی برای App Shell Assets (Cache Only)
+  // این منابع باید همیشه از کش برگردانده شوند اگر در کش موجود باشند.
+  if (isAppShellAsset) {
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        if (cachedResponse) {
+          console.log('[Service Worker] سرویس‌دهی از کش (App Shell):', requestUrl.href);
+          return cachedResponse;
+        }
+        // اگر در کش نبود، از شبکه بگیر و کش کن (نباید اتفاق بیفتد اگر install موفق باشد)
+        console.warn('[Service Worker] منبع App Shell در کش یافت نشد، تلاش برای دریافت از شبکه:', requestUrl.href);
+        return fetch(event.request).then(networkResponse => {
+            if (networkResponse && networkResponse.ok) {
+                caches.open(CACHE_NAME).then(cache => {
+                    cache.put(event.request, networkResponse.clone());
+                });
+            }
+            return networkResponse;
+        }).catch(error => {
+            console.error('[Service Worker] خطا در دریافت منبع App Shell از شبکه:', error);
+            return new Response('Offline: App Shell resource not available', { status: 503, statusText: 'Service Unavailable' });
+        });
+      })
+    );
+    return;
+  }
+
+  // 4. استراتژی برای سایر منابع (Cache First with Expiry, then Network)
+  // این برای منابع پویا یا غیر App Shell است که نیاز به بروزرسانی دارند.
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      // اگر منبع جزو App Shell باشد (در urlsToCache)، همیشه از کش برگردان
-      if (urlsToCache.includes(requestUrl) && cachedResponse) {
+      if (cachedResponse && !isResponseExpired(cachedResponse, MAX_CACHE_AGE)) {
+        console.log('[Service Worker] سرویس‌دهی از کش (با بررسی انقضا):', requestUrl.href);
         return cachedResponse;
+      } else if (cachedResponse) {
+        console.log('[Service Worker] پاسخ کش شده منقضی شده است (غیر از App Shell):', requestUrl.href);
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.delete(event.request);
+        });
       }
 
-      // برای منابع غیر App Shell، تلاش برای دریافت از شبکه، با فال‌بک به کش.
-      // اگر نسخه کش شده منقضی شده باشد، سعی می‌کنیم از شبکه بگیریم.
-      // اگر شبکه در دسترس نباشد، از نسخه کش شده (حتی اگر منقضی شده باشد) استفاده می‌کنیم.
       const fetchPromise = fetch(event.request)
         .then((networkResponse) => {
           if (networkResponse && networkResponse.ok) {
-            // اگر پاسخ شبکه معتبر بود، آن را در کش ذخیره کن (برای منابع پویا)
             caches.open(CACHE_NAME).then((cache) => {
               cache.put(event.request, networkResponse.clone());
             });
@@ -161,20 +194,11 @@ self.addEventListener('fetch', (event) => {
           return networkResponse;
         })
         .catch(() => {
-          console.warn('[Service Worker] دریافت منبع با شکست مواجه شد، بازگشت به کش:', requestUrl);
-          // اگر شبکه شکست خورد، از نسخه کش شده برگردان (حتی اگر منقضی شده باشد)
-          return cachedResponse;
+          console.warn('[Service Worker] دریافت منبع با شکست مواجه شد، بازگشت به کش (فال‌بک نهایی):', requestUrl.href);
+          return cachedResponse; // Fallback to potentially expired cached response
         });
 
-      // اگر نسخه کش شده و غیر App Shell موجود بود و منقضی نشده بود، بلافاصله آن را برگردان.
-      // در غیر این صورت، یا از شبکه بگیر یا به فال‌بک کش (در fetchPromise) اعتماد کن.
-      if (cachedResponse && !isResponseExpired(cachedResponse, MAX_CACHE_AGE)) {
-        return cachedResponse;
-      } else {
-        // اگر کش شده منقضی شده یا اصلا وجود نداشت، از fetchPromise استفاده کن
-        // که هم تلاش شبکه را شامل می‌شود و هم فال‌بک به کش (در صورت شکست شبکه).
-        return fetchPromise;
-      }
+      return fetchPromise;
     })
   );
 });
