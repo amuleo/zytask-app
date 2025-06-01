@@ -1403,8 +1403,8 @@ function toggleTaskCompletion(taskId, taskItemElement) {
     if (taskIndex > -1) {
         const task = tasks[taskIndex];
 
+        // یادداشت‌ها از طریق چک‌باکس تکمیل نمی‌شوند، فقط از طریق منو خط می‌خورند.
         if (task.importance === 'note') {
-            // Notes are not completed via checkbox, only struck through via menu
             return;
         }
 
@@ -1412,32 +1412,39 @@ function toggleTaskCompletion(taskId, taskItemElement) {
         let focusAfterRender = null;
 
         if (!task.completed) {
-            // Completing a task
-            task.completed = true;
-            task.isPinned = false; // Unpin when completed
-            task.pinnedAt = null; // Clear pinned date
+            // تکمیل یک وظیفه
+            // ابتدا وظیفه را از موقعیت فعلی‌اش در آرایه حذف کنید.
+            tasks.splice(taskIndex, 1);
 
+            task.completed = true; // وظیفه را تکمیل شده علامت بزنید.
+            task.isPinned = false; // وقتی تکمیل می‌شود، پین آن را بردارید.
+            task.pinnedAt = null; // تاریخ پین شدن را پاک کنید.
+
+            // محاسبه پوینت‌های کسب شده
             if (task.importance === 'important') {
                 pointsGained = pointsPerImportantTask;
             } else if (task.importance === 'normal') {
                 pointsGained = pointsPerNormalTask;
-            }
-            else if (task.importance === 'custom' && task.customPoints) {
+            } else if (task.importance === 'custom' && task.customPoints) {
                 pointsGained = task.customPoints;
                 totalCustomTasksCompleted++;
             }
-            zPoint += pointsGained;
-            showMessageBox('وظیفه تکمیل شد!', 'success');
-            showPointsGainFeedback(pointsGained, taskItemElement);
+            zPoint += pointsGained; // پوینت‌ها را اضافه کنید.
+            showMessageBox('وظیفه تکمیل شد!', 'success'); // پیام موفقیت نمایش دهید.
+            showPointsGainFeedback(pointsGained, taskItemElement); // بازخورد بصری پوینت‌ها را نمایش دهید.
 
-            // Insert at the beginning of the completed tasks section
-            const active = tasks.filter(t => !t.completed);
-            const completed = tasks.filter(t => t.completed);
-            tasks = [...active, task, ...completed]; // Insert 'task' at the beginning of completed section
-            focusAfterRender = task.id;
+            // بازسازی آرایه tasks برای قرار دادن وظیفه تازه تکمیل شده
+            // در ابتدای بخش وظایف تکمیل شده.
+            const activeTasks = tasks.filter(t => !t.completed); // وظایف فعال فعلی
+            const otherCompletedTasks = tasks.filter(t => t.completed); // وظایف از قبل تکمیل شده
+            // آرایه tasks را به این صورت بازسازی کنید: وظایف فعال، سپس وظیفه تازه تکمیل شده، سپس بقیه وظایف تکمیل شده.
+            tasks = [...activeTasks, task, ...otherCompletedTasks];
+
+            focusAfterRender = task.id; // برای فوکوس پس از رندر، ID وظیفه را نگه دارید.
 
         } else {
-            // Un-completing (restoring) a task
+            // بازگرداندن (لغو تکمیل) یک وظیفه
+            // پوینت‌های کسر شده را محاسبه کنید.
             let pointsDeducted = 0;
             if (task.importance === 'important') {
                 pointsDeducted = pointsPerImportantTask;
@@ -1447,33 +1454,28 @@ function toggleTaskCompletion(taskId, taskItemElement) {
                 pointsDeducted = task.customPoints;
                 totalCustomTasksCompleted--;
             }
-            zPoint -= pointsDeducted;
-            if (zPoint < 0) zPoint = 0;
+            zPoint -= pointsDeducted; // پوینت‌ها را کسر کنید.
+            if (zPoint < 0) zPoint = 0; // اطمینان حاصل کنید که پوینت‌ها منفی نمی‌شوند.
 
-            // Create a new task to simulate "restoring" to active list
-            // This creates a new ID, ensuring it's treated as a new active task at the end
-            const newActiveTask = {
-                id: Date.now().toString(),
-                name: task.name,
-                completed: false,
-                importance: task.importance,
-                customPoints: task.customPoints,
-                isPinned: false,
-                pinnedAt: null
-            };
+            // شیء وظیفه موجود را اصلاح کنید (به جای ایجاد یک شیء جدید)
+            task.completed = false; // وظیفه را به حالت فعال برگردانید.
+            task.isPinned = false; // اطمینان حاصل کنید که وقتی بازگردانی می‌شود پین نیست.
+            task.pinnedAt = null;
 
-            // Remove the old completed task
+            // وظیفه را از موقعیت فعلی‌اش (بخش تکمیل شده) حذف کنید.
             tasks.splice(taskIndex, 1);
-            // Add the new active task to the end of the list
-            tasks.push(newActiveTask);
-            focusAfterRender = newActiveTask.id;
+            // آن را دوباره به انتهای آرایه tasks اضافه کنید (به عنوان یک وظیفه فعال).
+            // تابع renderTasks مسئول مرتب‌سازی آن در لیست فعال خواهد بود.
+            tasks.push(task);
+            focusAfterRender = task.id; // برای فوکوس پس از رندر، ID وظیفه اصلی را نگه دارید.
 
-            showMessageBox(`وظیفه بازنشانی شد!`, 'success');
+            showMessageBox(`وظیفه بازنشانی شد!`, 'success'); // پیام بازنشانی نمایش دهید.
         }
-        saveToLocalStorage();
-        renderTasks(focusAfterRender);
+        saveToLocalStorage(); // داده‌ها را در Local Storage ذخیره کنید.
+        renderTasks(focusAfterRender); // رابط کاربری را دوباره رندر کنید.
     }
 }
+
 
 function pinTask(taskId) {
     const taskIndex = tasks.findIndex(t => t.id === taskId);
