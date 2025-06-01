@@ -8,17 +8,17 @@
 // -----------------------------------------------------------------------------
 // تعریف متغیرهای اصلی
 // -----------------------------------------------------------------------------
-const CACHE_NAME = 'my-app-v1.1.0'; // نسخه جدید کش منابع استاتیک
+const CACHE_NAME = 'my-app-v1.2.0'; // نسخه جدید کش منابع استاتیک (افزایش نسخه برای اطمینان از بروزرسانی)
 const API_CACHE_NAME = 'api-cache-v1'; // کش جداگانه برای پاسخ‌های API
 
 // حداکثر زمان نگهداری کش برای منابع غیر index (مثلاً API یا تصاویر): ۳۶۵ روز
 const MAX_CACHE_AGE = 365 * 24 * 60 * 60 * 1000;
 
-// لیست URL‌هایی که در هنگام نصب کش می‌شوند
+// لیست URL‌هایی که در هنگام نصب کش می‌شوند (App Shell)
 const urlsToCache = [
   '/',               // فرض شده index.html از این مسیر ارائه می‌شود
   '/index.html',     // کش کردن صریح فایل HTML اصلی
-  '/script.js',      // کش کردن فایل اصلی جاوااسکریپت - اصلاح شده
+  '/script.js',      // کش کردن فایل اصلی جاوااسکریپت
   '/style.css',      // کش کردن فایل اصلی CSS
   'https://cdn.tailwindcss.com',
   'https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@33.003/misc/Farsi-Digits/Vazirmatn-FD-font-face.css',
@@ -32,7 +32,7 @@ const urlsToCache = [
 ];
 
 // -----------------------------------------------------------------------------
-// NEW FEATURE: تابع کمکی برای بررسی انقضای کش برای منابع غیر از index.html
+// تابع کمکی برای بررسی انقضای کش
 // -----------------------------------------------------------------------------
 function isResponseExpired(response, maxAge) {
   if (!response) return true;
@@ -49,20 +49,22 @@ function isResponseExpired(response, maxAge) {
 
 
 // -----------------------------------------------------------------------------
-// کدهای اصلی (تقریباً ۲۰۰ خط) – دست نخورده حفظ شده و سپس ویژگی‌های جدید اضافه شده‌اند
+// کدهای اصلی Service Worker
 // -----------------------------------------------------------------------------
 
-// نصب Service Worker و کش کردن منابع اولیه
+// نصب Service Worker و کش کردن منابع اولیه (App Shell)
 self.addEventListener('install', (event) => {
   console.log('[Service Worker] در حال نصب...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('[Service Worker] در حال کش کردن منابع ضروری...');
+        console.log('[Service Worker] در حال کش کردن منابع ضروری (App Shell)...');
         return cache.addAll(urlsToCache);
       })
       .catch(error => {
         console.error('خطا در افزودن URL‌ها به کش در حین نصب:', error);
+        // در صورت شکست، نصب Service Worker با خطا مواجه می‌شود
+        throw error;
       })
   );
 });
@@ -71,115 +73,111 @@ self.addEventListener('install', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
-  // =============================
-  // بخش navigational (درخواست‌های بارگیری صفحه)
-  // =============================
+  const requestUrl = event.request.url;
+
+  // 1. استراتژی برای ناوبری (App Shell - index.html)
+  // این بخش برای بارگذاری اولیه صفحه و اطمینان از سرعت و قابلیت آفلاین است.
   if (event.request.mode === 'navigate') {
     event.respondWith(
       caches.open(CACHE_NAME).then((cache) => {
         return cache.match('/index.html').then((cachedIndex) => {
-          if (cachedIndex) {
-            // اگر index.html در کش موجود بود، آن را بازگردانیم
-            // در پس‌زمینه نسخه جدید از شبکه دریافت و به‌روز می‌شود
-            event.waitUntil(
-              fetch(event.request)
-                .then((networkResponse) => {
-                  if (networkResponse && networkResponse.ok) {
-                    cache.put('/index.html', networkResponse.clone());
-                  }
-                })
-                .catch(() => {
-                  // در صورت شکست شبکه، مشکلی نیست؛ از نسخه cached استفاده می‌شود
-                })
-            );
-            return cachedIndex;
-          }
-          // اگر index.html در کش موجود نباشد، تلاش برای دریافت از شبکه
-          return fetch(event.request)
-            .then((networkResponse) => {
-              if (networkResponse && networkResponse.ok) {
-                cache.put('/index.html', networkResponse.clone());
-              }
-              return networkResponse;
-            })
-            .catch(() => {
-              // در صورتی که حتی شبکه هم در دسترس نباشد، سعی می‌کنیم دوباره index.html را از کش برگردانیم
-              return cache.match('/index.html');
+          const fetchAndCache = fetch(event.request).then((networkResponse) => {
+            // اگر پاسخ شبکه معتبر بود، آن را در کش بروزرسانی کن
+            if (networkResponse && networkResponse.ok) {
+              cache.put('/index.html', networkResponse.clone());
+            }
+            return networkResponse;
+          }).catch((error) => {
+            console.error('خطا در دریافت index.html از شبکه:', error);
+            // در صورت شکست شبکه، اگر نسخه کش شده‌ای بود، آن را برگردان
+            return cachedIndex || new Response('<h1>Offline</h1><p>The application is offline and the requested page is not in cache.</p>', {
+              headers: { 'Content-Type': 'text/html' },
+              status: 503,
+              statusText: 'Service Unavailable'
             });
+          });
+
+          // اگر index.html در کش موجود بود، بلافاصله آن را برگردان
+          // و در پس‌زمینه نسخه جدید را از شبکه دریافت و کش را بروزرسانی کن.
+          if (cachedIndex) {
+            event.waitUntil(fetchAndCache); // بروزرسانی کش در پس‌زمینه
+            return cachedIndex;
+          } else {
+            // اگر در کش نبود، از شبکه بگیر و کش کن
+            return fetchAndCache;
+          }
         });
       })
     );
     return;
   }
 
-  // =============================
-  // مدیریت درخواست‌های API (URL هایی که '/api/' در آنها وجود دارد)
-  // =============================
-  if (event.request.url.includes('/api/')) {
+  // 2. استراتژی برای API (Network First with Cache Fallback)
+  // برای درخواست‌هایی که شامل '/api/' هستند.
+  if (requestUrl.includes('/api/')) {
     event.respondWith(
       caches.open(API_CACHE_NAME).then((cache) => {
-        return cache.match(event.request).then((cachedResponse) => {
-
-          // بررسی انقضای پاسخ کش شده API برای منابع غیر index
-          if (cachedResponse && isResponseExpired(cachedResponse, MAX_CACHE_AGE)) {
-            console.log('[Service Worker] پاسخ API کش شده منقضی شده است:', event.request.url);
-            cache.delete(event.request);
-            cachedResponse = null;
-          }
-
-          const networkPromise = fetch(event.request)
-            .then((networkResponse) => {
-              if (networkResponse && networkResponse.ok) {
-                cache.put(event.request.clone(), networkResponse.clone());
-              }
-              return networkResponse;
-            })
-            .catch(() => {
-              console.warn('[Service Worker] درخواست API با شکست مواجه شد، بازگشت به کش:', event.request.url);
-              return cachedResponse;
-            });
-          return cachedResponse || networkPromise;
-        });
+        return fetch(event.request)
+          .then((networkResponse) => {
+            if (networkResponse && networkResponse.ok) {
+              cache.put(event.request.clone(), networkResponse.clone());
+            }
+            return networkResponse;
+          })
+          .catch(() => {
+            console.warn('[Service Worker] درخواست API با شکست مواجه شد، بازگشت به کش:', requestUrl);
+            return cache.match(event.request); // Fallback به کش
+          });
       })
     );
     return;
   }
 
-  // =============================
-  // مدیریت درخواست‌های سایر منابع (مانند CSS، تصاویر و غیره)
-  // =============================
+  // 3. استراتژی برای سایر منابع (App Shell Assets & Dynamic Assets)
+  // این بخش شامل script.js, style.css و سایر منابع استاتیک و پویا می‌شود.
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse && !isResponseExpired(cachedResponse, MAX_CACHE_AGE)) {
+      // اگر منبع جزو App Shell باشد (در urlsToCache)، همیشه از کش برگردان
+      // این بخش تضمین می‌کند که فایل‌های اصلی برنامه همیشه آفلاین در دسترس باشند.
+      if (urlsToCache.includes(requestUrl) && cachedResponse) {
         return cachedResponse;
-      } else if (cachedResponse) {
-        console.log('[Service Worker] پاسخ کش شده منقضی شده است:', event.request.url);
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.delete(event.request);
-        });
       }
+
+      // اگر منبع در کش بود اما جزو App Shell نبود، بررسی انقضا
+      // این برای منابعی است که ممکن است نیاز به بروزرسانی مکرر داشته باشند.
+      if (cachedResponse && isResponseExpired(cachedResponse, MAX_CACHE_AGE)) {
+        console.log('[Service Worker] پاسخ کش شده منقضی شده است (غیر از App Shell):', requestUrl);
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.delete(event.request); // حذف نسخه منقضی شده
+        });
+        cachedResponse = null; // برای اطمینان از اینکه از آن استفاده نمی‌شود
+      }
+
+      // تلاش برای دریافت از شبکه
       const fetchRequest = event.request.clone();
       return fetch(fetchRequest)
         .then((networkResponse) => {
           if (!networkResponse || !networkResponse.ok) {
-            return networkResponse;
+            return networkResponse; // اگر پاسخ شبکه معتبر نبود (مثلاً 404 یا 500)
           }
-          // برای منابعی که در لیست urlsToCache نیستند، نسخه پویا در کش ذخیره می‌شود.
-          if (!urlsToCache.includes(event.request.url)) {
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, networkResponse.clone());
-            }).catch((cacheError) => {
-              console.error('خطا در قرار دادن پاسخ پویا در کش:', cacheError);
-            });
-          }
+          // کش کردن پاسخ معتبر شبکه (برای منابع پویا یا بروزرسانی App Shell)
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, networkResponse.clone());
+          }).catch((cacheError) => {
+            console.error('خطا در قرار دادن پاسخ پویا در کش:', cacheError);
+          });
           return networkResponse;
         })
         .catch((error) => {
-          console.error('دریافت اطلاعات با شکست مواجه شد؛ تلاش برای استفاده از کش:', error);
-          return caches.match(event.request);
+          console.error('دریافت اطلاعات با شکست مواجه شد؛ تلاش برای استفاده از کش (فال‌بک نهایی):', error);
+          // اگر شبکه شکست خورد و cachedResponse معتبر (غیر منقضی یا App Shell) نبود،
+          // سعی کن از آخرین نسخه کش شده (حتی اگر منقضی شده باشد) استفاده کنی.
+          // این یک فال‌بک نهایی برای اطمینان از بارگذاری است.
+          return cachedResponse || new Response('Offline: Resource not available', { status: 503, statusText: 'Service Unavailable' });
         });
     })
   );
+});
 
 
 // فعال‌سازی Service Worker و پاکسازی کش‌های قدیمی
@@ -198,7 +196,7 @@ self.addEventListener('activate', (event) => {
       );
     }).then(() => {
       console.log('[Service Worker] در حال تصاحب کلاینت‌ها...');
-      return self.clients.claim();
+      return self.clients.claim(); // این تضمین می‌کند که Service Worker بلافاصله کنترل صفحه را در دست بگیرد.
     })
   );
 });
@@ -217,6 +215,7 @@ self.addEventListener('message', (event) => {
           })
         );
       }).then(() => {
+        // لیست کلیدهای Local Storage که باید در طول بروزرسانی حفظ شوند.
         const keysToPreserve = [
           'tasks',
           'zPoint',
@@ -227,9 +226,9 @@ self.addEventListener('message', (event) => {
           'unlockedAchievements',
           'achievementUnlockDates',
           'hasPinnedTaskEver',
-          'currentMotivationIndex', // اضافه شده
-          'defaultCategories',      // اضافه شده
-          'theme'                   // اضافه شده
+          'currentMotivationIndex',
+          'defaultCategories',
+          'theme'
         ];
         console.log('[Service Worker] تمامی کش‌ها پاک شدند. لغو ثبت Service Worker و ارسال پیام به کلاینت...');
         return self.registration.unregister().then(() => {
