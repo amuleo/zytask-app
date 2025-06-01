@@ -2438,8 +2438,9 @@ confirmUpdateBtn.addEventListener('click', async () => {
 
     if ('serviceWorker' in navigator) {
         try {
-            const registration = await navigator.serviceWorker.ready;
-            if (registration && registration.active) {
+            const registration = await navigator.serviceWorker.getRegistration();
+            if (registration) {
+				 registration = await navigator.serviceWorker.ready;
                 showMessageBox('بروزرسانی برنامه آغاز شد. لطفاً صبر کنید...', 'info');
                 // Send message to service worker to start deep update
                 registration.active.postMessage({ type: 'START_DEEP_UPDATE' });
