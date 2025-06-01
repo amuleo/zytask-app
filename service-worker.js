@@ -8,7 +8,7 @@
 // -----------------------------------------------------------------------------
 // تعریف متغیرهای اصلی
 // -----------------------------------------------------------------------------
-const CACHE_NAME = 'my-app-v1.2.0'; // نسخه جدید کش منابع استاتیک (افزایش نسخه برای اطمینان از بروزرسانی)
+const CACHE_NAME = 'my-app-v1.3.0'; // نسخه جدید کش منابع استاتیک (افزایش نسخه برای اطمینان از بروزرسانی)
 const API_CACHE_NAME = 'api-cache-v1'; // کش جداگانه برای پاسخ‌های API
 
 // حداکثر زمان نگهداری کش برای منابع غیر index (مثلاً API یا تصاویر): ۳۶۵ روز
@@ -65,6 +65,11 @@ self.addEventListener('install', (event) => {
         console.error('خطا در افزودن URL‌ها به کش در حین نصب:', error);
         // در صورت شکست، نصب Service Worker با خطا مواجه می‌شود
         throw error;
+      })
+      .finally(() => {
+        // این تضمین می‌کند که Service Worker جدید بلافاصله پس از نصب فعال شود.
+        // بدون این، Service Worker جدید تا زمانی که تمام تب‌های قدیمی بسته نشوند، فعال نمی‌شود.
+        self.skipWaiting();
       })
   );
 });
@@ -138,43 +143,38 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       // اگر منبع جزو App Shell باشد (در urlsToCache)، همیشه از کش برگردان
-      // این بخش تضمین می‌کند که فایل‌های اصلی برنامه همیشه آفلاین در دسترس باشند.
       if (urlsToCache.includes(requestUrl) && cachedResponse) {
         return cachedResponse;
       }
 
-      // اگر منبع در کش بود اما جزو App Shell نبود، بررسی انقضا
-      // این برای منابعی است که ممکن است نیاز به بروزرسانی مکرر داشته باشند.
-      if (cachedResponse && isResponseExpired(cachedResponse, MAX_CACHE_AGE)) {
-        console.log('[Service Worker] پاسخ کش شده منقضی شده است (غیر از App Shell):', requestUrl);
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.delete(event.request); // حذف نسخه منقضی شده
-        });
-        cachedResponse = null; // برای اطمینان از اینکه از آن استفاده نمی‌شود
-      }
-
-      // تلاش برای دریافت از شبکه
-      const fetchRequest = event.request.clone();
-      return fetch(fetchRequest)
+      // برای منابع غیر App Shell، تلاش برای دریافت از شبکه، با فال‌بک به کش.
+      // اگر نسخه کش شده منقضی شده باشد، سعی می‌کنیم از شبکه بگیریم.
+      // اگر شبکه در دسترس نباشد، از نسخه کش شده (حتی اگر منقضی شده باشد) استفاده می‌کنیم.
+      const fetchPromise = fetch(event.request)
         .then((networkResponse) => {
-          if (!networkResponse || !networkResponse.ok) {
-            return networkResponse; // اگر پاسخ شبکه معتبر نبود (مثلاً 404 یا 500)
+          if (networkResponse && networkResponse.ok) {
+            // اگر پاسخ شبکه معتبر بود، آن را در کش ذخیره کن (برای منابع پویا)
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, networkResponse.clone());
+            });
           }
-          // کش کردن پاسخ معتبر شبکه (برای منابع پویا یا بروزرسانی App Shell)
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, networkResponse.clone());
-          }).catch((cacheError) => {
-            console.error('خطا در قرار دادن پاسخ پویا در کش:', cacheError);
-          });
           return networkResponse;
         })
-        .catch((error) => {
-          console.error('دریافت اطلاعات با شکست مواجه شد؛ تلاش برای استفاده از کش (فال‌بک نهایی):', error);
-          // اگر شبکه شکست خورد و cachedResponse معتبر (غیر منقضی یا App Shell) نبود،
-          // سعی کن از آخرین نسخه کش شده (حتی اگر منقضی شده باشد) استفاده کنی.
-          // این یک فال‌بک نهایی برای اطمینان از بارگذاری است.
-          return cachedResponse || new Response('Offline: Resource not available', { status: 503, statusText: 'Service Unavailable' });
+        .catch(() => {
+          console.warn('[Service Worker] دریافت منبع با شکست مواجه شد، بازگشت به کش:', requestUrl);
+          // اگر شبکه شکست خورد، از نسخه کش شده برگردان (حتی اگر منقضی شده باشد)
+          return cachedResponse;
         });
+
+      // اگر نسخه کش شده و غیر App Shell موجود بود و منقضی نشده بود، بلافاصله آن را برگردان.
+      // در غیر این صورت، یا از شبکه بگیر یا به فال‌بک کش (در fetchPromise) اعتماد کن.
+      if (cachedResponse && !isResponseExpired(cachedResponse, MAX_CACHE_AGE)) {
+        return cachedResponse;
+      } else {
+        // اگر کش شده منقضی شده یا اصلا وجود نداشت، از fetchPromise استفاده کن
+        // که هم تلاش شبکه را شامل می‌شود و هم فال‌بک به کش (در صورت شکست شبکه).
+        return fetchPromise;
+      }
     })
   );
 });
@@ -196,7 +196,8 @@ self.addEventListener('activate', (event) => {
       );
     }).then(() => {
       console.log('[Service Worker] در حال تصاحب کلاینت‌ها...');
-      return self.clients.claim(); // این تضمین می‌کند که Service Worker بلافاصله کنترل صفحه را در دست بگیرد.
+      // این تضمین می‌کند که Service Worker بلافاصله کنترل صفحه را در دست بگیرد.
+      self.clients.claim();
     })
   );
 });
@@ -230,17 +231,18 @@ self.addEventListener('message', (event) => {
           'defaultCategories',
           'theme'
         ];
-        console.log('[Service Worker] تمامی کش‌ها پاک شدند. لغو ثبت Service Worker و ارسال پیام به کلاینت...');
-        return self.registration.unregister().then(() => {
-          self.clients.matchAll().then((clients) => {
-            clients.forEach((client) => {
-              client.postMessage({
-                type: 'PERFORM_LOCAL_STORAGE_CLEANUP_AND_RELOAD',
-                keysToPreserve: keysToPreserve
-              });
+        console.log('[Service Worker] تمامی کش‌ها پاک شدند. ارسال پیام به کلاینت برای پاکسازی Local Storage و بارگذاری مجدد...');
+        self.clients.matchAll().then((clients) => {
+          clients.forEach((client) => {
+            client.postMessage({
+              type: 'PERFORM_LOCAL_STORAGE_CLEANUP_AND_RELOAD',
+              keysToPreserve: keysToPreserve
             });
           });
         });
+        // توجه: در این رویکرد، Service Worker خود را unregister نمی‌کنیم.
+        // بلکه کش‌ها را پاک کرده و به کلاینت دستور بارگذاری مجدد می‌دهیم.
+        // این باعث می‌شود Service Worker فعال بماند و کنترل را از دست ندهد.
       })
     );
   }
