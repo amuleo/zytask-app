@@ -63,24 +63,21 @@ self.addEventListener('fetch', (event) => {
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
+      // اگر درخواست در کش موجود باشد، آن را برگردان
       if (cachedResponse) {
-        // اگر درخواست در کش موجود باشد، همان را برگردان
         return cachedResponse;
-      } else if (event.request.mode === 'navigate') {
-        // برای درخواست‌های ناوبری (صفحه اصلی) سعی می‌شود index.html از کش ارائه شود
-        return caches.match('/index.html').then((response) => {
-          return response || new Response('اپلیکیشن در حالت آفلاین اجرا می‌شود', {
-            status: 503,
-            statusText: 'Service Unavailable',
-          });
-        });
-      } else {
-        // در صورت عدم یافتن موردی در کش، پیغام آفلاین ارائه می‌شود
-        return new Response('اپلیکیشن در حالت آفلاین اجرا می‌شود', {
-          status: 503,
-          statusText: 'Service Unavailable',
-        });
       }
+      
+      // اگر درخواست مربوط به ناوبری (صفحه) باشد، به صورت مستقیم index.html را برمی‌گردانیم
+      if (event.request.mode === 'navigate') {
+        return caches.match('/index.html');
+      }
+      
+      // در بقیه موارد، اگر چیزی در کش یافت نشد، یک پاسخ خطای آفلاین بازگردانده می‌شود
+      return new Response('اپلیکیشن در حالت آفلاین اجرا می‌شود', {
+        status: 503,
+        statusText: 'Service Unavailable',
+      });
     })
   );
 });
